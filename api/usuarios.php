@@ -61,7 +61,7 @@ switch ($method) {
         }
         
         // Usar consulta preparada para mayor seguridad
-        $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, 2)");
         //$stmt->bind_param("sss", $nombre, $email, $hashedPassword);
         $stmt->bind_param("sss", $nombre, $email, $plainPassword);
         

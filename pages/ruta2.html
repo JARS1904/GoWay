@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rutas - Transporte Público</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style2.css">
 </head>
 <body>
     <div class="container">
-        <!-- Menú Lateral -->
-        <aside class="sidebar">
+        <aside id="sidebar" class="sidebar">
             <div class="logo">
                 <img src="../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
                 <h1>GoWay</h1>
@@ -79,7 +78,6 @@
                 </ul>
             </nav>
 
-            <!-- Botón de Cerrar Sesión -->
             <div class="logout-button">
                 <a href="login.php" id="logout">
                     <img src="../assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesión" class="icon"> 
@@ -88,9 +86,9 @@
             </div>
         </aside>
 
-        <!-- Contenido Principal -->
         <main class="main-content">
             <header class="header">
+                        <button class="toggle-btn" onclick="toggleSidebar()">☰</button>    
                 <h2>Gestión de Rutas</h2>
                 <div class="user-info">
                     <span>Admin</span>
@@ -99,54 +97,67 @@
 
             <section class="content">
                 <h3>Lista de Rutas</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Calle de salida</th>
-                            <th>Colonia de salida</th>
-                            <th>Calle de llegada</th>
-                            <th>Colonia de llegada</th>
-                            <th>Ciudad de llegada</th>
-                            <th>Tiempo de recorrido</th>
-                            <th>RFC de la empresa</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Ruta 1</td>
-                            <td>Av. Revolución</td>
-                            <td>Centro</td>
-                            <td>Calle Juárez</td>
-                            <td>Zona Rosa</td>
-                            <td>Ciudad de México</td>
-                            <td>25 minutos</td>
-                            <td>EMP123456789</td>
-                            <td>
-                                <button class="btn-action btn-edit">Editar</button>
-                                <button class="btn-action btn-delete">Eliminar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Ruta 2</td>
-                            <td>Blvd. López Mateos</td>
-                            <td>Las Palmas</td>
-                            <td>Av. Hidalgo</td>
-                            <td>San Ángel</td>
-                            <td>Guadalajara</td>
-                            <td>40 minutos</td>
-                            <td>EMP987654321</td>
-                            <td>
-                                <button class="btn-action btn-edit">Editar</button>
-                                <button class="btn-action btn-delete">Eliminar</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Calle de salida</th>
+                                <th>Colonia de salida</th>
+                                <th class="desktop-only">Calle de llegada</th>
+                                <th class="desktop-only">Colonia de llegada</th>
+                                <th class="desktop-only">Ciudad de llegada</th>
+                                <th>Tiempo de recorrido</th>
+                                <th>RFC de la empresa</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Ruta 1</td>
+                                <td>Av. Revolución</td>
+                                <td>Centro</td>
+                                <td class="desktop-only">Calle Juárez</td>
+                                <td class="desktop-only">Zona Rosa</td>
+                                <td class="desktop-only">Ciudad de México</td>
+                                <td>25 minutos</td>
+                                <td>EMP123456789</td>
+                                <td>
+                                    <button class="btn-action btn-edit">Editar</button>
+                                    <button class="btn-action btn-delete">Eliminar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ruta 2</td>
+                                <td>Blvd. López Mateos</td>
+                                <td>Las Palmas</td>
+                                <td class="desktop-only">Av. Hidalgo</td>
+                                <td class="desktop-only">San Ángel</td>
+                                <td class="desktop-only">Guadalajara</td>
+                                <td>40 minutos</td>
+                                <td>EMP987654321</td>
+                                <td>
+                                    <button class="btn-action btn-edit">Editar</button>
+                                    <button class="btn-action btn-delete">Eliminar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                
+
                 <button class="btn-add">Agregar nueva ruta</button>
             </section>
         </main>
     </div>
+
+    <script>
+        function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+        }
+    </script>
+    
 </body>
 </html>

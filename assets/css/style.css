@@ -147,10 +147,10 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    background-color: #fff;
+    /*background-color: #fff;*/ /*Color blanco del titulo de pantallas*/
     padding: 15px 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);*/ /*Sombra del titulo de pantallas*/
 }
 
 .header h2 {
@@ -181,10 +181,10 @@ body {
 /* Tarjetas */
 /* ==================== */
 .content {
-    background-color: #fff;
+    /*background-color: #fff;*/ /* Color blanco del contenedor de las tablas */
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);*/ /* Sombra del contenedor de las tablas */
 }
 
 .content h3 {
@@ -200,6 +200,8 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: max-content;
+    display: inline-block;
 }
 
 .card:hover {
@@ -213,11 +215,15 @@ body {
     color: #3b82f6; /* Azul vibrante */
 }
 
+
 .card p {
     margin: 5px 0;
     font-size: 14px;
     color: #666;
 }
+
+
+
 
 /* ==================== */
 /* Tabla General */
@@ -262,6 +268,13 @@ body {
 .data-table tr:nth-child(even) {
     background-color: #f9f9f9;
 }
+
+
+
+
+
+
+
 
 /* ==================== */
 /* Botones de Acción */
@@ -322,12 +335,7 @@ body {
 /* ==================== */
 /* Responsividad */
 /* ==================== */
-@media (max-width: 768px) {
-    .data-table {
-        display: block;
-        overflow-x: auto;
-    }
-}
+
 
 /* ==================== */
 /* Estilos para Login y Registro */
@@ -451,3 +459,584 @@ body {
     border-left: 4px solid #d32f2f;
     font-size: 14px;
 }
+
+
+
+
+
+
+
+
+/* ==================== */
+/* responsividad para movil con el sidebar y header */
+/* ==================== */
+/* Esconde el toggle en escritorio, muestra en móvil */
+.toggle-btn {
+
+    width: 40px;
+    height: 45px;
+    display: none;
+    font-size: 24px;
+    background-color: #0660fe;
+    color: white;
+    padding: 1px;
+    border: none;
+    border-radius: 10px;
+    z-index: 1001;
+    cursor: pointer;
+    margin-right: 15px; /* Espacio con el título */
+  }
+
+  /* Sidebar estilo por defecto en escritorio */
+.sidebar {
+    display: block;
+  }
+
+
+
+
+
+@media (max-width: 768px) {
+
+    .logo{
+        margin-left: 70px;
+        margin-top: 12.5px;
+    }
+
+    .header{
+        justify-content: center;
+        width: max-content;
+        padding: 15px 20px;
+        margin-inline:5px;
+    }
+    .content{
+        margin-inline:5px;
+
+    }
+
+    .toggle-btn  {
+            display: block;
+        }
+
+    .sidebar {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #ecf5fc;
+            width: 250px;
+            height: 100%;
+            z-index: 1000;
+            padding: 20px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            display: block;
+
+
+        }
+
+    .sidebar.active {
+            display: block;
+            transform: translateX(0%);
+        }
+
+}
+
+
+
+/* ==================== */
+/* Estilos para el Modal */
+/* ==================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 700px; /* Aumentamos el ancho máximo */
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.modal-overlay.active .modal-container {
+    transform: translateY(0);
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #3b82f6;
+    color: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+}
+
+.modal-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas */
+    gap: 20px; /* Espacio entre columnas */
+}
+
+.modal-form-group {
+    margin-bottom: 15px;
+}
+
+.modal-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+}
+
+.modal-form-group input,
+.modal-form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background-color: #f9f9f9;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.modal-btn-cancel {
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+.modal-btn-cancel:hover {
+    background-color: #e0e0e0;
+}
+
+.modal-btn-save {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.modal-btn-save:hover {
+    background-color: #2563eb;
+}
+
+/* Responsive: en móviles volver a una columna */
+@media (max-width: 600px) {
+    .modal-body {
+        grid-template-columns: 1fr;
+    }
+}
+
+.modal-form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    min-height: 80px;
+    resize: vertical;
+    font-family: 'Arial', sans-serif;
+}
+
+
+
+/* ==================== */
+/* TABLAS RESPONSIVE CON TARJETAS */
+/* ==================== */
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos base para tablas */
+.data-table {
+    min-width: 600px;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.data-table th,
+.data-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.data-table th {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table tr:hover {
+    background-color: #f8fafc;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+.data-table td {
+    color: #475569;
+    font-size: 14px;
+}
+
+/* Estilos para la celda de acciones */
+.data-table td:last-child {
+    display: flex;
+    gap: 8px;
+}
+
+/* Filas alternas */
+.data-table tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+.data-table tr:nth-child(even):hover {
+    background-color: #f1f5f9;
+}
+
+/* ==================== */
+/* MODO TARJETA ELEGANTE PARA MÓVILES */
+/* ==================== */
+
+@media (max-width: 768px) {
+    /* Eliminar el contenedor que "encierra" las tarjetas */
+    .table-responsive {
+        overflow-x: visible;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+        border-radius: 0;
+        margin-bottom: 0;
+    }
+
+    .data-table {
+        display: block;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        min-width: 100%;
+    }
+
+    .data-table thead {
+        display: none;
+    }
+
+    .data-table tbody {
+        display: block;
+        width: 100%;
+    }
+
+    .data-table tr {
+        display: block;
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 0;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .data-table tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .data-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        border: none;
+        border-bottom: 1px solid #f1f5f9;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .data-table td:last-child {
+        border-bottom: none;
+        justify-content: center;
+        gap: 10px;
+        padding: 16px;
+        background: #f9f9f9;
+        flex-wrap: wrap;
+    }
+
+    /* Encabezado de la tarjeta (primera celda) */
+    .data-table td:first-child {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 16px 18px;
+        border-bottom: none;
+    }
+
+    .data-table td:first-child::before {
+        content: "📋 ";
+        font-weight: 500;
+    }
+
+    /* Estilos para las etiquetas */
+    .data-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #64748b;
+        margin-right: 10px;
+        flex-shrink: 0;
+        font-size: 12px;
+        background: #f1f5f9;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+
+    /* Ocultar etiqueta en celdas especiales */
+    .data-table td:first-child::before {
+        background: transparent;
+        padding: 0;
+    }
+    
+    .data-table td:last-child::before {
+        display: none;
+    }
+
+    /* Valor de la celda con ancho flexible */
+    .data-table td {
+        font-size: 14px;
+        color: #475569;
+    }
+
+    /* Mejora los botones en móvil */
+    .data-table .btn-action {
+        padding: 10px 18px;
+        font-size: 13px;
+        min-width: 100px;
+        flex: 0 1 auto;
+        text-align: center;
+        border-radius: 15px;
+        font-weight: normal;
+        transition: all 0.3s ease;
+        box-shadow: none;
+        margin: 0;
+    }
+
+    .btn-edit {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+    }
+
+    .btn-delete {
+        background: #f44336;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #e53935;
+        transform: translateY(-2px);
+    }
+}
+
+
+/* ==================== */
+/* MEJORAS PARA PANTALLAS PEQUEÑAS */
+/* ==================== */
+
+@media (max-width: 480px) {
+    .data-table tr {
+        margin-bottom: 16px;
+        border-radius: 14px;
+    }
+
+    .data-table td {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 16px;
+        gap: 8px;
+    }
+
+    .data-table td::before {
+        width: 95%;
+        font-size: 12px;
+        background: #e2e8f0;
+        margin-right: 0;
+        padding: 6px 8px;
+    }
+
+    .data-table td:last-child {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 16px;
+    }
+
+    .data-table .btn-action {
+        padding: 10px 16px;
+        font-size: 13px;
+        border-radius: 10px;
+    }
+
+    .data-table td:first-child {
+        padding: 18px 16px;
+        font-size: 15px;
+    }
+
+    .content {
+        padding: 16px;
+    }
+
+    .content h3 {
+        font-size: 18px;
+        color: #1e293b;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+}
+
+/* ==================== */
+/* ANIMACIONES Y EFECTOS */
+/* ==================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.data-table tr {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.data-table tr:nth-child(1) { animation-delay: 0.1s; }
+.data-table tr:nth-child(2) { animation-delay: 0.2s; }
+.data-table tr:nth-child(3) { animation-delay: 0.3s; }
+.data-table tr:nth-child(4) { animation-delay: 0.4s; }
+.data-table tr:nth-child(5) { animation-delay: 0.5s; }
+
+/* ==================== */
+/* ESTADO VACÍO MEJORADO */
+/* ==================== */
+
+.data-table tr td[colspan] {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+    font-style: italic;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+/* ==================== */
+/* INDICADOR DE ESTADO ACTIVO/INACTIVO */
+/* ==================== */
+
+.status-active, .status-inactive {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

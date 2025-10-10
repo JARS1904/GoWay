@@ -1,0 +1,48 @@
+<!-- Modal para agregar nueva ruta -->
+ 
+<div class="modal-overlay" id="addRouteModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Agregar nueva ruta</h3>
+            <button class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Columna izquierda -->
+            <div>
+                <div class="modal-form-group">
+                    <label for="routeName">Nombre de la ruta</label>
+                    <input type="text" id="routeNameR" placeholder="Ej: Ruta 3">
+                </div>
+                <div class="modal-form-group">
+                    <label for="departureNeighborhood">Destino</label>
+                    <input type="text" id="destinoR" placeholder="Ej: Centro">
+                </div>
+                <div class="modal-form-group">
+                    <label for="arrivalNeighborhood">Activa</label>
+                    <input type="text" id="activaR" placeholder="Ej: Jardines">
+                </div>
+                
+                
+            </div>
+            
+            <!-- Columna derecha -->
+            <div>
+                <div class="modal-form-group">
+                    <label for="departureStreet">Origen</label>
+                    <input type="text" id="origenR" placeholder="Ej: Av. Principal">
+                </div>
+
+                <div class="modal-form-group">
+                    <label for="arrivalCity">Paradas</label>
+                    <input type="text" id="paradasR" placeholder="Ej: Ciudad de México">
+                </div>
+                
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-cancel" id="cancelModal">Cancelar</button>
+            <button class="modal-btn modal-btn-save">Guardar</button>
+        </div>
+    </div>
+</div>
