@@ -152,7 +152,15 @@
                         ?>
                     </tbody>
                 </table>
-                <button class="btn-add">Agregar nuevo usuario</button>
+
+                <!-- Paginación -->
+                <div class="pagination">
+                    <button class="pagination-btn" id="prevPage" disabled>‹ Anterior</button>
+                    <div class="pagination-info" id="pageInfo">Página 1 de 5</div>
+                    <button class="pagination-btn" id="nextPage">Siguiente ›</button>
+                </div>
+
+                <button class="btn-add">+ Agregar nuevo usuario</button>
             </section>
         </main>
     </div>
@@ -262,6 +270,7 @@
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/update/actu_usuarios.js"></script>
     <script src="../assets/js/delete/delete_usuarios.js"></script>
+    <script src="../assets/js/pagination.js"></script>
 </body>
 
 </html>

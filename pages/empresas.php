@@ -160,19 +160,16 @@
                         ?>
                     </tbody>
                 </table>
+
+                <!-- Paginación -->
+                <div class="pagination">
+                    <button class="pagination-btn" id="prevPage" disabled>‹ Anterior</button>
+                    <div class="pagination-info" id="pageInfo">Página 1 de 5</div>
+                    <button class="pagination-btn" id="nextPage">Siguiente ›</button>
+                </div>
+
                 <!--<button class="btn-add">Agregar nueva empresa</button>-->
-               
-        
-
-
-
-
-                <button class="btn-add"> + Agregar nueva empresa</button>
-
-
-
-
-
+                <button class="btn-add">+ Agregar nueva empresa</button>
             </section>
         </main>
     </div>
@@ -304,6 +301,7 @@
 <script src="../assets/js/main.js"></script>
 <script src="../assets/js/update/actu_empresas.js"></script>
 <script src="../assets/js/delete/delete_empresas.js"></script>
+<script src="../assets/js/pagination.js"></script>
 
 </body>
 </html>
