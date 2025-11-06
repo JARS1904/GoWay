@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conductores - Transporte Público</title>
+    <title>Checadores - Transporte Público</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,8 +11,30 @@
 </head>
 <body>
     <div class="container">
+        <!-- Overlay para fondo oscuro -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Barra Superior Móvil -->
+        <div class="mobile-topbar">
+            <div class="mobile-topbar-content">
+                <div class="mobile-topbar-left">
+                    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+                    <h1 class="mobile-page-title">Gestión de Checadores</h1>
+                </div>
+                <div class="mobile-topbar-right">
+                    <div class="mobile-user-info">
+                        <span>Admin</span>
+                        <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Menú Lateral -->
-        <aside class="sidebar">
+        <aside id="sidebar" class="sidebar">
+            <!-- Botón de Cerrar para Móvil -->
+            <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
+            
             <div class="logo">
                 <img src="../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
                 <h1>GoWay</h1>
@@ -92,13 +114,13 @@
         </aside>
 
         <!-- Contenido Principal -->
-        <main class="main-content">
+        <main class="main-content" id="mainContent">
+            <!-- Header para escritorio -->
             <header class="header">
                 <h2>Gestión de Checadores</h2>
                 <div class="user-info">
                     <span>Admin</span>
                     <img src="../assets/images/icons/administrador.png" alt="Usuario">
-
                 </div>
             </header>
 
@@ -108,7 +130,7 @@
                     <thead>
                         <tr>
                             <th>RFC del checador</th>
-                            <th>RFC de empresa</th>
+                            <th>RFC de la empresa</th>
                             <th>Nombre</th>
                             <th>Usuario</th>
                             <th>Contraseña</th>
@@ -135,8 +157,8 @@
                                 $statusText = $row["activo"] ? 'Sí' : 'No';
                                 
                                 echo '<tr>
-                                        <td data-label="RFC Checador" data-id="'.$row["rfc_checador"].'">'.$row["rfc_checador"].'</td>
-                                        <td data-label="RFC Empresa">'.$row["rfc_empresa"].'</td>
+                                        <td data-label="RFC del Checador" data-id="'.$row["rfc_checador"].'">'.$row["rfc_checador"].'</td>
+                                        <td data-label="RFC de la Empresa">'.$row["rfc_empresa"].'</td>
                                         <td data-label="Nombre">'.$row["nombre"].'</td>
                                         <td data-label="Usuario">'.$row["usuario"].'</td>
                                         <td data-label="Contraseña">'.$row["contrasena"].'</td>
@@ -168,153 +190,182 @@
         </main>
     </div>
 
-       <!-- Modal para agregar nuevo checador -->
-<div class="modal-overlay" id="addRouteModal">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h3>Agregar nuevo checador</h3>
-            <button class="modal-close" id="closeModal">&times;</button>
-        </div>
-        <form id="routeForm" action="../controllers/insert_checador.php" method="POST">
-            <div class="modal-body">
-                <!-- Columna izquierda -->
-                <div>
-                    <div class="modal-form-group">
-                        <label >RFC de Checador</label>
-                        <input type="text" id="" name="rfc_checador" placeholder="" required>
-                    </div>
-                    <div class="modal-form-group">
-                        <label >RFC de la Empresa</label>
-                        <select name="rfc_empresa" id="">
-                            
-                        <?php
-                        $conn = new mysqli("localhost", "root", "", "goway");
-                        $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
-                        while ($row = $result->fetch_assoc()) {
-                        echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
-                        }
-                        ?>
-
-                        </select>
-
-
-                    </div>
-                    <div class="modal-form-group">
-                        <label >Nombre</label>
-                        <input type="text" id="" name="nombre" placeholder="" required>
-                    </div>
-                </div>
-                
-                <!-- Columna derecha -->
-                <div>
-                    <div class="modal-form-group">
-                        <label >Usuario</label>
-                        <select name="usuario" id="">
-                        <?php
-                        $conn = new mysqli("localhost", "root", "", "goway");
-                        $result = $conn->query("SELECT email, nombre FROM usuarios");
-                        while ($row = $result->fetch_assoc()) {
-                        echo "<option value='{$row['email']}'>{$row['nombre']}</option>";
-                        }
-                        ?>
-
-                        </select>
-
-
-                    </div>
-                    <div class="modal-form-group">
-                        <label >Contraseña</label>
-                        <input type="text" id="" name="password" placeholder=""></input>
+    <!-- Modal para agregar nuevo checador -->
+    <div class="modal-overlay" id="addRouteModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Agregar nuevo checador</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="routeForm" action="../controllers/insert_checador.php" method="POST">
+                <div class="modal-body">
+                    <!-- Columna izquierda -->
+                    <div>
+                        <div class="modal-form-group">
+                            <label>RFC de Checador</label>
+                            <input type="text" id="" name="rfc_checador" placeholder="" required>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>RFC de la Empresa</label>
+                            <select name="rfc_empresa" id="">
+                                <?php
+                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="" name="nombre" placeholder="" required>
+                        </div>
                     </div>
                     
+                    <!-- Columna derecha -->
+                    <div>
+                        <div class="modal-form-group">
+                            <label>Usuario</label>
+                            <select name="usuario" id="">
+                                <?php
+                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $result = $conn->query("SELECT email, nombre FROM usuarios");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['email']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Contraseña</label>
+                            <input type="text" id="" name="password" placeholder=""></input>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-
-            <div class="modal-footer">
-                <button type="button" class="modal-btn modal-btn-cancel" id="cancelModal">Cancelar</button>
-                <button type="submit" class="modal-btn modal-btn-save" >Guardar</button>
-            </div>
-        </form>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelModal">Cancelar</button>
+                    <button type="submit" class="modal-btn modal-btn-save">Guardar</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-
-
-   <!-- Modal para editar conductores -->
-
-<div class="modal-overlay" id="editChecadoresModal">
-  <div class="modal-container">
-    <div class="modal-header">
-      <h3>Editar Checador</h3>
-      <button class="modal-close" id="closeEditChecadoresModal">×</button>
+    <!-- Modal para editar checadores -->
+    <div class="modal-overlay" id="editChecadoresModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Editar Checador</h3>
+                <button class="modal-close" id="closeEditChecadoresModal">×</button>
+            </div>
+            <form id="editChecadoresForm" action="../pages/actualizar/actu_checadoresSql.php" method="POST">
+                <div class="modal-body">
+                    <div>
+                        <div class="modal-form-group">
+                            <label for="edit_rfc_checador">RFC de Checador</label>
+                            <input type="text" id="edit_rfc_checador" name="rfc_checador" required>
+                        </div>
+                        <div class="modal-form-group">
+                            <label for="edit_rfc_empresa">RFC de Empresa</label>
+                            <input type="text" id="edit_rfc_empresa" name="rfc_empresa" required>
+                        </div>
+                        <div class="modal-form-group">
+                            <label for="edit_nombre">Nombre</label>
+                            <input type="text" id="edit_nombre" name="nombre" required>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="modal-form-group">
+                            <label for="edit_usuario">Usuario</label>
+                            <input type="text" id="edit_usuario" name="usuario" required>
+                        </div>
+                        <div class="modal-form-group">
+                            <label for="edit_password">Contraseña</label>
+                            <input type="text" id="edit_password" name="password" required>
+                        </div>
+                        <div class="modal-form-group">
+                            <label for="edit_activo">Activo</label>
+                            <select id="edit_activo" name="activo">
+                                <option value="1">Sí</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelEditChecadoresModal">Cancelar</button>
+                    <button type="submit" class="modal-btn modal-btn-save">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <form id="editChecadoresForm" action="../pages/actualizar/actu_checadoresSql.php" method="POST">
-      <!--<input type="text" id="edit_rfc_conductor" name="rfc_conductor" >-->
-      <div class="modal-body">
-        <div>
-          <div class="modal-form-group">
-            <label for="edit_rfc_checador">RFC de Checador</label>
-            <input type="text" id="edit_rfc_checador" name="rfc_checador" required>
-          </div>
 
-          <div class="modal-form-group">
-            <label for="edit_rfc_empresa">RFC de Empresa</label>
-            <input type="text" id="edit_rfc_empresa" name="rfc_empresa" required>
-          </div>
+    <script>
+        // Funciones para el menú hamburguesa
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Ocultar/mostrar botón hamburguesa
+            if (sidebar.classList.contains('active')) {
+                toggleBtn.style.opacity = '0';
+                toggleBtn.style.visibility = 'hidden';
+            } else {
+                toggleBtn.style.opacity = '1';
+                toggleBtn.style.visibility = 'visible';
+            }
+            
+            // Prevenir scroll del body cuando el menú está abierto
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
 
-          <div class="modal-form-group">
-            <label for="edit_capacidad">Nombre</label>
-            <input type="text" id="edit_nombre" name="nombre" required>
-          </div>
-        </div>
-        <div>
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            
+            // Mostrar botón hamburguesa al cerrar
+            toggleBtn.style.opacity = '1';
+            toggleBtn.style.visibility = 'visible';
+            
+            document.body.style.overflow = '';
+        }
 
-        <div class="modal-form-group">
-            <label for="edit_licencia">Usuario</label>
-            <input type="text" id="edit_usuario" name="usuario" required>
-          </div>
+        // Cerrar sidebar al hacer clic en un enlace (en móvil)
+        document.querySelectorAll('.sidebar nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
 
-        <div class="modal-form-group">
-            <label for="edit_capacidad">Contraseña</label>
-            <input type="text" id="edit_password" name="password" required>
-          </div>
+        // Cerrar sidebar con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
 
-          <div class="modal-form-group">
-            <label for="edit_activo">Activo</label>
-            <select id="edit_activo" name="activo">
-              <option value="1">Sí</option>
-              <option value="0">No</option>
-            </select>
-          </div>
+        // Ajustar en redimensionamiento de ventana
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+    </script>
 
-
-        </div>
-        <div>
-
-        
-                                
-        </div>
-        <div>
-
-        
-         
-
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="modal-btn modal-btn-cancel" id="cancelEditEmpresasModal">Cancelar</button>
-        <button type="submit" class="modal-btn modal-btn-save">Guardar cambios</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-
-
-<script src="../assets/js/main.js"></script>
-<script src="../assets/js/update/actu_checadores.js"></script>
-<script src="../assets/js/delete/delete_checadores.js"></script>
-<script src="../assets/js/pagination.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/update/actu_checadores.js"></script>
+    <script src="../assets/js/delete/delete_checadores.js"></script>
+    <script src="../assets/js/pagination.js"></script>
 </body>
 </html>

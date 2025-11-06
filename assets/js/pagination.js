@@ -82,5 +82,5 @@ class Pagination {
 
 // Inicializar paginación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-    new Pagination('.data-table', 5); // 5 registros por página
+    new Pagination('.data-table', 7); // 5 registros por página
 });

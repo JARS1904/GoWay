@@ -27,14 +27,16 @@
                     <label for="confirm-password">Confirmar contraseña:</label>
                     <input type="password" id="confirm-password" placeholder="Confirma tu contraseña" name="confirm-password">
                 </div>
-                <div class="role-group">
-                    <select name="role_id" id="role_id" required>
+                <div class="form-group">
+                    <label for="role_id">Rol:</label>
+                    <select name="role_id" id="role_id" class="role-select" required>
+                        <option value="">Selecciona un rol</option>
                         <option value="1">Administrador</option>
                         <option value="2">Usuario</option>
                         <option value="3">Checador</option>
                     </select>
                 </div>
-                <button type="submit" class="btn" >Registrarse</button>
+                <button type="submit" class="btn">Registrarse</button>
             </form>
             <p>¿Ya tienes una cuenta? <a href="login.php">Inicia sesión</a></p>
         </div>

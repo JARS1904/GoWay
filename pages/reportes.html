@@ -8,8 +8,30 @@
 </head>
 <body>
     <div class="container">
+        <!-- Overlay para fondo oscuro -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Barra Superior Móvil -->
+        <div class="mobile-topbar">
+            <div class="mobile-topbar-content">
+                <div class="mobile-topbar-left">
+                    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+                    <h1 class="mobile-page-title">Reportes</h1>
+                </div>
+                <div class="mobile-topbar-right">
+                    <div class="mobile-user-info">
+                        <span>Admin</span>
+                        <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Menú Lateral -->
-        <aside class="sidebar">
+        <aside id="sidebar" class="sidebar">
+            <!-- Botón de Cerrar para Móvil -->
+            <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
+            
             <div class="logo">
                 <img src="../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
                 <h1>GoWay</h1>
@@ -61,7 +83,7 @@
                     <li>
                         <a href="paradas.php">
                             <img src="../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
-                            <span>Paradas</span>
+                            <span>Asignaciones</span>
                         </a>
                     </li>
                     <li>
@@ -89,13 +111,13 @@
         </aside>
 
         <!-- Contenido Principal -->
-        <main class="main-content">
+        <main class="main-content" id="mainContent">
+            <!-- Header para escritorio -->
             <header class="header">
                 <h2>Reportes</h2>
                 <div class="user-info">
                     <span>Admin</span>
                     <img src="../assets/images/icons/administrador.png" alt="Usuario">
-
                 </div>
             </header>
 
@@ -112,5 +134,67 @@
             </section>
         </main>
     </div>
+
+    <script>
+        // Funciones para el menú hamburguesa
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Ocultar/mostrar botón hamburguesa
+            if (sidebar.classList.contains('active')) {
+                toggleBtn.style.opacity = '0';
+                toggleBtn.style.visibility = 'hidden';
+            } else {
+                toggleBtn.style.opacity = '1';
+                toggleBtn.style.visibility = 'visible';
+            }
+            
+            // Prevenir scroll del body cuando el menú está abierto
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            
+            // Mostrar botón hamburguesa al cerrar
+            toggleBtn.style.opacity = '1';
+            toggleBtn.style.visibility = 'visible';
+            
+            document.body.style.overflow = '';
+        }
+
+        // Cerrar sidebar al hacer clic en un enlace (en móvil)
+        document.querySelectorAll('.sidebar nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Cerrar sidebar con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+
+        // Ajustar en redimensionamiento de ventana
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+    </script>
 </body>
 </html>

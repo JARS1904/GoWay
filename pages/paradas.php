@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conductores - Transporte Público</title>
+    <title>Asignaciones - Transporte Público</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,8 +11,30 @@
 </head>
 <body>
     <div class="container">
+        <!-- Overlay para fondo oscuro -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Barra Superior Móvil -->
+        <div class="mobile-topbar">
+            <div class="mobile-topbar-content">
+                <div class="mobile-topbar-left">
+                    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+                    <h1 class="mobile-page-title">Gestión de Asignaciones</h1>
+                </div>
+                <div class="mobile-topbar-right">
+                    <div class="mobile-user-info">
+                        <span>Admin</span>
+                        <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Menú Lateral -->
-        <aside class="sidebar">
+        <aside id="sidebar" class="sidebar">
+            <!-- Botón de Cerrar para Móvil -->
+            <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
+            
             <div class="logo">
                 <img src="../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
                 <h1>GoWay</h1>
@@ -92,13 +114,13 @@
         </aside>
 
         <!-- Contenido Principal -->
-        <main class="main-content">
+        <main class="main-content" id="mainContent">
+            <!-- Header para escritorio -->
             <header class="header">
                 <h2>Gestión de Asignaciones</h2>
                 <div class="user-info">
                     <span>Admin</span>
                     <img src="../assets/images/icons/administrador.png" alt="Usuario">
-
                 </div>
             </header>
 
@@ -169,120 +191,160 @@
         </main>
     </div>
 
-
-    <!-- Modal para agregar nueva Empresa -->
+    <!-- Modal para agregar nueva Asignación -->
     <div class="modal-overlay" id="addRouteModal">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h3>Agregar nueva Asignacion</h3>
-            <button class="modal-close" id="closeModal">&times;</button>
-        </div>
-        <form id="routeForm" action="../controllers/insert_asignaciones.php" method="POST">
-            <div class="modal-body">
-                <!-- Columna izquierda -->
-                <div>
-                    <div class="modal-form-group">
-                        <label >RFC de la Empresa</label>
-                        <select name="rfc_empresa" required>
-                            <?php
-                            $conn = new mysqli("localhost", "root", "", "goway");
-                            $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
-                            while ($row = $result->fetch_assoc()) {
-                            echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
-                            }
-                            ?>
-                        </select>
-
-
-
-                    </div>
-                    <div class="modal-form-group">
-                        <label>ID de vehiculo</label>
-                        <select name="id_vehiculo" required>
-                            <?php
-                            $conn = new mysqli("localhost", "root", "", "goway");
-                            $result = $conn->query("SELECT id_vehiculo, placa FROM vehiculos");
-                            while ($row = $result->fetch_assoc()) {
-                            echo "<option value='{$row['id_vehiculo']}'>{$row['placa']}</option>";
-                            }
-                            ?>
-                        </select>
-
-
-                    </div>
-                    <div class="modal-form-group">
-                        <label >RFC Conductor</label>
-                        <select name="rfc_conductor" required>
-                            <?php
-                            $conn = new mysqli("localhost", "root", "", "goway");
-                            $result = $conn->query("SELECT rfc_conductor, nombre FROM conductores");
-                            while ($row = $result->fetch_assoc()) {
-                            echo "<option value='{$row['rfc_conductor']}'>{$row['nombre']}</option>";
-                            }
-                            ?>
-                        </select>
-
-
-                    </div>
-                </div>
-                
-                <!-- Columna derecha -->
-                <div>
-                    <div class="modal-form-group">
-                        <label >ID Ruta</label>
-                        
-                            <select name="id_ruta" required>
-                            <?php
-                            $conn = new mysqli("localhost", "root", "", "goway");
-                            $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
-                            while ($row = $result->fetch_assoc()) {
-                            echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";
-                            }
-                            ?>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Agregar nueva Asignacion</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="routeForm" action="../controllers/insert_asignaciones.php" method="POST">
+                <div class="modal-body">
+                    <!-- Columna izquierda -->
+                    <div>
+                        <div class="modal-form-group">
+                            <label>RFC de la Empresa</label>
+                            <select name="rfc_empresa" required>
+                                <?php
+                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
                             </select>
-
-
-
-                    </div>
-
-                    <div class="modal-form-group">
-                        <label for="">ID horario</label>
-                        
-                        <select name="id_horario" required>
-                            <?php
-                            $conn = new mysqli("localhost", "root", "", "goway");
-                            $result = $conn->query("SELECT id_horario, dia_semana FROM horarios");
-                            while ($row = $result->fetch_assoc()) {
-                            echo "<option value='{$row['id_horario']}'>{$row['dia_semana']}</option>";
-                            }
-                            ?>
-                        </select>
-
-
-
-                    </div>
-
-                    <div class="modal-form-group">
-                        <label >Fecha</label>
-                        <input type="date" name="fecha" required placeholder="Fecha">
+                        </div>
+                        <div class="modal-form-group">
+                            <label>ID de vehiculo</label>
+                            <select name="id_vehiculo" required>
+                                <?php
+                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $result = $conn->query("SELECT id_vehiculo, placa FROM vehiculos");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['id_vehiculo']}'>{$row['placa']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>RFC Conductor</label>
+                            <select name="rfc_conductor" required>
+                                <?php
+                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $result = $conn->query("SELECT rfc_conductor, nombre FROM conductores");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['rfc_conductor']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
                     </div>
                     
+                    <!-- Columna derecha -->
+                    <div>
+                        <div class="modal-form-group">
+                            <label>ID Ruta</label>
+                            <select name="id_ruta" required>
+                                <?php
+                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>ID horario</label>
+                            <select name="id_horario" required>
+                                <?php
+                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $result = $conn->query("SELECT id_horario, dia_semana FROM horarios");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['id_horario']}'>{$row['dia_semana']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Fecha</label>
+                            <input type="date" name="fecha" required placeholder="Fecha">
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-
-            <div class="modal-footer">
-                <button type="button" class="modal-btn modal-btn-cancel" id="cancelModal">Cancelar</button>
-                <button type="submit" class="modal-btn modal-btn-save" >Guardar</button>
-            </div>
-        </form>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelModal">Cancelar</button>
+                    <button type="submit" class="modal-btn modal-btn-save">Guardar</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
+    <script>
+        // Funciones para el menú hamburguesa
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Ocultar/mostrar botón hamburguesa
+            if (sidebar.classList.contains('active')) {
+                toggleBtn.style.opacity = '0';
+                toggleBtn.style.visibility = 'hidden';
+            } else {
+                toggleBtn.style.opacity = '1';
+                toggleBtn.style.visibility = 'visible';
+            }
+            
+            // Prevenir scroll del body cuando el menú está abierto
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
 
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            
+            // Mostrar botón hamburguesa al cerrar
+            toggleBtn.style.opacity = '1';
+            toggleBtn.style.visibility = 'visible';
+            
+            document.body.style.overflow = '';
+        }
 
-<script src="../assets/js/main.js"></script>
-<script src="../assets/js/delete/delete_asignaciones.js"></script>
-<script src="../assets/js/pagination.js"></script>
+        // Cerrar sidebar al hacer clic en un enlace (en móvil)
+        document.querySelectorAll('.sidebar nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Cerrar sidebar con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+
+        // Ajustar en redimensionamiento de ventana
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+    </script>
+
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/delete/delete_asignaciones.js"></script>
+    <script src="../assets/js/pagination.js"></script>
 </body>
 </html>

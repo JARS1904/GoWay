@@ -13,7 +13,6 @@
             
             <form method="post" action="" id="loginForm">
                 <?php
-
                 session_start();
                 include("../config/conexion_bd.php");
                 include("../controllers/controlador.php");

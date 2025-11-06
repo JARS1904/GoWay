@@ -5,8 +5,9 @@ body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f9fafb; /* Fondo claro */
+    background-color: #f9fafb;
     color: #333;
+    overflow-x: hidden;
 }
 
 .container {
@@ -19,33 +20,37 @@ body {
 /* ==================== */
 .sidebar {
     width: 250px;
-    background-color: #ecf5fc; /* Color del panel lateral */
+    background-color: #ecf5fc;
     color: #fff;
     padding: 20px;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    position: relative; /* Para posicionar el botón de cerrar sesión */
+    position: relative;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 /* Estilos para el Logo */
 .logo {
     display: flex;
-    align-items: center; /* Alinea verticalmente el logo y el texto */
-    justify-content: center; /* Centra horizontalmente */
+    align-items: center;
+    justify-content: center;
     margin-bottom: 30px;
 }
 
 .logo-img {
-    width: 40px; /* Ajusta el tamaño del logo */
-    height: 40px; /* Ajusta el tamaño del logo */
-    margin-right: 10px; /* Espacio entre el logo y el texto */
-    margin-left: 5px; /* Espacio entre el logo y el margen izquierdo del panel */
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    margin-left: 5px;
 }
 
 .logo h1 {
     font-size: 18px;
     font-weight: bold;
-    color: #1c1f24; /* Color del texto GoWay del logo */
-    margin-right: auto; /* Para que el logo esté alineado con los botones */
+    color: #1c1f24;
+    margin-right: auto;
 }
 
 .sidebar nav ul {
@@ -64,42 +69,35 @@ body {
     display: flex;
     align-items: center;
     padding: 10px;
-    border-radius: 15px; /* Botones más redondos */
+    border-radius: 15px;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+/* SOLO HOVER - Sin color permanente para página activa */
 .sidebar nav ul li a:hover {
-    background-color: #0660fe; /* Azul vibrante */
-    transform: translateX(5px); /* Desplazamiento hacia la derecha */
+    background-color: #0660fe;
+    transform: translateX(5px);
     font-weight: bold;
     color: #fff;
 }
 
-/* Resaltar la sección activa */
-.sidebar nav ul li a.active {
-    background-color: #3b82f6; /* Azul vibrante */
-    color: #fff;
-}
-
 .sidebar nav ul li a .icon {
-    width: 20px; /* Ajusta el tamaño del icono */
-    height: 20px; /* Ajusta el tamaño del icono */
-    margin-right: 10px; /* Espacio entre el icono y el texto */
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
 }
 
 .sidebar nav ul li a:hover .icon {
-    filter: brightness(0) invert(1); /* Convierte el icono a blanco */
+    filter: brightness(0) invert(1);
 }
 
-
 /* ==================== */
-/* BOTÖN DE CERRAR SESIÓN */
+/* BOTÓN DE CERRAR SESIÓN */
 /* ==================== */
 .sidebar .logout-button {
-    position: absolute; /* Posiciona el botón en la parte inferior */
-    /*bottom: -15px;*/
+    position: absolute;
     left: 20px;
-    width: 250px; /* Ancho del menú lateral */
+    width: calc(100% - 40px);
 }
 
 .sidebar .logout-button a {
@@ -114,26 +112,151 @@ body {
 }
 
 .sidebar .logout-button a:hover {
-    background-color: #dc2626; /* Color rojo más oscuro al pasar el mouse */
-    transform: translateX(5px); /* Desplazamiento hacia la derecha */
+    background-color: #dc2626;
+    transform: translateX(5px);
     font-weight: bold;
     color: #fff;
 }
 
 .sidebar .logout-button a i {
-    margin-right: 10px; /* Espacio entre el ícono y el texto */
+    margin-right: 10px;
 }
 
-/* Estilos para el ícono del botón de cerrar sesión */
 .sidebar .logout-button a .icon {
-    width: 20px; /* Ajusta el tamaño del ícono */
-    height: 20px; /* Ajusta el tamaño del ícono */
-    margin-right: 10px; /* Espacio entre el ícono y el texto */
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
 }
 
-/* Cambiar el color del ícono a blanco en hover */
 .sidebar .logout-button a:hover .icon {
-    filter: brightness(0) invert(1); /* Convierte el ícono a blanco */
+    filter: brightness(0) invert(1);
+}
+
+/* ==================== */
+/* BARRA SUPERIOR MÓVIL */
+/* ==================== */
+.mobile-topbar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    z-index: 1001;
+    padding: 0 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-topbar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+}
+
+.mobile-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.mobile-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.mobile-user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+}
+
+.mobile-user-info img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.mobile-user-info span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.mobile-page-title {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ==================== */
+/* Botón Hamburguesa Mejorado */
+/* ==================== */
+.toggle-btn {
+    width: 45px;
+    height: 45px;
+    display: none;
+    font-size: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+/* Overlay para fondo oscuro cuando el menú está abierto */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Botón de cerrar para móvil */
+.sidebar-close {
+    display: none;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #61666c;
+    cursor: pointer;
+    z-index: 1001;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.sidebar-close:hover {
+    color: #0660fe;
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 /* ==================== */
@@ -142,7 +265,9 @@ body {
 .main-content {
     flex: 1;
     padding: 20px;
-    background-color: #f9fafb; /* Fondo claro */
+    background-color: #f9fafb;
+    transition: all 0.3s ease;
+    width: 100%;
 }
 
 .header {
@@ -150,16 +275,14 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    /*background-color: #fff;*/ /*Color blanco del titulo de pantallas*/
     padding: 0px 20px;
     border-radius: 8px;
-    /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);*/ /*Sombra del titulo de pantallas*/
 }
 
 .header h2 {
     margin: 0;
     font-size: 24px;
-    color: #1a1c23; /* Azul oscuro */
+    color: #1a1c23;
 }
 
 .user-info {
@@ -170,7 +293,7 @@ body {
 .user-info span {
     margin-right: 10px;
     font-size: 16px;
-    color: #1a1c23; /* Azul oscuro */
+    color: #1a1c23;
 }
 
 .user-info img {
@@ -184,16 +307,14 @@ body {
 /* Tarjetas */
 /* ==================== */
 .content {
-    /*background-color: #fff;*/ /* Color blanco del contenedor de las tablas */
     padding: 20px;
     border-radius: 8px;
-    /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);*/ /* Sombra del contenedor de las tablas */
 }
 
 .content h3 {
     margin-top: 0;
     font-size: 20px;
-    color: #1a1c23; /* Azul oscuro */
+    color: #1a1c23;
 }
 
 .card {
@@ -215,18 +336,14 @@ body {
 .card h4 {
     margin: 0 0 10px 0;
     font-size: 18px;
-    color: #3b82f6; /* Azul vibrante */
+    color: #3b82f6;
 }
-
 
 .card p {
     margin: 5px 0;
     font-size: 14px;
     color: #666;
 }
-
-
-
 
 /* ==================== */
 /* Tabla General */
@@ -261,33 +378,24 @@ body {
     color: #666;
 }
 
-/* Estilos para la celda de acciones */
 .data-table td:last-child {
     display: flex;
-    gap: 8px; /* Espacio entre los botones */
+    gap: 8px;
 }
 
-/* Filas alternas */
 .data-table tr:nth-child(even) {
     background-color: #f9f9f9;
 }
-
-
-
-
-
-
-
 
 /* ==================== */
 /* Botones de Acción */
 /* ==================== */
 .btn-action {
-    background-color: #3b82f6; /* Azul vibrante */
+    background-color: #3b82f6;
     color: #fff;
     border: none;
     padding: 8px 12px;
-    border-radius: 15px; /* Botones más redondos */
+    border-radius: 15px;
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.3s ease, transform 0.3s ease;
@@ -295,35 +403,35 @@ body {
 }
 
 .btn-action:hover {
-    background-color: #0660fe; /* Azul más oscuro */
+    background-color: #0660fe;
     transform: translateY(-2px);
 }
 
 .btn-edit {
-    background-color: #4CAF50; /* Verde */
+    background-color: #4CAF50;
 }
 
 .btn-edit:hover {
-    background-color: #45a049; /* Verde más oscuro */
+    background-color: #45a049;
 }
 
 .btn-delete {
-    background-color: #f44336; /* Rojo */
+    background-color: #f44336;
 }
 
 .btn-delete:hover {
-    background-color: #e53935; /* Rojo más oscuro */
+    background-color: #e53935;
 }
 
 /* ==================== */
 /* Botón de Agregar */
 /* ==================== */
 .btn-add {
-    background-color: #3b82f6; /* Azul vibrante */
+    background-color: #3b82f6;
     color: #fff;
     border: none;
     padding: 10px 20px;
-    border-radius: 15px; /* Botones más redondos */
+    border-radius: 15px;
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.3s ease, transform 0.3s ease;
@@ -331,33 +439,28 @@ body {
 }
 
 .btn-add:hover {
-    background-color: #0660fe; /* Azul más oscuro */
+    background-color: #0660fe;
     transform: translateY(-2px);
 }
 
 /* ==================== */
-/* Responsividad */
-/* ==================== */
-
-
-/* ==================== */
 /* Estilos para Login y Registro */
 /* ==================== */
-
 .auth-container {
     display: flex;
     background-color: #fff;
-    border-radius: 15px; /* Bordes redondeados */
+    border-radius: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     max-width: 800px;
     width: 100%;
-    margin: 11rem auto; /* Centrar el contenedor */
+    margin: 11rem auto;
+    min-height: 500px;
 }
 
 .auth-form {
-    flex: 1; /* Ocupa la mitad del contenedor */
-    padding: 40px; /* Padding interno */
+    flex: 1;
+    padding: 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -365,28 +468,37 @@ body {
 
 .auth-form h2 {
     margin-bottom: 20px;
-    color: #1a1c23; /* Color oscuro */
+    color: #1a1c23;
     text-align: center;
+    font-size: 28px;
 }
 
 .auth-form .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .auth-form .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    margin-bottom: 8px;
+    font-weight: 600;
     color: #333;
+    font-size: 14px;
 }
 
 .auth-form .form-group input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 14px;
-    box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-form .form-group input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .auth-form .form-group .forgot-password {
@@ -394,49 +506,96 @@ body {
     color: #3b82f6;
     text-decoration: none;
     font-size: 14px;
+    transition: color 0.3s ease;
 }
 
 .auth-form .form-group .forgot-password:hover {
     text-decoration: underline;
+    color: #2563eb;
 }
 
+/* ==================== */
+/* Estilos para el Select de Roles */
+/* ==================== */
+.role-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='%23333' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.role-select option {
+    padding: 10px;
+    background-color: white;
+    color: #333;
+}
+
+.role-select:hover {
+    border-color: #3b82f6;
+}
+
+/* ==================== */
+/* Botón de formulario */
+/* ==================== */
 .auth-form .btn {
     width: 100%;
-    padding: 12px;
-    background-color: #3b82f6; /* Azul vibrante */
+    padding: 14px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
     color: #fff;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+    font-weight: 600;
     margin-top: 10px;
-    box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+    box-sizing: border-box;
+    transition: all 0.3s ease;
 }
 
 .auth-form .btn:hover {
-    background-color: #2563eb; /* Azul más oscuro */
-    font-weight: bold;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .auth-form p {
-    margin-top: 15px;
+    margin-top: 20px;
     text-align: center;
     color: #666;
+    font-size: 14px;
 }
 
 .auth-form a {
     color: #3b82f6;
     text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .auth-form a:hover {
     text-decoration: underline;
+    color: #2563eb;
 }
 
-/* Imagen de fondo */
 .auth-image {
-    flex: 1; /* Ocupa la mitad del contenedor */
-    background-color: #3b82f6; /* Fondo gris claro */
+    flex: 1;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -447,7 +606,8 @@ body {
 .auth-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ajusta la imagen para cubrir todo el espacio */
+    object-fit: contain;
+    max-width: 300px;
 }
 
 /* ==================== */
@@ -456,96 +616,13 @@ body {
 .error-message {
     color: #d32f2f;
     background-color: #fde8e8;
-    padding: 12px;
-    border-radius: 4px;
+    padding: 12px 15px;
+    border-radius: 8px;
     margin-bottom: 20px;
     border-left: 4px solid #d32f2f;
     font-size: 14px;
+    font-weight: 500;
 }
-
-
-
-
-
-
-
-
-/* ==================== */
-/* responsividad para movil con el sidebar y header */
-/* ==================== */
-/* Esconde el toggle en escritorio, muestra en móvil */
-.toggle-btn {
-
-    width: 40px;
-    height: 45px;
-    display: none;
-    font-size: 24px;
-    background-color: #0660fe;
-    color: white;
-    padding: 1px;
-    border: none;
-    border-radius: 10px;
-    z-index: 1001;
-    cursor: pointer;
-    margin-right: 15px; /* Espacio con el título */
-  }
-
-  /* Sidebar estilo por defecto en escritorio */
-.sidebar {
-    display: block;
-  }
-
-
-
-
-
-@media (max-width: 768px) {
-
-    .logo{
-        margin-left: 70px;
-        margin-top: 12.5px;
-    }
-
-    .header{
-        justify-content: center;
-        width: max-content;
-        padding: 15px 20px;
-        margin-inline:5px;
-    }
-    .content{
-        margin-inline:5px;
-
-    }
-
-    .toggle-btn  {
-            display: block;
-        }
-
-    .sidebar {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: #ecf5fc;
-            width: 250px;
-            height: 100%;
-            z-index: 1000;
-            padding: 20px;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            display: block;
-
-
-        }
-
-    .sidebar.active {
-            display: block;
-            transform: translateX(0%);
-        }
-
-}
-
-
 
 /* ==================== */
 /* Estilos para el Modal */
@@ -560,7 +637,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 1100;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -576,7 +653,7 @@ body {
     border-radius: 20px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     width: 90%;
-    max-width: 700px; /* Aumentamos el ancho máximo */
+    max-width: 700px;
     transform: translateY(-20px);
     transition: transform 0.3s ease;
     overflow: hidden;
@@ -612,8 +689,8 @@ body {
 .modal-body {
     padding: 20px;
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas */
-    gap: 20px; /* Espacio entre columnas */
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 .modal-form-group {
@@ -674,13 +751,6 @@ body {
     background-color: #2563eb;
 }
 
-/* Responsive: en móviles volver a una columna */
-@media (max-width: 600px) {
-    .modal-body {
-        grid-template-columns: 1fr;
-    }
-}
-
 .modal-form-group textarea {
     width: 100%;
     padding: 10px;
@@ -693,12 +763,9 @@ body {
     font-family: 'Arial', sans-serif;
 }
 
-
-
 /* ==================== */
 /* TABLAS RESPONSIVE CON TARJETAS */
 /* ==================== */
-
 .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -707,7 +774,6 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* Estilos base para tablas */
 .data-table {
     min-width: 600px;
     width: 100%;
@@ -744,13 +810,11 @@ body {
     font-size: 14px;
 }
 
-/* Estilos para la celda de acciones */
 .data-table td:last-child {
     display: flex;
     gap: 8px;
 }
 
-/* Filas alternas */
 .data-table tr:nth-child(even) {
     background-color: #f8fafc;
 }
@@ -760,11 +824,173 @@ body {
 }
 
 /* ==================== */
-/* MODO TARJETA ELEGANTE PARA MÓVILES */
+/* INDICADOR DE ESTADO ACTIVO/INACTIVO */
 /* ==================== */
+.status-active, .status-inactive {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ==================== */
+/* ESTILOS PARA PAGINACIÓN */
+/* ==================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pagination-info {
+    margin: 0 15px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.pagination-btn {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 40px;
+    text-align: center;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    transform: translateY(-1px);
+}
+
+.pagination-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.pagination-btn:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ==================== */
+/* RESPONSIVE - MÓVIL */
+/* ==================== */
 @media (max-width: 768px) {
-    /* Eliminar el contenedor que "encierra" las tarjetas */
+    /* Mostrar barra superior móvil */
+    .mobile-topbar {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Ocultar header original en móvil */
+    .header {
+        display: none;
+    }
+
+    /* Ajustar contenido principal para la barra móvil */
+    .main-content {
+        padding: 90px 15px 20px 15px;
+    }
+
+    /* Mostrar botón hamburguesa en móvil */
+    .toggle-btn {
+        display: flex;
+    }
+
+    /* Mostrar botón de cerrar en móvil */
+    .sidebar-close {
+        display: block;
+    }
+
+    /* Sidebar en móvil */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        width: 280px;
+        height: 100vh;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    /* Ocultar botón hamburguesa cuando el menú está abierto */
+    .sidebar.active ~ .mobile-topbar .toggle-btn {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    /* Logo centrado en móvil */
+    .logo {
+        margin: 60px 0 30px 0;
+        justify-content: center;
+    }
+
+    .logo h1 {
+        font-size: 16px;
+    }
+
+    /* Contenido ajustado */
+    .content {
+        margin: 0;
+        padding: 15px 0;
+    }
+
+    /* Modal responsive */
+    .modal-body {
+        grid-template-columns: 1fr;
+    }
+
+    /* Paginación responsive */
+    .pagination {
+        gap: 6px;
+        margin-top: 20px;
+    }
+    
+    .pagination-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+        min-width: 36px;
+    }
+    
+    .pagination-info {
+        margin: 0 10px;
+        font-size: 13px;
+    }
+
+    /* Tablas responsive */
     .table-responsive {
         overflow-x: visible;
         background: transparent;
@@ -829,7 +1055,6 @@ body {
         flex-wrap: wrap;
     }
 
-    /* Encabezado de la tarjeta (primera celda) */
     .data-table td:first-child {
         background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         color: white;
@@ -844,7 +1069,6 @@ body {
         font-weight: 500;
     }
 
-    /* Estilos para las etiquetas */
     .data-table td::before {
         content: attr(data-label);
         font-weight: 600;
@@ -857,7 +1081,6 @@ body {
         border-radius: 6px;
     }
 
-    /* Ocultar etiqueta en celdas especiales */
     .data-table td:first-child::before {
         background: transparent;
         padding: 0;
@@ -867,13 +1090,11 @@ body {
         display: none;
     }
 
-    /* Valor de la celda con ancho flexible */
     .data-table td {
         font-size: 14px;
         color: #475569;
     }
 
-    /* Mejora los botones en móvil */
     .data-table .btn-action {
         padding: 10px 18px;
         font-size: 13px;
@@ -887,33 +1108,88 @@ body {
         margin: 0;
     }
 
-    .btn-edit {
-        background: #4CAF50;
-        color: white;
+    /* ==================== */
+    /* RESPONSIVE - Login y Registro */
+    /* ==================== */
+    .auth-container {
+        flex-direction: column;
+        margin: 2rem auto;
+        max-width: 90%;
+        min-height: auto;
+        border-radius: 12px;
     }
 
-    .btn-edit:hover {
-        background: #45a049;
-        transform: translateY(-2px);
+    .auth-form {
+        padding: 30px 25px;
+        order: 2;
     }
 
-    .btn-delete {
-        background: #f44336;
-        color: white;
+    .auth-form h2 {
+        font-size: 24px;
+        margin-bottom: 25px;
     }
 
-    .btn-delete:hover {
-        background: #e53935;
-        transform: translateY(-2px);
+    .auth-image {
+        order: 1;
+        padding: 30px;
+        min-height: 200px;
+    }
+
+    .auth-image img {
+        max-width: 150px;
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 18px;
+    }
+
+    .auth-form .form-group input,
+    .role-select {
+        padding: 14px 15px;
+        font-size: 16px; /* Mejor para móviles */
+    }
+
+    .auth-form .btn {
+        padding: 16px;
+        font-size: 16px;
+        margin-top: 15px;
+    }
+
+    .auth-form p {
+        margin-top: 25px;
+        font-size: 15px;
     }
 }
 
-
-/* ==================== */
-/* MEJORAS PARA PANTALLAS PEQUEÑAS */
-/* ==================== */
-
+/* Para pantallas muy pequeñas */
 @media (max-width: 480px) {
+    .sidebar {
+        width: 250px;
+    }
+
+    .mobile-topbar {
+        height: 60px;
+        padding: 0 10px;
+    }
+
+    .toggle-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .mobile-page-title {
+        font-size: 16px;
+    }
+
+    .mobile-user-info span {
+        display: none;
+    }
+
+    .main-content {
+        padding: 80px 10px 20px 10px;
+    }
+
     .data-table tr {
         margin-bottom: 16px;
         border-radius: 14px;
@@ -953,7 +1229,7 @@ body {
     }
 
     .content {
-        padding: 16px;
+        padding: 16px 0;
     }
 
     .content h3 {
@@ -962,12 +1238,72 @@ body {
         margin-bottom: 20px;
         text-align: center;
     }
+
+    /* Login y Registro para móviles pequeños */
+    .auth-container {
+        margin: 1rem auto;
+        max-width: 95%;
+        border-radius: 10px;
+    }
+
+    .auth-form {
+        padding: 25px 20px;
+    }
+
+    .auth-form h2 {
+        font-size: 22px;
+    }
+
+    .auth-image {
+        padding: 25px;
+        min-height: 150px;
+    }
+
+    .auth-image img {
+        max-width: 200px;
+    }
+
+    .auth-form .form-group label {
+        font-size: 15px;
+    }
+
+    .auth-form .form-group input,
+    .role-select {
+        padding: 12px 15px;
+    }
+
+    .auth-form .btn {
+        padding: 15px;
+    }
+
+    .auth-form .form-group .forgot-password {
+        font-size: 13px;
+    }
+}
+
+/* Para pantallas muy pequeñas (móviles en portrait) */
+@media (max-width: 360px) {
+    .auth-form {
+        padding: 20px 15px;
+    }
+
+    .auth-form h2 {
+        font-size: 20px;
+    }
+
+    .auth-image {
+        padding: 20px;
+        min-height: 120px;
+    }
+
+    .auth-image img {
+        max-width: 100px;
+    }
 }
 
 /* ==================== */
-/* ANIMACIONES Y EFECTOS */
+/* ANIMACIONES */
 /* ==================== */
-
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -989,10 +1325,6 @@ body {
 .data-table tr:nth-child(4) { animation-delay: 0.4s; }
 .data-table tr:nth-child(5) { animation-delay: 0.5s; }
 
-/* ==================== */
-/* ESTADO VACÍO MEJORADO */
-/* ==================== */
-
 .data-table tr td[colspan] {
     text-align: center;
     padding: 40px 20px;
@@ -1002,113 +1334,58 @@ body {
     border-radius: 12px;
 }
 
-/* ==================== */
-/* INDICADOR DE ESTADO ACTIVO/INACTIVO */
-/* ==================== */
-
-.status-active, .status-inactive {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+/* Estilos específicos para la tabla de checadores */
+.data-table td:nth-child(5) { /* Columna de contraseña */
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.status-active {
-    background: #d1fae5;
-    color: #065f46;
+/* Para dispositivos móviles */
+@media (max-width: 768px) {
+    .data-table td:nth-child(5) {
+        max-width: 450px;
+    }
+    
+    /*
+    .data-table td:nth-child(5)::before {
+        content: "Contraseña:";
+    }
+    */
 }
 
-.status-inactive {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-
-
-
-/* ==================== */
-/* ESTILOS PARA PAGINACIÓN DE LAS TABLAS*/
-/* ==================== */
-
-.pagination {
+/* Estilos para cuando la imagen no carga */
+.auth-image img:before {
+    content: "🎯";
+    font-size: 50px;
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 30px;
-    gap: 8px;
-    flex-wrap: wrap;
 }
 
-.pagination-info {
-    margin: 0 15px;
-    color: #64748b;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.pagination-btn {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    color: #475569;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    min-width: 40px;
-    text-align: center;
-}
-
-.pagination-btn:hover:not(:disabled) {
-    background: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
-    transform: translateY(-1px);
-}
-
-.pagination-btn.active {
-    background: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
-}
-
-.pagination-btn:disabled {
-    background: #f1f5f9;
-    color: #94a3b8;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.pagination-dots {
-    color: #94a3b8;
-    padding: 8px 4px;
-}
-
-/* Responsive para paginación */
-@media (max-width: 768px) {
-    .pagination {
-        gap: 6px;
-        margin-top: 20px;
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .auth-form .btn,
+    .auth-form .form-group input,
+    .role-select {
+        transition: none;
     }
     
-    .pagination-btn {
-        padding: 6px 12px;
-        font-size: 13px;
-        min-width: 36px;
-    }
-    
-    .pagination-info {
-        margin: 0 10px;
-        font-size: 13px;
+    .data-table tr {
+        animation: none;
     }
 }
 
-
-
-
-
+/* Alto contraste para mejor accesibilidad */
+@media (prefers-contrast: high) {
+    .auth-form .form-group input,
+    .role-select {
+        border-width: 2px;
+    }
+    
+    .auth-form .btn {
+        border: 2px solid #1d4ed8;
+    }
+}
