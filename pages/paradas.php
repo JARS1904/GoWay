@@ -96,7 +96,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="reportes.html">
+                        <a href="reportes.php">
                             <img src="../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
                             <span>Reportes</span>
                         </a>
