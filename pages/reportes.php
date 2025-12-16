@@ -84,6 +84,7 @@ if ($conexion->error) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes - Transporte Público</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="icon" href="../assets/images/logo.png" type="image/png">
     <style>
         /* Los estilos permanecen igual */
         .reports-container {
@@ -749,7 +750,7 @@ if ($conexion->error) {
                     </div>
                     <div class="report-description">${report.descripcion}</div>
                     <div class="report-actions">
-                        <button class="btn-action-small btn-view" onclick="viewReport(${report.id})">Ver</button>
+                        <!--<button class="btn-action-small btn-view" onclick="viewReport(${report.id})">Ver</button>-->
                         <button class="btn-action-small btn-edit" onclick="editReport(${report.id})">Editar</button>
                         <button class="btn-action-small btn-delete" onclick="deleteReport(${report.id})">Eliminar</button>
                     </div>
