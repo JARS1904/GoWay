@@ -18,10 +18,20 @@ if (isset($_POST['btningresar'])) {
             $usuario = $resultado->fetch_assoc();
             
             // Iniciar sesión y guardar datos del usuario
+
+            // Se comento por problemas al iniciar sesión
+            /*
             session_start();
             $_SESSION['user_id'] = $usuario['id'];
             $_SESSION['user_name'] = $usuario['nombre'];
             $_SESSION['user_role'] = $usuario['rol'];
+            */
+
+            // Se cambio por esta versión
+            session_start();
+            $_SESSION['id']     = $usuario['id'];
+            $_SESSION['nombre'] = $usuario['nombre'];
+            $_SESSION['rol']    = $usuario['rol'];
             
             // Redirigir según el rol
             if ($usuario['rol'] == 1) { // Administrador
