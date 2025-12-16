@@ -60,7 +60,7 @@ $sql_rutas = "SELECT id_ruta, nombre FROM rutas ORDER BY nombre";
 $result_rutas = $conexion->query($sql_rutas);
 
 // Obtener reportes recientes
-$sql_reportes = "SELECT r.*, 
+$sql_reportes = "SELECT r.*,
                         v.placa as vehiculo_placa, v.modelo as vehiculo_modelo,
                         c.nombre as conductor_nombre,
                         ru.nombre as ruta_nombre
@@ -682,9 +682,32 @@ if ($conexion->error) {
         return statusMap[status] || status;
     }
 
+    // Antigua función para la fecha de los reportes
+    /*
     function formatDate(dateTime) {
         const date = new Date(dateTime);
         return date.toLocaleDateString('es-ES') + ' ' + date.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'});
+    }
+    */
+
+    // Nueva función para manejar los casos de las fechas
+    function formatDate(dateTime) {
+        try {
+            const date = new Date(dateTime);
+            if (isNaN(date.getTime())) {
+                return 'Fecha inválida';
+            }
+            return date.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }) + ' ' + date.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (e) {
+            return dateTime;
+        }
     }
 
     function updateStats(reports) {
