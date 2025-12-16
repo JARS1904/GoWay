@@ -328,6 +328,38 @@ if ($conexion->error) {
                 flex-direction: column;
             }
         }
+
+        /* Estilos para botones deshabilitados */
+        .btn-action-small:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Estilos para indicador de carga */
+        .loading {
+            position: relative;
+            color: transparent !important;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -728,11 +760,191 @@ if ($conexion->error) {
         // Implementar edición del reporte
     }
 
+    /**
+     * Función para eliminar un reporte
+     * 
+     * Elimina un reporte por id y actualiza la UI.
+     * @param {number} id - ID del reporte.
+     * Comportamiento:
+     *  - Muestra confirm dialog.
+     *  - Envía POST a '../controllers/delete/delete_reportes.php' con FormData {id}.
+     *  - Espera JSON { success: boolean, message: string }.
+     *  - Si success true: elimina la tarjeta y actualiza estadísticas.
+     *  - Si success false o error de red: restaura UI y muestra notificación.
+     */
     function deleteReport(id) {
-        if (confirm('¿Está seguro de que desea eliminar este reporte?')) {
-            alert(`Reporte ${id} eliminado`);
-            // Implementar eliminación del reporte
+        // Mostrar modal de confirmación
+        const confirmDelete = confirm('¿Está seguro de que desea eliminar este reporte?\n\n⚠️ Esta acción no se puede deshacer.');
+
+        if (!confirmDelete) {
+            return;
         }
+
+        // Encontrar el elemento del reporte para efectos visuales
+        const reportCard = document.querySelector(`.report-card [onclick="deleteReport(${id})"]`)?.closest('.report-card');
+        const deleteBtn = document.querySelector(`button[onclick="deleteReport(${id})"]`);
+
+        if (reportCard) {
+            // Efecto visual de eliminación
+            reportCard.style.transition = 'all 0.3s ease';
+            reportCard.style.opacity = '0.5';
+            reportCard.style.transform = 'scale(0.98)';
+        }
+
+        if (deleteBtn) {
+            deleteBtn.classList.add('loading');
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = '';
+        }
+
+        // Crear y enviar solicitud
+        const formData = new FormData();
+        formData.append('id', id);
+
+        fetch('../controllers/delete/delete_reportes.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error de red');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Encontrar y eliminar del array
+                const reportIndex = reportes.findIndex(r => r.id == id);
+                if (reportIndex !== -1) {
+                    // Efecto visual de eliminación exitosa
+                    if (reportCard) {
+                        reportCard.style.opacity = '0';
+                        reportCard.style.transform = 'scale(0.95)';
+                        reportCard.style.height = '0';
+                        reportCard.style.margin = '0';
+                        reportCard.style.padding = '0';
+                        reportCard.style.border = '0';
+
+                        // Eliminar después de la animación
+                        setTimeout(() => {
+                            reportes.splice(reportIndex, 1);
+
+                            // Actualizar vista
+                            const currentFilter = document.getElementById('filterStatus').value;
+                            if (currentFilter === 'todos') {
+                                loadReports(reportes);
+                            } else {
+                                filterReports();
+                            }
+
+                            updateStats(reportes);
+
+                            // Mostrar mensaje de éxito
+                            showNotification('Reporte eliminado exitosamente', 'success');
+                        }, 300);
+                    } else {
+                        // Si no hay elemento visual, solo actualizar
+                        reportes.splice(reportIndex, 1);
+                        const currentFilter = document.getElementById('filterStatus').value;
+                        if (currentFilter === 'todos') {
+                            loadReports(reportes);
+                        } else {
+                            filterReports();
+                        }
+                        updateStats(reportes);
+                        showNotification('Reporte eliminado exitosamente', 'success');
+                    }
+                }
+            } else {
+                throw new Error(data.message || 'Error desconocido');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+
+            // Restaurar apariencia
+            if (reportCard) {
+                reportCard.style.opacity = '1';
+                reportCard.style.transform = '';
+            }
+
+            if (deleteBtn) {
+                deleteBtn.classList.remove('loading');
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = 'Eliminar';
+            }
+
+            showNotification('Error al eliminar el reporte: ' + error.message, 'error');
+        });
+    }
+
+    // Función para mostrar notificaciones (opcional)
+    function showNotification(message, type = 'info') {
+        // Crear elemento de notificación
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+
+        // Estilos básicos
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 350px;
+        `;
+
+        // Colores según tipo
+        if (type === 'success') {
+            notification.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        } else if (type === 'error') {
+            notification.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+        } else {
+            notification.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+        }
+
+        // Animación
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Añadir al documento
+        document.body.appendChild(notification);
+
+        // Auto-eliminar después de 5 segundos
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 5000);
+
+        // Permitir cerrar manualmente
+        notification.addEventListener('click', () => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        });
     }
 
     // Función para manejar el cambio de vehículo
