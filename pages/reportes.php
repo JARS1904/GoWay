@@ -637,11 +637,28 @@ if ($conexion->error) {
         });
     }
 
-    // Función para filtrar reportes
+    // Función para filtrar reportes segun los siguientes estados:
+    // Pendiente
+    // En Proceso
+    // Resuelto
     function filterReports() {
-        const filter = document.getElementById('filterStatus').value;
-        // Implementar filtrado según sea necesario
-        console.log('Filtrando por:', filter);
+        const filterValue = document.getElementById('filterStatus').value;
+
+        let filteredReports;
+
+        if (filterValue === 'todos') {
+            filteredReports = reportes;
+        } else if (filterValue === 'pendiente') {
+            filteredReports = reportes.filter(report => report.status === 'pendiente');
+        } else if (filterValue === 'en-proceso') {
+            filteredReports = reportes.filter(report => report.status === 'en-proceso');
+        } else if (filterValue === 'resuelto') {
+            filteredReports = reportes.filter(report => report.status === 'resuelto');
+        } else {
+            filteredReports = reportes;
+        }
+
+        loadReports(filteredReports);
     }
 
     // Función para manejar el envío del formulario
