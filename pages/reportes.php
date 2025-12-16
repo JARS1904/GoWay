@@ -1,3 +1,82 @@
+<?php
+require_once '../config/conexion_bd.php';
+
+// Procesar el formulario cuando se envía
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    try {
+        // Obtener y sanitizar los datos del formulario
+        $id_vehiculo = $conexion->real_escape_string($_POST['vehiculo']);
+        $rfc_conductor = $conexion->real_escape_string($_POST['conductor']);
+        $id_ruta = $conexion->real_escape_string($_POST['ruta']);
+        $tipo_incidente = $conexion->real_escape_string($_POST['tipoIncidente']);
+        $fecha_incidente = $conexion->real_escape_string($_POST['fechaIncidente']);
+        $descripcion = $conexion->real_escape_string($_POST['descripcion']);
+        $gravedad = $conexion->real_escape_string($_POST['gravedad']);
+
+        // Preparar la consulta SQL
+        $sql = "INSERT INTO reportes (id_vehiculo, rfc_conductor, id_ruta, tipo_incidente, 
+                                    fecha_incidente, descripcion, gravedad) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        // Preparar y ejecutar la consulta
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param("issssss", 
+            $id_vehiculo, 
+            $rfc_conductor, 
+            $id_ruta, 
+            $tipo_incidente, 
+            $fecha_incidente, 
+            $descripcion, 
+            $gravedad
+        );
+
+        if ($stmt->execute()) {
+            echo "<script>
+                    alert('Reporte guardado exitosamente');
+                    window.location.href = '" . $_SERVER['PHP_SELF'] . "';
+                  </script>";
+        } else {
+            throw new Exception("Error al guardar el reporte: " . $stmt->error);
+        }
+
+        $stmt->close();
+    } catch (Exception $e) {
+        echo "<script>
+                alert('Error: " . str_replace("'", "\\'", $e->getMessage()) . "');
+              </script>";
+    }
+}
+
+// Obtener lista de vehículos con placa y modelo
+$sql_vehiculos = "SELECT id_vehiculo, placa, modelo FROM vehiculos ORDER BY placa";
+$result_vehiculos = $conexion->query($sql_vehiculos);
+
+// Obtener lista de conductores
+$sql_conductores = "SELECT rfc_conductor, nombre FROM conductores ORDER BY nombre";
+$result_conductores = $conexion->query($sql_conductores);
+
+// Obtener lista de rutas
+$sql_rutas = "SELECT id_ruta, nombre FROM rutas ORDER BY nombre";
+$result_rutas = $conexion->query($sql_rutas);
+
+// Obtener reportes recientes
+$sql_reportes = "SELECT r.*, 
+                        v.placa as vehiculo_placa, v.modelo as vehiculo_modelo,
+                        c.nombre as conductor_nombre,
+                        ru.nombre as ruta_nombre
+                 FROM reportes r
+                 INNER JOIN vehiculos v ON r.id_vehiculo = v.id_vehiculo
+                 INNER JOIN conductores c ON r.rfc_conductor = c.rfc_conductor
+                 INNER JOIN rutas ru ON r.id_ruta = ru.id_ruta
+                 ORDER BY r.created_at DESC
+                 LIMIT 10";
+$result_reportes = $conexion->query($sql_reportes);
+
+// Si hay error en la conexión o en las consultas
+if ($conexion->error) {
+    die("Error en la conexión: " . $conexion->error);
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,7 +85,7 @@
     <title>Reportes - Transporte Público</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
-        /* Estilos específicos para reportes */
+        /* Los estilos permanecen igual */
         .reports-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -338,7 +417,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="reportes.html">
+                    <a href="reportes.php">
                         <img src="../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
                         <span>Reportes</span>
                     </a>
@@ -391,14 +470,18 @@
                 <!-- Formulario para nuevo reporte -->
                 <div class="report-form-container">
                     <h3>Nuevo Reporte de Incidente</h3>
-                    <form id="incidentForm">
+                    <form id="incidentForm" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                         <div class="form-group">
                             <label for="vehiculo">Vehículo *</label>
                             <select id="vehiculo" name="vehiculo" required>
                                 <option value="">Seleccionar vehículo</option>
-                                <option value="VH001">VH001 - Ruta 15</option>
-                                <option value="VH002">VH002 - Ruta 22</option>
-                                <option value="VH003">VH003 - Ruta 8</option>
+                                <?php
+                                if ($result_vehiculos && $result_vehiculos->num_rows > 0) {
+                                    while($row = $result_vehiculos->fetch_assoc()) {
+                                        echo "<option value='" . $row['id_vehiculo'] . "'>" . $row['placa'] . " - " . $row['modelo'] . "</option>";
+                                    }
+                                }
+                                ?>
                             </select>
                         </div>
 
@@ -406,9 +489,27 @@
                             <label for="conductor">Conductor *</label>
                             <select id="conductor" name="conductor" required>
                                 <option value="">Seleccionar conductor</option>
-                                <option value="C001">Juan Pérez</option>
-                                <option value="C002">María García</option>
-                                <option value="C003">Carlos López</option>
+                                <?php
+                                if ($result_conductores && $result_conductores->num_rows > 0) {
+                                    while($row = $result_conductores->fetch_assoc()) {
+                                        echo "<option value='" . $row['rfc_conductor'] . "'>" . $row['nombre'] . "</option>";
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ruta">Ruta *</label>
+                            <select id="ruta" name="ruta" required>
+                                <option value="">Seleccionar ruta</option>
+                                <?php
+                                if ($result_rutas && $result_rutas->num_rows > 0) {
+                                    while($row = $result_rutas->fetch_assoc()) {
+                                        echo "<option value='" . $row['id_ruta'] . "'>" . $row['nombre'] . "</option>";
+                                    }
+                                }
+                                ?>
                             </select>
                         </div>
 
@@ -427,11 +528,6 @@
                         <div class="form-group">
                             <label for="fechaIncidente">Fecha y Hora *</label>
                             <input type="datetime-local" id="fechaIncidente" name="fechaIncidente" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="ubicacion">Ubicación *</label>
-                            <input type="text" id="ubicacion" name="ubicacion" placeholder="Ej: Av. Principal #123" required>
                         </div>
 
                         <div class="form-group">
@@ -480,58 +576,39 @@
 </div>
 
 <script>
-    // Datos de ejemplo para los reportes
-    const sampleReports = [
-        {
-            id: 1,
-            vehiculo: "VH001 - Ruta 15",
-            conductor: "Juan Pérez",
-            tipo: "averia",
-            tipoTexto: "Avería Mecánica",
-            fecha: "2024-01-15 14:30",
-            ubicacion: "Av. Central km 5",
-            descripcion: "Falla en el sistema de frenos, requiere revisión inmediata.",
-            gravedad: "alta",
-            status: "pendiente"
-        },
-        {
-            id: 2,
-            vehiculo: "VH002 - Ruta 22",
-            conductor: "María García",
-            tipo: "retraso",
-            tipoTexto: "Retraso Significativo",
-            fecha: "2024-01-15 10:15",
-            ubicacion: "Terminal Norte",
-            descripcion: "Retraso de 45 minutos por congestión vehicular extrema.",
-            gravedad: "media",
-            status: "resuelto"
-        },
-        {
-            id: 3,
-            vehiculo: "VH003 - Ruta 8",
-            conductor: "Carlos López",
-            tipo: "accidente",
-            tipoTexto: "Accidente Menor",
-            fecha: "2024-01-14 16:45",
-            ubicacion: "Calle 5ta y Av. Sur",
-            descripcion: "Colisión lateral sin heridos, daños menores en vehículo.",
-            gravedad: "media",
-            status: "en-proceso"
+    // Cargar reportes desde PHP
+    const reportes = [
+        <?php 
+        if ($result_reportes && $result_reportes->num_rows > 0) {
+            while($row = $result_reportes->fetch_assoc()) {
+                echo "{
+                    id: " . $row['id'] . ",
+                    vehiculo: \"" . $row['vehiculo_placa'] . " - " . $row['vehiculo_modelo'] . "\",
+                    conductor: \"" . $row['conductor_nombre'] . "\",
+                    tipo: \"" . $row['tipo_incidente'] . "\",
+                    tipoTexto: \"" . ucfirst($row['tipo_incidente']) . "\",
+                    fecha: \"" . $row['fecha_incidente'] . "\",
+                    descripcion: \"" . addslashes($row['descripcion']) . "\",
+                    gravedad: \"" . $row['gravedad'] . "\",
+                    status: \"" . $row['estado'] . "\"
+                },";
+            }
         }
+        ?>
     ];
 
     // Cargar reportes al iniciar
     document.addEventListener('DOMContentLoaded', function() {
-        loadReports();
-        updateStats();
+        loadReports(reportes);
+        updateStats(reportes);
     });
 
     // Función para cargar reportes en la lista
-    function loadReports() {
+    function loadReports(reports) {
         const reportsList = document.getElementById('reportsList');
         reportsList.innerHTML = '';
 
-        sampleReports.forEach(report => {
+        reports.forEach(report => {
             const reportCard = document.createElement('div');
             reportCard.className = 'report-card';
             reportCard.innerHTML = `
@@ -569,11 +646,13 @@
 
     // Función para manejar el envío del formulario
     document.getElementById('incidentForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Aquí iría la lógica para enviar el reporte a la base de datos
-        alert('Reporte generado exitosamente');
-        this.reset();
+        // No prevenimos el evento submit para permitir el envío del formulario
+        const fechaIncidente = document.getElementById('fechaIncidente');
+        if (!fechaIncidente.value) {
+            e.preventDefault();
+            alert('Por favor, seleccione la fecha y hora del incidente');
+            return;
+        }
     });
 
     // Funciones auxiliares
@@ -591,12 +670,12 @@
         return date.toLocaleDateString('es-ES') + ' ' + date.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'});
     }
 
-    function updateStats() {
-        // Actualizar estadísticas (en una implementación real, esto vendría de la base de datos)
-        document.getElementById('totalReports').textContent = sampleReports.length;
-        document.getElementById('pendingReports').textContent = sampleReports.filter(r => r.status === 'pendiente').length;
-        document.getElementById('inProgressReports').textContent = sampleReports.filter(r => r.status === 'en-proceso').length;
-        document.getElementById('resolvedReports').textContent = sampleReports.filter(r => r.status === 'resuelto').length;
+    function updateStats(reports) {
+        // Actualizar estadísticas con datos reales
+        document.getElementById('totalReports').textContent = reports.length;
+        document.getElementById('pendingReports').textContent = reports.filter(r => r.status === 'pendiente').length;
+        document.getElementById('inProgressReports').textContent = reports.filter(r => r.status === 'en-proceso').length;
+        document.getElementById('resolvedReports').textContent = reports.filter(r => r.status === 'resuelto').length;
     }
 
     function viewReport(id) {
@@ -616,7 +695,13 @@
         }
     }
 
-    // Funciones para el menú hamburguesa (las que ya tenías)
+    // Función para manejar el cambio de vehículo
+    document.getElementById('vehiculo').addEventListener('change', function() {
+        const vehiculoId = this.value;
+        // Aquí puedes agregar lógica adicional si necesitas hacer algo cuando se selecciona un vehículo
+    });
+
+    // Funciones para el menú hamburguesa
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');

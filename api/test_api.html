@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Test API GoWay</title>
+</head>
+<body>
+
+<h1>Pruebas de la API GoWay</h1>
+
+<button onclick="testSearchRoutes()">Probar search_routes</button>
+
+<script>
+function testSearchRoutes() {
+  fetch("http://localhost/GoWay/api/routes_api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "search_routes",
+      origin: "Guadalajara",
+      destination: "Zapopan"
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("Respuesta de search_routes:", data);
+    alert("Revisa la consola (F12)");
+  })
+  .catch(console.error);
+}
+</script>
+
+</body>
+</html>
