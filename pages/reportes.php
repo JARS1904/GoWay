@@ -579,6 +579,92 @@ if ($conexion->error) {
 
                         <button type="submit" class="btn-submit">Generar Reporte</button>
                     </form>
+
+                    <!-- Modal editar reporte -->
+                    <div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999;">
+                        <div style="background:white; width:90%; max-width:600px; border-radius:10px; padding:20px; position:relative;">
+                            <h3>Editar Reporte</h3>
+                            <form id="editForm">
+                            <input type="hidden" id="edit_id" name="id">
+                            <div class="form-group">
+                                <label for="edit_vehiculo">Vehículo *</label>
+                                <select id="edit_vehiculo" name="vehiculo" required>
+                                <option value="">Seleccionar vehículo</option>
+                                <?php
+                                // Reusar $result_vehiculos (si ya fue iterado antes, recrea la query)
+                                $r = $conexion->query("SELECT id_vehiculo, placa, modelo FROM vehiculos ORDER BY placa");
+                                while($v = $r->fetch_assoc()){
+                                    echo "<option value='{$v['id_vehiculo']}'>{$v['placa']} - {$v['modelo']}</option>";
+                                }
+                                ?>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_conductor">Conductor *</label>
+                                <select id="edit_conductor" name="conductor" required>
+                                <option value="">Seleccionar conductor</option>
+                                <?php
+                                $r = $conexion->query("SELECT rfc_conductor, nombre FROM conductores ORDER BY nombre");
+                                while($c = $r->fetch_assoc()){
+                                    echo "<option value='{$c['rfc_conductor']}'>{$c['nombre']}</option>";
+                                }
+                                ?>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_ruta">Ruta *</label>
+                                <select id="edit_ruta" name="ruta" required>
+                                <option value="">Seleccionar ruta</option>
+                                <?php
+                                $r = $conexion->query("SELECT id_ruta, nombre FROM rutas ORDER BY nombre");
+                                while($ru = $r->fetch_assoc()){
+                                    echo "<option value='{$ru['id_ruta']}'>{$ru['nombre']}</option>";
+                                }
+                                ?>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_tipoIncidente">Tipo de Incidente *</label>
+                                <select id="edit_tipoIncidente" name="tipoIncidente" required>
+                                <option value="">Seleccionar tipo</option>
+                                <option value="accidente">Accidente</option>
+                                <option value="averia">Avería Mecánica</option>
+                                <option value="retraso">Retraso Significativo</option>
+                                <option value="cliente">Incidente con Cliente</option>
+                                <option value="otro">Otro</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_fechaIncidente">Fecha y Hora *</label>
+                                <input type="datetime-local" id="edit_fechaIncidente" name="fechaIncidente" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_descripcion">Descripción *</label>
+                                <textarea id="edit_descripcion" name="descripcion" required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_gravedad">Gravedad</label>
+                                <select id="edit_gravedad" name="gravedad">
+                                <option value="baja">Baja</option>
+                                <option value="media">Media</option>
+                                <option value="alta">Alta</option>
+                                <option value="critica">Crítica</option>
+                                </select>
+                            </div>
+
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button type="button" id="editCancel" class="btn-action-small" style="background:#9CA3AF;color:white;border-radius:6px;padding:8px 12px;">Cancelar</button>
+                                <button type="submit" id="editSave" class="btn-action-small" style="background:#3b82f6;color:white;border-radius:6px;padding:8px 12px;">Guardar cambios</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Lista de reportes existentes -->
@@ -615,9 +701,12 @@ if ($conexion->error) {
             while($row = $result_reportes->fetch_assoc()) {
                 echo "{
                     id: " . $row['id'] . ",
+                    id_vehiculo: " . (int)$row['id_vehiculo'] . ",
+                    rfc_conductor: \"" . $row['rfc_conductor'] . "\",
+                    id_ruta: " . (int)$row['id_ruta'] . ",
                     vehiculo: \"" . $row['vehiculo_placa'] . " - " . $row['vehiculo_modelo'] . "\",
-                    conductor: \"" . $row['conductor_nombre'] . "\",
-                    tipo: \"" . $row['tipo_incidente'] . "\",
+                    conductor: \"" . addslashes($row['conductor_nombre']) . "\",
+                    tipo: \"" . addslashes($row['tipo_incidente']) . "\",
                     tipoTexto: \"" . ucfirst($row['tipo_incidente']) . "\",
                     fecha: \"" . $row['fecha_incidente'] . "\",
                     descripcion: \"" . addslashes($row['descripcion']) . "\",
@@ -1005,6 +1094,119 @@ if ($conexion->error) {
         if (window.innerWidth > 768) {
             closeSidebar();
         }
+    });
+
+    // --- funciones para editar ---
+    function openEditModal() {
+        const modal = document.getElementById('editModal');
+        modal.style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('editModal');
+        modal.style.display = 'none';
+    }
+
+    // Abrir modal y prefilling
+    function editReport(id) {
+        const report = reportes.find(r => r.id == id);
+        if (!report) {
+            showNotification('Reporte no encontrado', 'error');
+            return;
+        }
+
+        // set values (si no tienes id_vehiculo en el objeto report, puede venir del backend)
+        document.getElementById('edit_id').value = report.id;
+        if (report.id_vehiculo) document.getElementById('edit_vehiculo').value = report.id_vehiculo;
+        if (report.rfc_conductor) document.getElementById('edit_conductor').value = report.rfc_conductor;
+        if (report.id_ruta) document.getElementById('edit_ruta').value = report.id_ruta;
+        document.getElementById('edit_tipoIncidente').value = report.tipo || report.tipo_incidente || '';
+        // fecha: convertir a formato compatible con datetime-local (yyyy-mm-ddThh:mm)
+        if (report.fecha) {
+            const d = new Date(report.fecha);
+            if (!isNaN(d.getTime())) {
+                const pad = n => n.toString().padStart(2,'0');
+                const dt = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                document.getElementById('edit_fechaIncidente').value = dt;
+            } else {
+                document.getElementById('edit_fechaIncidente').value = '';
+            }
+        } else {
+            document.getElementById('edit_fechaIncidente').value = '';
+        }
+        document.getElementById('edit_descripcion').value = report.descripcion || '';
+        document.getElementById('edit_gravedad').value = report.gravedad || 'media';
+
+        openEditModal();
+    }
+
+    // submit del formulario de edición
+    document.getElementById('editForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        const saveBtn = document.getElementById('editSave');
+        saveBtn.disabled = true;
+        saveBtn.classList.add('loading');
+
+        const formData = new FormData(this);
+        // enviar a endpoint
+        fetch('../controllers/update/update_reportes.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            saveBtn.disabled = false;
+            saveBtn.classList.remove('loading');
+            if (data.success) {
+                // actualizar array reportes en memoria y UI
+                const id = formData.get('id');
+                const idx = reportes.findIndex(r => r.id == id);
+                if (idx !== -1) {
+                    const vehSelect = document.getElementById('edit_vehiculo');
+                    const condSelect = document.getElementById('edit_conductor');
+                    const rutaSelect = document.getElementById('edit_ruta');
+
+                    // actualizar campos visibles en array
+                    reportes[idx].vehiculo = vehSelect.selectedOptions[0].text;
+                    reportes[idx].conductor = condSelect.selectedOptions[0].text;
+                    reportes[idx].ruta = rutaSelect.selectedOptions[0].text || reportes[idx].ruta;
+                    reportes[idx].tipo = document.getElementById('edit_tipoIncidente').value;
+                    reportes[idx].fecha = document.getElementById('edit_fechaIncidente').value;
+                    reportes[idx].descripcion = document.getElementById('edit_descripcion').value;
+                    reportes[idx].gravedad = document.getElementById('edit_gravedad').value;
+
+                    // además mantener ids si los necesitas
+                    reportes[idx].id_vehiculo = parseInt(formData.get('vehiculo'));
+                    reportes[idx].rfc_conductor = formData.get('conductor');
+                    reportes[idx].id_ruta = parseInt(formData.get('ruta'));
+                }
+
+                // refrescar lista y stats
+                const currentFilter = document.getElementById('filterStatus').value;
+                if (currentFilter === 'todos') {
+                    loadReports(reportes);
+                } else {
+                    filterReports();
+                }
+                updateStats(reportes);
+
+                closeEditModal();
+                showNotification(data.message || 'Reporte actualizado', 'success');
+            } else {
+                showNotification(data.message || 'Error al actualizar', 'error');
+            }
+        })
+        .catch(err => {
+            saveBtn.disabled = false;
+            saveBtn.classList.remove('loading');
+            console.error(err);
+            showNotification('Error de red al actualizar', 'error');
+        });
+    });
+
+    // cancelar edición
+    document.getElementById('editCancel').addEventListener('click', function(){
+        closeEditModal();
     });
 </script>
 </body>
