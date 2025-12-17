@@ -134,7 +134,7 @@ if ($conexion->error) {
             width: 100%;
             padding: 12px;
             border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            border-radius: 15px;
             font-size: 14px;
             transition: border-color 0.3s ease;
             box-sizing: border-box;
@@ -370,6 +370,22 @@ if ($conexion->error) {
             0% { transform: translate(-50%, -50%) rotate(0deg); }
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
+
+        /* Estilos adicionales para modal */
+        .modal-form-group textarea {
+            min-height: 110px;
+            resize: vertical;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .modal-form-group input:focus,
+        .modal-form-group select:focus,
+        .modal-form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
     </style>
 </head>
 <body>
@@ -591,87 +607,95 @@ if ($conexion->error) {
                     </form>
 
                     <!-- Modal editar reporte -->
-                    <div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999;">
-                        <div style="background:white; width:90%; max-width:600px; border-radius:10px; padding:20px; position:relative;">
-                            <h3>Editar Reporte</h3>
+                    <div class="modal-overlay" id="editModal">
+                        <div class="modal-container">
+                            <div class="modal-header">
+                                <h3>Editar Reporte</h3>
+                                <button type="button" class="modal-close" id="editClose">&times;</button>
+                            </div>
                             <form id="editForm">
-                            <input type="hidden" id="edit_id" name="id">
-                            <div class="form-group">
-                                <label for="edit_vehiculo">Vehículo *</label>
-                                <select id="edit_vehiculo" name="vehiculo" required>
-                                <option value="">Seleccionar vehículo</option>
-                                <?php
-                                // Reusar $result_vehiculos (si ya fue iterado antes, recrea la query)
-                                $r = $conexion->query("SELECT id_vehiculo, placa, modelo FROM vehiculos ORDER BY placa");
-                                while($v = $r->fetch_assoc()){
-                                    echo "<option value='{$v['id_vehiculo']}'>{$v['placa']} - {$v['modelo']}</option>";
-                                }
-                                ?>
-                                </select>
-                            </div>
+                                <input type="hidden" id="edit_id" name="id">
+                                <div class="modal-body">
+                                    <div>
+                                        <div class="modal-form-group">
+                                            <label for="edit_vehiculo">Vehículo *</label>
+                                            <select id="edit_vehiculo" name="vehiculo" required>
+                                                <option value="">Seleccionar vehículo</option>
+                                                <?php
+                                                $r = $conexion->query("SELECT id_vehiculo, placa, modelo FROM vehiculos ORDER BY placa");
+                                                while($v = $r->fetch_assoc()){
+                                                    echo "<option value='{$v['id_vehiculo']}'>{$v['placa']} - {$v['modelo']}</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
 
-                            <div class="form-group">
-                                <label for="edit_conductor">Conductor *</label>
-                                <select id="edit_conductor" name="conductor" required>
-                                <option value="">Seleccionar conductor</option>
-                                <?php
-                                $r = $conexion->query("SELECT rfc_conductor, nombre FROM conductores ORDER BY nombre");
-                                while($c = $r->fetch_assoc()){
-                                    echo "<option value='{$c['rfc_conductor']}'>{$c['nombre']}</option>";
-                                }
-                                ?>
-                                </select>
-                            </div>
+                                        <div class="modal-form-group">
+                                            <label for="edit_conductor">Conductor *</label>
+                                            <select id="edit_conductor" name="conductor" required>
+                                                <option value="">Seleccionar conductor</option>
+                                                <?php
+                                                $r = $conexion->query("SELECT rfc_conductor, nombre FROM conductores ORDER BY nombre");
+                                                while($c = $r->fetch_assoc()){
+                                                    echo "<option value='{$c['rfc_conductor']}'>{$c['nombre']}</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
 
-                            <div class="form-group">
-                                <label for="edit_ruta">Ruta *</label>
-                                <select id="edit_ruta" name="ruta" required>
-                                <option value="">Seleccionar ruta</option>
-                                <?php
-                                $r = $conexion->query("SELECT id_ruta, nombre FROM rutas ORDER BY nombre");
-                                while($ru = $r->fetch_assoc()){
-                                    echo "<option value='{$ru['id_ruta']}'>{$ru['nombre']}</option>";
-                                }
-                                ?>
-                                </select>
-                            </div>
+                                        <div class="modal-form-group">
+                                            <label for="edit_ruta">Ruta *</label>
+                                            <select id="edit_ruta" name="ruta" required>
+                                                <option value="">Seleccionar ruta</option>
+                                                <?php
+                                                $r = $conexion->query("SELECT id_ruta, nombre FROM rutas ORDER BY nombre");
+                                                while($ru = $r->fetch_assoc()){
+                                                    echo "<option value='{$ru['id_ruta']}'>{$ru['nombre']}</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
 
-                            <div class="form-group">
-                                <label for="edit_tipoIncidente">Tipo de Incidente *</label>
-                                <select id="edit_tipoIncidente" name="tipoIncidente" required>
-                                <option value="">Seleccionar tipo</option>
-                                <option value="accidente">Accidente</option>
-                                <option value="averia">Avería Mecánica</option>
-                                <option value="retraso">Retraso Significativo</option>
-                                <option value="cliente">Incidente con Cliente</option>
-                                <option value="otro">Otro</option>
-                                </select>
-                            </div>
+                                        <div class="modal-form-group">
+                                            <label for="edit_tipoIncidente">Tipo de Incidente *</label>
+                                            <select id="edit_tipoIncidente" name="tipoIncidente" required>
+                                                <option value="">Seleccionar tipo</option>
+                                                <option value="accidente">Accidente</option>
+                                                <option value="averia">Avería Mecánica</option>
+                                                <option value="retraso">Retraso Significativo</option>
+                                                <option value="cliente">Incidente con Cliente</option>
+                                                <option value="otro">Otro</option>
+                                            </select>
+                                        </div>
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="edit_fechaIncidente">Fecha y Hora *</label>
-                                <input type="datetime-local" id="edit_fechaIncidente" name="fechaIncidente" required>
-                            </div>
+                                    <div>
+                                        <div class="modal-form-group">
+                                            <label for="edit_fechaIncidente">Fecha y Hora *</label>
+                                            <input type="datetime-local" id="edit_fechaIncidente" name="fechaIncidente" required>
+                                        </div>
 
-                            <div class="form-group">
-                                <label for="edit_descripcion">Descripción *</label>
-                                <textarea id="edit_descripcion" name="descripcion" required></textarea>
-                            </div>
+                                        <div class="modal-form-group">
+                                            <label for="edit_descripcion">Descripción *</label>
+                                            <textarea id="edit_descripcion" name="descripcion" required></textarea>
+                                        </div>
 
-                            <div class="form-group">
-                                <label for="edit_gravedad">Gravedad</label>
-                                <select id="edit_gravedad" name="gravedad">
-                                <option value="baja">Baja</option>
-                                <option value="media">Media</option>
-                                <option value="alta">Alta</option>
-                                <option value="critica">Crítica</option>
-                                </select>
-                            </div>
+                                        <div class="modal-form-group">
+                                            <label for="edit_gravedad">Gravedad</label>
+                                            <select id="edit_gravedad" name="gravedad">
+                                                <option value="baja">Baja</option>
+                                                <option value="media">Media</option>
+                                                <option value="alta">Alta</option>
+                                                <option value="critica">Crítica</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            <div style="display:flex; gap:10px; margin-top:10px;">
-                                <button type="button" id="editCancel" class="btn-action-small" style="background:#9CA3AF;color:white;border-radius:6px;padding:8px 12px;">Cancelar</button>
-                                <button type="submit" id="editSave" class="btn-action-small" style="background:#3b82f6;color:white;border-radius:6px;padding:8px 12px;">Guardar cambios</button>
-                            </div>
+                                <div class="modal-footer">
+                                    <button type="button" id="editCancel" class="modal-btn modal-btn-cancel">Cancelar</button>
+                                    <button type="submit" id="editSave" class="modal-btn modal-btn-save">Guardar cambios</button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -1101,6 +1125,7 @@ if ($conexion->error) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeSidebar();
+            closeEditModal();
         }
     });
 
@@ -1113,13 +1138,18 @@ if ($conexion->error) {
     // --- funciones para editar ---
     function openEditModal() {
         const modal = document.getElementById('editModal');
-        modal.style.display = 'flex';
+        modal.classList.add('active');
     }
 
     function closeEditModal() {
         const modal = document.getElementById('editModal');
-        modal.style.display = 'none';
+        modal.classList.remove('active');
     }
+
+    // Cerrar modal con el botón X
+    document.getElementById('editClose').addEventListener('click', function(){
+        closeEditModal();
+    });
 
     // Abrir modal y prefilling
     function editReport(id) {
