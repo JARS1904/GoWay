@@ -709,19 +709,20 @@ if ($conexion->error) {
         <?php 
         if ($result_reportes && $result_reportes->num_rows > 0) {
             while($row = $result_reportes->fetch_assoc()) {
-                echo "{
+            echo "{
                     id: " . $row['id'] . ",
                     id_vehiculo: " . (int)$row['id_vehiculo'] . ",
-                    rfc_conductor: \"" . $row['rfc_conductor'] . "\",
+                    rfc_conductor: \"" . addslashes($row['rfc_conductor']) . "\",
                     id_ruta: " . (int)$row['id_ruta'] . ",
-                    vehiculo: \"" . $row['vehiculo_placa'] . " - " . $row['vehiculo_modelo'] . "\",
+                    vehiculo: \"" . addslashes($row['vehiculo_placa'] . " - " . $row['vehiculo_modelo']) . "\",
                     conductor: \"" . addslashes($row['conductor_nombre']) . "\",
+                    ruta: \"" . addslashes($row['ruta_nombre']) . "\",
                     tipo: \"" . addslashes($row['tipo_incidente']) . "\",
-                    tipoTexto: \"" . ucfirst($row['tipo_incidente']) . "\",
-                    fecha: \"" . $row['fecha_incidente'] . "\",
+                    tipoTexto: \"" . addslashes(ucfirst($row['tipo_incidente'])) . "\",
+                    fecha: \"" . addslashes($row['fecha_incidente']) . "\",
                     descripcion: \"" . addslashes($row['descripcion']) . "\",
-                    gravedad: \"" . $row['gravedad'] . "\",
-                    status: \"" . $row['estado'] . "\"
+                    gravedad: \"" . addslashes($row['gravedad']) . "\",
+                    status: \"" . addslashes($row['estado']) . "\"
                 },";
             }
         }
@@ -744,7 +745,7 @@ if ($conexion->error) {
             reportCard.className = 'report-card';
             reportCard.innerHTML = `
                     <div class="report-header">
-                        <h4 class="report-title">${report.tipoTexto}</h4>
+                        <h4 class="report-title">Incidente: ${report.tipoTexto}</h4>
                         <span class="report-status status-${report.status}">
                             ${getStatusText(report.status)}
                         </span>
@@ -752,6 +753,9 @@ if ($conexion->error) {
                     <div class="report-meta">
                         <span>Vehículo: ${report.vehiculo}</span>
                         <span>Conductor: ${report.conductor}</span>
+                    </div>
+                    <div class="report-meta">
+                         <span>Ruta: ${report.ruta}</span>
                     </div>
                     <div class="report-meta">
                         <span>${formatDate(report.fecha)}</span>
