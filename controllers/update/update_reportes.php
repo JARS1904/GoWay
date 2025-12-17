@@ -16,6 +16,7 @@ $tipo_incidente = isset($_POST['tipoIncidente']) ? $conexion->real_escape_string
 $fecha_incidente = isset($_POST['fechaIncidente']) ? $conexion->real_escape_string($_POST['fechaIncidente']) : '';
 $descripcion = isset($_POST['descripcion']) ? $conexion->real_escape_string($_POST['descripcion']) : '';
 $gravedad = isset($_POST['gravedad']) ? $conexion->real_escape_string($_POST['gravedad']) : '';
+$estado = isset($_POST['estado']) ? $conexion->real_escape_string($_POST['estado']) : '';
 
 if ($id <= 0) {
     http_response_code(400);
@@ -37,9 +38,9 @@ try {
     $check_stmt->close();
 
     // Actualizar
-    $sql = "UPDATE reportes SET id_vehiculo = ?, rfc_conductor = ?, id_ruta = ?, tipo_incidente = ?, fecha_incidente = ?, descripcion = ?, gravedad = ? WHERE id = ?";
+    $sql = "UPDATE reportes SET id_vehiculo = ?, rfc_conductor = ?, id_ruta = ?, tipo_incidente = ?, fecha_incidente = ?, descripcion = ?, gravedad = ?, estado = ? WHERE id = ?";
     $stmt = $conexion->prepare($sql);
-    $stmt->bind_param("isissssi",
+    $stmt->bind_param("isisssssi",
         $id_vehiculo,
         $rfc_conductor,
         $id_ruta,
@@ -47,6 +48,7 @@ try {
         $fecha_incidente,
         $descripcion,
         $gravedad,
+        $estado,
         $id
     );
 

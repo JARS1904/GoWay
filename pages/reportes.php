@@ -689,6 +689,14 @@ if ($conexion->error) {
                                                 <option value="critica">Crítica</option>
                                             </select>
                                         </div>
+                                        <div class="modal-form-group">
+                                            <label for="edit_estado">Estado</label>
+                                            <select id="edit_estado" name="estado">
+                                                <option value="pendiente">Pendiente</option>
+                                                <option value="en-proceso">En Proceso</option>
+                                                <option value="resuelto">Resuelto</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1180,6 +1188,10 @@ if ($conexion->error) {
         }
         document.getElementById('edit_descripcion').value = report.descripcion || '';
         document.getElementById('edit_gravedad').value = report.gravedad || 'media';
+        // Estado del reporte (pendiente, en-proceso, resuelto)
+        if (document.getElementById('edit_estado')) {
+            document.getElementById('edit_estado').value = report.status || report.estado || 'pendiente';
+        }
 
         openEditModal();
     }
@@ -1218,6 +1230,8 @@ if ($conexion->error) {
                     reportes[idx].fecha = document.getElementById('edit_fechaIncidente').value;
                     reportes[idx].descripcion = document.getElementById('edit_descripcion').value;
                     reportes[idx].gravedad = document.getElementById('edit_gravedad').value;
+                    // actualizar estado
+                    reportes[idx].status = formData.get('estado') || reportes[idx].status;
 
                     // además mantener ids si los necesitas
                     reportes[idx].id_vehiculo = parseInt(formData.get('vehiculo'));
