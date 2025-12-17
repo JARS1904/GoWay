@@ -683,6 +683,7 @@ body {
 .modal-header h3 {
     margin: 0;
     font-size: 20px;
+    color: white;
 }
 
 .modal-close {
