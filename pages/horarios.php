@@ -18,8 +18,30 @@ if (!isset($_SESSION['id'])) {
 </head>
 <body>
     <div class="container">
+        <!-- Overlay para fondo oscuro -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Barra Superior Móvil -->
+        <div class="mobile-topbar">
+            <div class="mobile-topbar-content">
+                <div class="mobile-topbar-left">
+                    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+                    <h1 class="mobile-page-title">Gestión de Horarios</h1>
+                </div>
+                <div class="mobile-topbar-right">
+                    <div class="mobile-user-info">
+                        <span>Admin</span>
+                        <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Menú Lateral -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
+            <!-- Botón de Cerrar para Móvil -->
+            <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
+            
             <div class="logo">
                 <img src="../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
                 <h1>GoWay</h1>
@@ -99,13 +121,13 @@ if (!isset($_SESSION['id'])) {
         </aside>
 
         <!-- Contenido Principal -->
-        <main class="main-content">
+        <main class="main-content" id="mainContent">
+            <!-- Header para escritorio -->
             <header class="header">
                 <h2>Gestión de Horarios</h2>
                 <div class="user-info">
                     <span>Admin</span>
                     <img src="../assets/images/icons/administrador.png" alt="Usuario">
-
                 </div>
             </header>
 
@@ -361,6 +383,53 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('addRouteModal').addEventListener('click', function(e) {
         if (e.target === this) {
             this.classList.remove('active');
+        }
+    });
+
+    // Funciones para el sidebar responsivo (móvil)
+    window.toggleSidebar = function() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevenir scroll cuando sidebar está abierto
+        }
+    };
+
+    window.closeSidebar = function() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restaurar scroll
+        }
+    };
+
+    // Cerrar sidebar al hacer clic en enlaces del menú (solo en móvil)
+    const sidebarLinks = document.querySelectorAll('.sidebar nav a');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
+    });
+
+    // Cerrar sidebar con tecla ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeSidebar();
+        }
+    });
+
+    // Cerrar sidebar si se redimensiona a pantalla grande
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeSidebar();
         }
     });
 });
