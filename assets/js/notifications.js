@@ -161,7 +161,12 @@ function handleUpdateForm(formElement, successMessage = 'Registro actualizado ex
 
             if (data.success) {
                 // Cerrar modal si existe
-                const modal = document.getElementById('editRouteModal') || document.getElementById('editVehicleModal');
+                const modal = document.getElementById('editRouteModal') || 
+                             document.getElementById('editVehicleModal') ||
+                             document.getElementById('editEmpresasModal') ||
+                             document.getElementById('editConductoresModal') ||
+                             document.getElementById('editChecadoresModal') ||
+                             document.getElementById('editUserModal');
                 if (modal) {
                     modal.classList.remove('active');
                 }

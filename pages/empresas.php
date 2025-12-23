@@ -207,7 +207,7 @@ if (!isset($_SESSION['id'])) {
                 <h3>Agregar nueva empresa</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="./controllers/insert_empresa.php" method="POST">
+            <form id="routeForm" action="../controllers/insert_empresa.php" method="POST">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>
@@ -358,8 +358,78 @@ if (!isset($_SESSION['id'])) {
     </script>
 
     <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/update/actu_empresas.js"></script>
-    <script src="../assets/js/delete/delete_empresas.js"></script>
+    <script src="../assets/js/notifications.js"></script>
     <script src="../assets/js/pagination.js"></script>
+    
+    <script>
+        // Manejar cierre de modal de agregar
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('addRouteModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelModal').addEventListener('click', () => {
+            document.getElementById('addRouteModal').classList.remove('active');
+        });
+
+        // Manejo del formulario de inserción
+        handleInsertForm(document.getElementById('routeForm'), 'Empresa agregada correctamente');
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('addRouteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Usar event delegation para botones de edición
+        const tbody = document.querySelector('tbody');
+        if (tbody) {
+            tbody.addEventListener('click', function(e) {
+                const btn = e.target.closest('.btn-edit');
+                if (btn) {
+                    const row = btn.closest('tr');
+                    const cells = row.querySelectorAll('td');
+                    
+                    document.getElementById('edit_rfc_empresa').value = cells[0].textContent.trim();
+                    document.getElementById('edit_nombre_empresa').value = cells[1].textContent.trim();
+                    document.getElementById('edit_direccion_empresa').value = cells[2].textContent.trim();
+                    document.getElementById('edit_telefono').value = cells[3].textContent.trim();
+                    document.getElementById('edit_email_empresa').value = cells[4].textContent.trim();
+                    
+                    const statusText = cells[5].querySelector('span').textContent.trim();
+                    document.getElementById('edit_activo').value = statusText === 'Sí' ? 1 : 0;
+                    
+                    document.getElementById('editEmpresasModal').classList.add('active');
+                }
+            });
+        }
+
+        // Cerrar modal de edición
+        document.getElementById('closeEditEmpresasModal').addEventListener('click', () => {
+            document.getElementById('editEmpresasModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelEditEmpresasModal').addEventListener('click', () => {
+            document.getElementById('editEmpresasModal').classList.remove('active');
+        });
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('editEmpresasModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Manejo del formulario de edición
+        handleUpdateForm(document.getElementById('editEmpresasForm'), 'Empresa actualizada correctamente');
+
+        // Inicializar botones de eliminación
+        initializeDeleteButtons(
+            '.btn-delete',
+            '../controllers/delete/delete_empresas.php',
+            'rfc_empresa',
+            '¿Estás seguro de que deseas eliminar esta empresa?'
+        );
+    </script>
 </body>
 </html>

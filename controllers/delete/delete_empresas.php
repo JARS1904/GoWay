@@ -1,6 +1,9 @@
 <?php
+header('Content-Type: application/json');
+
 if (!isset($_POST['rfc_empresa'])) {
-    die("RFC de empresa no proporcionado.");
+    echo json_encode(["success" => false, "message" => "RFC de empresa no proporcionado."]);
+    exit();
 }
 
 $rfc = $_POST['rfc_empresa'];
@@ -8,7 +11,8 @@ $rfc = $_POST['rfc_empresa'];
 $conn = new mysqli("localhost", "root", "", "goway");
 
 if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+    echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
+    exit();
 }
 
 // Iniciar transacción
@@ -77,13 +81,11 @@ try {
     // Confirmar transacción
     $conn->commit();
     
-    header("Location: /GoWay/pages/empresas.php");
-    echo "Empresa eliminada correctamente.";
-    exit();
+    echo json_encode(["success" => true, "message" => "Empresa eliminada correctamente."]);
 } catch (Exception $e) {
     // Revertir en caso de error
     $conn->rollback();
-    echo "Error al eliminar la empresa: " . $e->getMessage();
+    echo json_encode(["success" => false, "message" => "Error al eliminar: " . $e->getMessage()]);
 }
 
 // Cerrar conexiones
