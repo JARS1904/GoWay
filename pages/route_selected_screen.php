@@ -2,7 +2,7 @@
 session_start();
 
 // Verificar si el usuario está logueado y tiene rol=2
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 2) {
+if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
     header("Location: login.php");
     exit();
 }
