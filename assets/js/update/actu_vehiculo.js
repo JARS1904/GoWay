@@ -43,8 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const placa = row.querySelector('td:nth-child(1)').textContent;
             const modelo = row.querySelector('td:nth-child(2)').textContent;
             const capacidad = row.querySelector('td:nth-child(3)').textContent;
-            const activo = row.querySelector('td:nth-child(4)').textContent === 'Sí' ? '1' : '0';
-            const rfc_empresa = row.querySelector('td:nth-child(5)').textContent;
+            const rfc_empresa = row.querySelector('td:nth-child(4)').textContent;
+            const activo = row.querySelector('td:nth-child(5)').textContent === 'Sí' ? '1' : '0';
 
             document.getElementById('edit_id_vehiculo').value = id_vehiculo;
             document.getElementById('edit_placa').value = placa;

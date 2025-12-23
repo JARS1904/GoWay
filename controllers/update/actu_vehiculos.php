@@ -21,7 +21,7 @@ $id_vehiculo = $_POST['id_vehiculo'];
 $placa = $_POST['placa'];
 $modelo = $_POST['modelo'];
 $capacidad = $_POST['capacidad'];
-$activo = isset($_POST['activo']) ? 1 : 0;
+$activo = $_POST['activo'];
 $rfc_empresa = $_POST['rfc_empresa'];
 
 // Preparar la consulta SQL

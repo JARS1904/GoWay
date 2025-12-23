@@ -213,6 +213,18 @@ if (!isset($_SESSION['id'])) {
                             <input type="text" id="" name="placa" placeholder="" required>
                         </div>
                         <div class="modal-form-group">
+                            <label>Modelo de Vehiculo</label>
+                            <input type="text" id="" name="modelo" placeholder="" required>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Capacidad del Vehiculo</label>
+                            <input type="number" id="" name="capacidad" placeholder=""></input>
+                        </div>
+                    </div>
+
+                    <!-- Columna derecha -->
+                    <div>
+                        <div class="modal-form-group">
                             <label>RFC de Empresa</label>
                             <select name="rfc_empresa" id="">
                                 <?php
@@ -224,17 +236,12 @@ if (!isset($_SESSION['id'])) {
                                 ?>
                             </select>
                         </div>
-                    </div>
-
-                    <!-- Columna derecha -->
-                    <div>
                         <div class="modal-form-group">
-                            <label>Modelo de Vehiculo</label>
-                            <input type="text" id="" name="modelo" placeholder="" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label>Capacidad del Vehiculo</label>
-                            <input type="number" id="" name="capacidad" placeholder=""></input>
+                            <label>Activo</label>
+                            <select name="activo" id="">
+                                <option value="1">Sí</option>
+                                <option value="0">No</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -255,33 +262,41 @@ if (!isset($_SESSION['id'])) {
                 <button class="modal-close" id="closeEditVehicleModal">×</button>
             </div>
             <form id="editVehicleForm" action="../controllers/update/actu_vehiculos.php" method="POST">
-                <input type="number" id="edit_id_vehiculo" name="id_vehiculo">
+                <input type="hidden" id="edit_id_vehiculo" name="id_vehiculo">
                 <div class="modal-body">
                     <div>
                         <div class="modal-form-group">
-                            <label for="edit_placa">Placa</label>
+                            <label for="edit_placa">Placa del Vehiculo</label>
                             <input type="text" id="edit_placa" name="placa" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="edit_modelo">Modelo</label>
+                            <label for="edit_modelo">Modelo de Vehiculo</label>
                             <input type="text" id="edit_modelo" name="modelo" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="edit_capacidad">Capacidad</label>
+                            <label for="edit_capacidad">Capacidad del Vehiculo</label>
                             <input type="number" id="edit_capacidad" name="capacidad" required>
                         </div>
                     </div>
                     <div>
+                        <div class="modal-form-group">
+                            <label for="edit_rfc_empresa">RFC de Empresa</label>
+                            <select id="edit_rfc_empresa" name="rfc_empresa" required>
+                                <?php
+                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
+                                while ($row = $result->fetch_assoc()) {
+                                    echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
                         <div class="modal-form-group">
                             <label for="edit_activo">Activo</label>
                             <select id="edit_activo" name="activo">
                                 <option value="1">Sí</option>
                                 <option value="0">No</option>
                             </select>
-                        </div>
-                        <div class="modal-form-group">
-                            <label for="edit_rfc_empresa">RFC Empresa</label>
-                            <input type="text" id="edit_rfc_empresa" name="rfc_empresa" required >
                         </div>
                     </div>
                 </div>
