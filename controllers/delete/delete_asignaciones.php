@@ -1,6 +1,9 @@
 <?php
+header('Content-Type: application/json');
+
 if (!isset($_POST['id_asignacion'])) {
-    die("ID de asignación no proporcionado.");
+    echo json_encode(["success" => false, "message" => "ID de asignación no proporcionado."]);
+    exit();
 }
 
 $id = $_POST['id_asignacion'];
@@ -8,7 +11,8 @@ $id = $_POST['id_asignacion'];
 $conn = new mysqli("localhost", "root", "", "goway");
 
 if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+    echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
+    exit();
 }
 
 // Iniciar transacción
@@ -27,12 +31,12 @@ try {
     // Confirmar transacción
     $conn->commit();
     
-    header("Location: /GoWay/pages/paradas.php?success=1");
+    echo json_encode(["success" => true, "message" => "Asignación eliminada correctamente"]);
     exit();
 } catch (Exception $e) {
     // Revertir en caso de error
     $conn->rollback();
-    header("Location: /GoWay/pages/paradas.php?error=" . urlencode($e->getMessage()));
+    echo json_encode(["success" => false, "message" => $e->getMessage()]);
     exit();
 }
 

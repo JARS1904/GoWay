@@ -215,6 +215,7 @@ if (!isset($_SESSION['id'])) {
                         <div class="modal-form-group">
                             <label>RFC de la Empresa</label>
                             <select name="rfc_empresa" required>
+                                <option value="" disabled selected>Seleccionar empresa</option>
                                 <?php
                                 $conn = new mysqli("localhost", "root", "", "goway");
                                 $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
@@ -227,6 +228,7 @@ if (!isset($_SESSION['id'])) {
                         <div class="modal-form-group">
                             <label>ID de vehiculo</label>
                             <select name="id_vehiculo" required>
+                                <option value="" disabled selected>Seleccionar vehículo</option>
                                 <?php
                                 $conn = new mysqli("localhost", "root", "", "goway");
                                 $result = $conn->query("SELECT id_vehiculo, placa FROM vehiculos");
@@ -239,6 +241,7 @@ if (!isset($_SESSION['id'])) {
                         <div class="modal-form-group">
                             <label>RFC Conductor</label>
                             <select name="rfc_conductor" required>
+                                <option value="" disabled selected>Seleccionar conductor</option>
                                 <?php
                                 $conn = new mysqli("localhost", "root", "", "goway");
                                 $result = $conn->query("SELECT rfc_conductor, nombre FROM conductores");
@@ -255,6 +258,7 @@ if (!isset($_SESSION['id'])) {
                         <div class="modal-form-group">
                             <label>ID Ruta</label>
                             <select name="id_ruta" required>
+                                <option value="" disabled selected>Seleccionar ruta</option>
                                 <?php
                                 $conn = new mysqli("localhost", "root", "", "goway");
                                 $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
@@ -267,6 +271,7 @@ if (!isset($_SESSION['id'])) {
                         <div class="modal-form-group">
                             <label>ID horario</label>
                             <select name="id_horario" required>
+                                <option value="" disabled selected>Seleccionar horario</option>
                                 <?php
                                 $conn = new mysqli("localhost", "root", "", "goway");
                                 $result = $conn->query("SELECT id_horario, dia_semana FROM horarios");
@@ -354,7 +359,36 @@ if (!isset($_SESSION['id'])) {
     </script>
 
     <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/delete/delete_asignaciones.js"></script>
+    <script src="../assets/js/notifications.js"></script>
     <script src="../assets/js/pagination.js"></script>
+    
+    <script>
+        // Manejar cierre de modal de agregar
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('addRouteModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelModal').addEventListener('click', () => {
+            document.getElementById('addRouteModal').classList.remove('active');
+        });
+
+        // Manejo del formulario de inserción
+        handleInsertForm(document.getElementById('routeForm'), 'Asignación agregada correctamente');
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('addRouteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Inicializar botones de eliminación
+        initializeDeleteButtons(
+            '.btn-delete',
+            '../controllers/delete/delete_asignaciones.php',
+            'id_asignacion',
+            '¿Estás seguro de que deseas eliminar esta asignación?'
+        );
+    </script>
 </body>
 </html>
