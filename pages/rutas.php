@@ -379,6 +379,87 @@ if (!isset($_SESSION['id'])) {
                 closeSidebar();
             }
         });
+
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'info') {
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+
+            // Estilos básicos
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                max-width: 350px;
+                cursor: pointer;
+            `;
+
+            // Colores según tipo
+            if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            } else if (type === 'error') {
+                notification.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            } else {
+                notification.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+            }
+
+            // Animación
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            if (!document.querySelector('style[data-notification="true"]')) {
+                style.setAttribute('data-notification', 'true');
+                document.head.appendChild(style);
+            }
+
+            // Añadir al documento
+            document.body.appendChild(notification);
+
+            // Auto-eliminar después de 5 segundos
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+
+            // Permitir cerrar manualmente
+            notification.addEventListener('click', () => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            });
+        }
+
+        // Verificar si hay mensaje de éxito (desde PHP)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            showNotification('Ruta actualizada exitosamente', 'success');
+            // Limpiar URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     </script>
 
     <script src="../assets/js/main.js"></script>

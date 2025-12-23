@@ -12,15 +12,24 @@ require_once '../config/conexion_bd.php';
 
 // Procesar el formulario cuando se envía
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    header('Content-Type: application/json');
+    
     try {
         // Obtener y sanitizar los datos del formulario
-        $id_vehiculo = $conexion->real_escape_string($_POST['vehiculo']);
-        $rfc_conductor = $conexion->real_escape_string($_POST['conductor']);
-        $id_ruta = $conexion->real_escape_string($_POST['ruta']);
-        $tipo_incidente = $conexion->real_escape_string($_POST['tipoIncidente']);
-        $fecha_incidente = $conexion->real_escape_string($_POST['fechaIncidente']);
-        $descripcion = $conexion->real_escape_string($_POST['descripcion']);
-        $gravedad = $conexion->real_escape_string($_POST['gravedad']);
+        $id_vehiculo = isset($_POST['vehiculo']) ? (int)$_POST['vehiculo'] : 0;
+        $rfc_conductor = $conexion->real_escape_string($_POST['conductor'] ?? '');
+        $id_ruta = isset($_POST['ruta']) ? (int)$_POST['ruta'] : 0;
+        $tipo_incidente = $conexion->real_escape_string($_POST['tipoIncidente'] ?? '');
+        $fecha_incidente = $conexion->real_escape_string($_POST['fechaIncidente'] ?? '');
+        $descripcion = $conexion->real_escape_string($_POST['descripcion'] ?? '');
+        $gravedad = $conexion->real_escape_string($_POST['gravedad'] ?? 'media');
+
+        // Validar datos requeridos
+        if (empty($id_vehiculo) || empty($rfc_conductor) || empty($id_ruta) || empty($tipo_incidente) || empty($fecha_incidente) || empty($descripcion)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Por favor completa todos los campos requeridos']);
+            exit;
+        }
 
         // Preparar la consulta SQL
         $sql = "INSERT INTO reportes (id_vehiculo, rfc_conductor, id_ruta, tipo_incidente, 
@@ -40,20 +49,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         );
 
         if ($stmt->execute()) {
-            echo "<script>
-                    alert('Reporte guardado exitosamente');
-                    window.location.href = '" . $_SERVER['PHP_SELF'] . "';
-                  </script>";
+            http_response_code(200);
+            echo json_encode(['success' => true, 'message' => 'Reporte guardado exitosamente']);
         } else {
             throw new Exception("Error al guardar el reporte: " . $stmt->error);
         }
 
         $stmt->close();
     } catch (Exception $e) {
-        echo "<script>
-                alert('Error: " . str_replace("'", "\\'", $e->getMessage()) . "');
-              </script>";
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
+    exit;
 }
 
 // Obtener lista de vehículos con placa y modelo
@@ -828,15 +835,55 @@ if ($conexion->error) {
         loadReports(filteredReports);
     }
 
-    // Función para manejar el envío del formulario
+    // Función para manejar el envío del formulario con AJAX
     document.getElementById('incidentForm').addEventListener('submit', function(e) {
-        // No prevenimos el evento submit para permitir el envío del formulario
+        e.preventDefault();
+
         const fechaIncidente = document.getElementById('fechaIncidente');
         if (!fechaIncidente.value) {
-            e.preventDefault();
-            alert('Por favor, seleccione la fecha y hora del incidente');
+            showNotification('Por favor, seleccione la fecha y hora del incidente', 'error');
             return;
         }
+
+        // Deshabilitar botón submit
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando...';
+
+        // Enviar con AJAX
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+
+            if (data.success) {
+                // Limpiar formulario
+                document.getElementById('incidentForm').reset();
+                
+                // Mostrar notificación
+                showNotification(data.message || 'Reporte guardado exitosamente', 'success');
+
+                // Recargar la página después de 2 segundos
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                showNotification(data.message || 'Error al guardar el reporte', 'error');
+            }
+        })
+        .catch(error => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            console.error('Error:', error);
+            showNotification('Error de conexión: ' + error.message, 'error');
+        });
     });
 
     // Funciones auxiliares

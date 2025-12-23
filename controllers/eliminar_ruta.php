@@ -1,14 +1,20 @@
 <?php
+header('Content-Type: application/json');
+
 if (!isset($_POST['id_ruta'])) {
-    die("ID de ruta no proporcionado.");
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'ID de ruta no proporcionado']);
+    exit;
 }
 
-$id = $_POST['id_ruta'];
+$id = (int)$_POST['id_ruta'];
 
 $conn = new mysqli("localhost", "root", "", "goway");
 
 if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error de conexión: ' . $conn->connect_error]);
+    exit;
 }
 
 // Iniciar transacción
@@ -36,17 +42,20 @@ try {
     // Confirmar transacción
     $conn->commit();
     
-    header("Location: /GoWay/pages/rutas.php");
-    echo "Ruta eliminada correctamente.";
-    exit();
+    http_response_code(200);
+    echo json_encode(['success' => true, 'message' => 'Ruta eliminada exitosamente']);
+    exit;
 } catch (Exception $e) {
     // Revertir en caso de error
     $conn->rollback();
-    echo "Error al eliminar la ruta: " . $e->getMessage();
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error al eliminar la ruta: ' . $e->getMessage()]);
+    exit;
 }
 
 $stmt1->close();
 $stmt2->close();
 $stmt3->close();
 $conn->close();
+?>$conn->close();
 ?>

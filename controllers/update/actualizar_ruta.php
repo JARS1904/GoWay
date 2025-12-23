@@ -12,17 +12,26 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar conexión
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error de conexión: ' . $conn->connect_error]);
+    exit;
 }
 
 // Recoger datos del formulario
-$id_ruta = $_POST['id_ruta'];
-$nombre = $_POST['nombre'];
-$origen = $_POST['origen'];
-$destino = $_POST['destino'];
-$paradas = $_POST['paradas'];
-$activo = $_POST['activo'];
-$rfc_empresa = $_POST['rfc_empresa'];
+$id_ruta = isset($_POST['id_ruta']) ? (int)$_POST['id_ruta'] : 0;
+$nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
+$origen = isset($_POST['origen']) ? trim($_POST['origen']) : '';
+$destino = isset($_POST['destino']) ? trim($_POST['destino']) : '';
+$paradas = isset($_POST['paradas']) ? trim($_POST['paradas']) : '';
+$activa = isset($_POST['activa']) ? (int)$_POST['activa'] : 0;
+$rfc_empresa = isset($_POST['rfc_empresa']) ? trim($_POST['rfc_empresa']) : '';
+
+// Validar datos
+if (empty($id_ruta) || empty($nombre) || empty($origen) || empty($destino) || empty($rfc_empresa)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Por favor completa todos los campos requeridos']);
+    exit;
+}
 
 // Preparar la consulta SQL
 $sql = "UPDATE rutas SET 
@@ -38,7 +47,9 @@ $sql = "UPDATE rutas SET
 $stmt = $conn->prepare($sql);
 
 if ($stmt === false) {
-    die("Error en la preparación: " . $conn->error);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error en la preparación: ' . $conn->error]);
+    exit;
 }
 
 // Vincular parámetros
@@ -46,11 +57,11 @@ $stmt->bind_param("sssssii", $rfc_empresa, $nombre, $origen, $destino, $paradas,
 
 // Ejecutar consulta
 if ($stmt->execute()) {
-    echo "Ruta actualizada exitosamente";
-    // Redireccionar después de 2 segundos
-    header("Refresh: 2; URL=/GoWay/pages/rutas.php");
+    http_response_code(200);
+    echo json_encode(['success' => true, 'message' => 'Ruta actualizada exitosamente']);
 } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $stmt->error]);
 }
 
 // Cerrar conexiones

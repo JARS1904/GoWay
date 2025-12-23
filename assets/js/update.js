@@ -45,4 +45,65 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('editRouteModal').classList.remove('active');
         }
     });
+
+    // Manejar envío del formulario de edición con AJAX
+    const editRouteForm = document.getElementById('editRouteForm');
+    if (editRouteForm) {
+        editRouteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Deshabilitar botón submit
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+
+            // Enviar con AJAX
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+
+                if (data.success) {
+                    // Cerrar modal
+                    document.getElementById('editRouteModal').classList.remove('active');
+                    
+                    // Mostrar notificación
+                    if (typeof showNotification === 'function') {
+                        showNotification(data.message || 'Ruta actualizada exitosamente', 'success');
+                    }
+
+                    // Recargar tabla después de 3 segundos
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                } else {
+                    // Error
+                    if (typeof showNotification === 'function') {
+                        showNotification(data.message || 'Error al actualizar la ruta', 'error');
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                }
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                console.error('Error:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Error de conexión al actualizar', 'error');
+                } else {
+                    alert('Error de conexión: ' + error.message);
+                }
+            });
+        });
+    }
 });

@@ -18,6 +18,72 @@ document.getElementById('addRouteModal').addEventListener('click', function(e) {
     }
 });
 
+// Manejar envío del formulario de agregar con AJAX
+document.addEventListener('DOMContentLoaded', function() {
+    const routeForm = document.getElementById('routeForm');
+    if (routeForm) {
+        routeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Deshabilitar botón submit
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+
+            // Enviar con AJAX
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+
+                if (data.success) {
+                    // Limpiar formulario
+                    routeForm.reset();
+                    
+                    // Cerrar modal
+                    document.getElementById('addRouteModal').classList.remove('active');
+                    
+                    // Mostrar notificación en AZUL para inserción
+                    if (typeof showNotification === 'function') {
+                        showNotification(data.message || 'Ruta agregada exitosamente', 'info');
+                    }
+
+                    // Recargar tabla después de 3 segundos (más tiempo para ver la notificación)
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                } else {
+                    // Error
+                    if (typeof showNotification === 'function') {
+                        showNotification(data.message || 'Error al agregar la ruta', 'error');
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                }
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                console.error('Error:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Error de conexión al agregar', 'error');
+                } else {
+                    alert('Error de conexión: ' + error.message);
+                }
+            });
+        });
+    }
+});
+
 // ==================== //
 // FUNCIONES PARA EL MENÚ HAMBURGUESA
 // ==================== //
