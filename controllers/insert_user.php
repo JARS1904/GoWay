@@ -1,5 +1,7 @@
 
 <?php
+header('Content-Type: application/json');
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -10,7 +12,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar conexión
 if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+    echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
+    exit();
 }
 
 // Preparar y enlazar
@@ -25,11 +28,7 @@ $rol = $_POST['rol'];
 
 $stmt->execute();
 
-
-echo "Nuevo user creado exitosamente";
-// Redireccionar después de 2 segundos
-header("Refresh: 2; URL=/GoWay/pages/usuarios.php");
-
+echo json_encode(["success" => true, "message" => "Usuario agregado correctamente"]);
 
 $stmt->close();
 $conn->close();

@@ -209,23 +209,27 @@ if (!isset($_SESSION['id'])) {
                     <div>
                         <div class="modal-form-group">
                             <label for="nombre">Nombre</label>
-                            <input type="text" id="" name="nombre" placeholder="" required>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ingresa un nombre de usuario" required>
                         </div>
                         <div class="modal-form-group">
                             <label for="Email">Email</label>
-                            <input type="email" id="" name="email" placeholder="" required>
+                            <input type="email" id="email" name="email" placeholder="Ingresa un correo electrónico" required>
                         </div>
                     </div>
 
                     <!-- Columna derecha -->
                     <div>
                         <div class="modal-form-group">
-                            <label for="">Contraseña</label>
-                            <input type="text" id="" name="password" placeholder="" required>
+                            <label for="password">Contraseña</label>
+                            <input type="text" id="password" name="password" placeholder="Ingresa una contraseña" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="">Rol</label>
-                            <input type="text" id="" name="rol" placeholder=""></input>
+                            <label for="rol">Rol</label>
+                            <select id="rol" name="rol" required>
+                                <option value="" disabled selected>Seleccionar rol</option>
+                                <option value="1">Administrador</option>
+                                <option value="2">Usuario</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -252,11 +256,11 @@ if (!isset($_SESSION['id'])) {
                     <div>
                         <div class="modal-form-group">
                             <label>Nombre</label>
-                            <input type="text" id="edit_nombre" name="nombre">
+                            <input type="text" id="edit_nombre" name="nombre" placeholder="Ingresa el nombre del usuario">
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_email">E-mail</label>
-                            <input type="email" id="edit_email" name="email">
+                            <input type="email" id="edit_email" name="email" placeholder="Ingresa un correo electrónico">
                         </div>
                     </div>
 
@@ -264,11 +268,14 @@ if (!isset($_SESSION['id'])) {
                     <div>
                         <div class="modal-form-group">
                             <label for="edit_password">Contraseña</label>
-                            <input type="text" id="edit_password" name="password">
+                            <input type="text" id="edit_password" name="password" placeholder="Ingresa una contraseña">
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_rol">Rol</label>
-                            <input type="text" id="edit_rol" name="rol">
+                            <select id="edit_rol" name="rol" required>
+                                <option value="1">Administrador</option>
+                                <option value="2">Usuario</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -344,8 +351,75 @@ if (!isset($_SESSION['id'])) {
     </script>
 
     <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/update/actu_usuarios.js"></script>
-    <script src="../assets/js/delete/delete_usuarios.js"></script>
+    <script src="../assets/js/notifications.js"></script>
     <script src="../assets/js/pagination.js"></script>
+    
+    <script>
+        // Manejar cierre de modal de agregar
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('addRouteModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelModal').addEventListener('click', () => {
+            document.getElementById('addRouteModal').classList.remove('active');
+        });
+
+        // Manejo del formulario de inserción
+        handleInsertForm(document.getElementById('routeForm'), 'Usuario agregado correctamente');
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('addRouteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Usar event delegation para botones de edición
+        const tbody = document.querySelector('tbody');
+        if (tbody) {
+            tbody.addEventListener('click', function(e) {
+                const btn = e.target.closest('.btn-edit');
+                if (btn) {
+                    const row = btn.closest('tr');
+                    const cells = row.querySelectorAll('td');
+                    
+                    document.getElementById('edit_id_usuario').value = cells[0].textContent.trim();
+                    document.getElementById('edit_nombre').value = cells[1].textContent.trim();
+                    document.getElementById('edit_email').value = cells[2].textContent.trim();
+                    document.getElementById('edit_password').value = cells[3].textContent.trim();
+                    document.getElementById('edit_rol').value = cells[4].textContent.trim();
+                    
+                    document.getElementById('editUserModal').classList.add('active');
+                }
+            });
+        }
+
+        // Cerrar modal de edición
+        document.getElementById('closeEditModal').addEventListener('click', () => {
+            document.getElementById('editUserModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelEditModal').addEventListener('click', () => {
+            document.getElementById('editUserModal').classList.remove('active');
+        });
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('editUserModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Manejo del formulario de edición
+        handleUpdateForm(document.getElementById('editUserForm'), 'Usuario actualizado correctamente');
+
+        // Inicializar botones de eliminación
+        initializeDeleteButtons(
+            '.btn-delete',
+            '../controllers/delete/delete_usuarios.php',
+            'id',
+            '¿Estás seguro de que deseas eliminar este usuario?'
+        );
+    </script>
 </body>
 </html>
