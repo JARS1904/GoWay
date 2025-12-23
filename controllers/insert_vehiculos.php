@@ -1,4 +1,6 @@
 <?php
+header('Content-Type: application/json');
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -9,7 +11,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar conexión
 if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+    echo json_encode(['success' => false, 'message' => 'Conexión fallida: ' . $conn->connect_error]);
+    exit;
 }
 
 // Preparar y enlazar
@@ -22,11 +25,12 @@ $rfc_empresa = $_POST['rfc_empresa'];
 $modelo = $_POST['modelo'];
 $capacidad = $_POST['capacidad'];
 $activo = $_POST['activo'];
-$stmt->execute();
 
-echo "Vehículo guardado exitosamente";
-// Redireccionar después de 2 segundos
-header("Refresh: 2; URL=/GoWay/pages/vehiculos.php");
+if ($stmt->execute()) {
+    echo json_encode(['success' => true, 'message' => 'Vehículo guardado exitosamente']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Error al guardar: ' . $stmt->error]);
+}
 
 $stmt->close();
 $conn->close();

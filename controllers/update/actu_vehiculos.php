@@ -1,5 +1,7 @@
 
 <?php
+header('Content-Type: application/json');
+
 // actualizar_vehiculo.php
 
 // Configuración de la base de datos
@@ -13,7 +15,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar conexión
 if ($conn->connect_error) {
-die("Connection failed: " . $conn->connect_error);
+    echo json_encode(['success' => false, 'message' => 'Conexión fallida: ' . $conn->connect_error]);
+    exit;
 }
 
 // Recoger datos del formulario
@@ -37,7 +40,8 @@ WHERE id_vehiculo = ?";
 $stmt = $conn->prepare($sql);
 
 if ($stmt === false) {
-die("Error en la preparación: " . $conn->error);
+    echo json_encode(['success' => false, 'message' => 'Error en la preparación: ' . $conn->error]);
+    exit;
 }
 
 // Vincular parámetros
@@ -45,11 +49,9 @@ $stmt->bind_param("ssiisi", $placa, $modelo, $capacidad, $activo, $rfc_empresa, 
 
 // Ejecutar consulta
 if ($stmt->execute()) {
-echo "Vehículo actualizado exitosamente";
-
-header ("Refresh: 2; URL=/GoWay/pages/vehiculos.php");
+    echo json_encode(['success' => true, 'message' => 'Vehículo actualizado exitosamente']);
 } else {
-echo "Error: " . $sql . "<br>" . $conn->error;
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $conn->error]);
 }
 
 // Cerrar conexiones

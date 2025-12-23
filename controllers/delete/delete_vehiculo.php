@@ -1,6 +1,9 @@
 <?php
+header('Content-Type: application/json');
+
 if (!isset($_POST['id_vehiculo'])) {
-    die("ID de vehículo no proporcionado.");
+    echo json_encode(['success' => false, 'message' => 'ID de vehículo no proporcionado.']);
+    exit;
 }
 
 $id = $_POST['id_vehiculo'];
@@ -8,7 +11,8 @@ $id = $_POST['id_vehiculo'];
 $conn = new mysqli("localhost", "root", "", "goway");
 
 if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+    echo json_encode(['success' => false, 'message' => 'Error de conexión: ' . $conn->connect_error]);
+    exit;
 }
 
 // Iniciar transacción
@@ -30,13 +34,13 @@ try {
     // Confirmar transacción si todo salió bien
     $conn->commit();
 
-    header("Location: /GoWay/pages/vehiculos.php");
-    echo "Vehículo eliminado correctamente.";
-    exit();
+    echo json_encode(['success' => true, 'message' => 'Vehículo eliminado exitosamente']);
+    exit;
 } catch (Exception $e) {
     // Revertir en caso de error
     $conn->rollback();
-    echo "Error al eliminar el vehículo: " . $e->getMessage();
+    echo json_encode(['success' => false, 'message' => 'Error al eliminar el vehículo: ' . $e->getMessage()]);
+    exit;
 }
 
 $stmt1->close();

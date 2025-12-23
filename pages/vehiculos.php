@@ -368,11 +368,52 @@ if (!isset($_SESSION['id'])) {
                 closeSidebar();
             }
         });
+
+        // Manejar inserción de vehículos
+        document.addEventListener('DOMContentLoaded', function() {
+            handleInsertForm(
+                document.getElementById('routeForm'),
+                'Vehículo agregado exitosamente'
+            );
+
+            // Manejar actualización de vehículos
+            handleUpdateForm(
+                document.getElementById('editVehicleForm'),
+                'Vehículo actualizado exitosamente'
+            );
+
+            // Manejar eliminación de vehículos
+            initializeDeleteButtons(
+                '.btn-delete',
+                '/GoWay/controllers/delete/delete_vehiculo.php',
+                'id_vehiculo',
+                '¿Estás seguro de que deseas eliminar este vehículo?'
+            );
+
+            // Modal para agregar
+            document.querySelector('.btn-add').addEventListener('click', function() {
+                document.getElementById('addRouteModal').classList.add('active');
+            });
+
+            document.getElementById('closeModal').addEventListener('click', function() {
+                document.getElementById('addRouteModal').classList.remove('active');
+            });
+
+            document.getElementById('cancelModal').addEventListener('click', function() {
+                document.getElementById('addRouteModal').classList.remove('active');
+            });
+
+            document.getElementById('addRouteModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
     </script>
 
+    <script src="../assets/js/notifications.js"></script>
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/update/actu_vehiculo.js"></script>
-    <script src="../assets/js/delete/delete_vehiculos.js"></script>
     <script src="../assets/js/pagination.js"></script>
 </body>
 </html>

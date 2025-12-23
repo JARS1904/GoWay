@@ -103,6 +103,7 @@ function handleInsertForm(formElement, successMessage = 'Registro agregado exito
             submitBtn.textContent = originalText;
 
             if (data.success) {
+                // Limpiar formulario
                 formElement.reset();
                 
                 // Cerrar modal si existe
@@ -160,7 +161,7 @@ function handleUpdateForm(formElement, successMessage = 'Registro actualizado ex
 
             if (data.success) {
                 // Cerrar modal si existe
-                const modal = document.getElementById('editRouteModal');
+                const modal = document.getElementById('editRouteModal') || document.getElementById('editVehicleModal');
                 if (modal) {
                     modal.classList.remove('active');
                 }
