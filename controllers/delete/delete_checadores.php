@@ -1,6 +1,9 @@
 <?php
+header('Content-Type: application/json');
+
 if (!isset($_POST['rfc_checador'])) {
-    die("RFC de checador no proporcionado.");
+    echo json_encode(["success" => false, "message" => "RFC de checador no proporcionado."]);
+    exit();
 }
 
 $rfc = $_POST['rfc_checador'];
@@ -8,10 +11,11 @@ $rfc = $_POST['rfc_checador'];
 $conn = new mysqli("localhost", "root", "", "goway");
 
 if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+    echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
+    exit();
 }
 
-// Iniciar transacción (aunque solo es una operación, es buena práctica)
+// Iniciar transacción
 $conn->begin_transaction();
 
 try {
@@ -24,13 +28,12 @@ try {
     // Confirmar transacción
     $conn->commit();
     
-    header("Location: /GoWay/pages/checadores.php?success=1");
-    echo "Checador eliminado correctamente.";
+    echo json_encode(["success" => true, "message" => "Checador eliminado correctamente"]);
     exit();
 } catch (Exception $e) {
     // Revertir en caso de error
     $conn->rollback();
-    header("Location: /GoWay/pages/checadores.php?error=" . urlencode($e->getMessage()));
+    echo json_encode(["success" => false, "message" => "Error al eliminar: " . $e->getMessage()]);
     exit();
 }
 
