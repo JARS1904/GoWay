@@ -128,7 +128,7 @@ if (!isset($_SESSION['id'])) {
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo '
-                            <div class="card">
+                            <div class="card" data-id="'.$row["id_horario"].'">
                                 <div class="card-header">
                                     <h3>Horario #'.$row["id_horario"].'</h3>
                                     <span class="route-id">Ruta ID: '.$row["id_ruta"].'</span>
@@ -146,8 +146,8 @@ if (!isset($_SESSION['id'])) {
                                 <div class="card-footer">
                                     <small>Creado: '.$row["created_at"].'</small>
                                     <div class="card-actions">
-                                        <button class="btn-action btn-edit">Editar</button>
-                                        <button class="btn-action btn-delete">Eliminar</button>
+                                        <button class="btn-action btn-edit" data-id="'.$row["id_horario"].'">Editar</button>
+                                        <button class="btn-action btn-delete" data-id="'.$row["id_horario"].'">Eliminar</button>
                                     </div>
                                 </div>
                             </div>';
@@ -281,7 +281,89 @@ if (!isset($_SESSION['id'])) {
 
 
 
+<script src="../assets/js/notifications.js"></script>
 <script src="../assets/js/main.js"></script>
-<script src="../assets/js/update/actu_horarios.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejar inserción de horarios
+    handleInsertForm(
+        document.getElementById('routeForm'),
+        'Horario agregado exitosamente'
+    );
+
+    // Manejar actualización de horarios
+    handleUpdateForm(
+        document.getElementById('editRouteForm'),
+        'Horario actualizado exitosamente'
+    );
+
+    // Manejar eliminación de horarios
+    initializeDeleteButtons(
+        '.btn-delete',
+        '/GoWay/controllers/delete/delete_horarios.php',
+        'id_horario',
+        '¿Estás seguro de que deseas eliminar este horario?'
+    );
+
+    // Manejar clics en botones de edición
+    document.querySelectorAll('.btn-edit').forEach(button => {
+        button.addEventListener('click', function() {
+            const card = this.closest('.card');
+            const id_horario = this.getAttribute('data-id');
+            const id_ruta = card.querySelector('.route-id').textContent.split(': ')[1];
+            const dia_semana = card.querySelector('.schedule-info p:nth-child(1)').textContent.split(': ')[1];
+            const hora_salida = card.querySelector('.schedule-info p:nth-child(2)').textContent.split(': ')[1];
+            const hora_llegada = card.querySelector('.schedule-info p:nth-child(3)').textContent.split(': ')[1];
+            const frecuencia = card.querySelector('.frequency-info p').textContent.split(': ')[1];
+
+            // Rellenar el formulario de edición
+            document.getElementById('edit_id_horario').value = id_horario;
+            document.getElementById('edit_id_ruta').value = id_ruta;
+            document.getElementById('edit_dia_semana').value = dia_semana;
+            document.getElementById('edit_hora_salida').value = hora_salida;
+            document.getElementById('edit_hora_llegada').value = hora_llegada;
+            document.getElementById('edit_frecuencia').value = frecuencia;
+
+            // Abrir modal de edición
+            document.getElementById('editRouteModal').classList.add('active');
+        });
+    });
+
+    // Cerrar modal de edición con botones
+    document.getElementById('closeEditModal')?.addEventListener('click', function() {
+        document.getElementById('editRouteModal').classList.remove('active');
+    });
+
+    document.getElementById('cancelEditModal')?.addEventListener('click', function() {
+        document.getElementById('editRouteModal').classList.remove('active');
+    });
+
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('editRouteModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+
+    // Modal de agregar
+    document.querySelector('.btn-add').addEventListener('click', function() {
+        document.getElementById('addRouteModal').classList.add('active');
+    });
+
+    document.getElementById('closeModal').addEventListener('click', function() {
+        document.getElementById('addRouteModal').classList.remove('active');
+    });
+
+    document.getElementById('cancelModal').addEventListener('click', function() {
+        document.getElementById('addRouteModal').classList.remove('active');
+    });
+
+    document.getElementById('addRouteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+</script>
 </body>
 </html>
