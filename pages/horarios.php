@@ -258,7 +258,7 @@ if (!isset($_SESSION['id'])) {
       <button class="modal-close" id="closeEditModal">×</button>
     </div>
     <form id="editRouteForm" action="../pages/actualizar/actu_horariosSql.php" method="POST">
-      <input type="text" name="id_horario" id="edit_id_horario">
+      <input type="hidden" name="id_horario" id="edit_id_horario">
       <div class="modal-body">
         <div>
           <div class="modal-form-group">
@@ -306,6 +306,7 @@ if (!isset($_SESSION['id'])) {
 
 <script src="../assets/js/notifications.js"></script>
 <script src="../assets/js/main.js"></script>
+<script src="../assets/js/card-pagination.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Manejar inserción de horarios
@@ -334,9 +335,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const card = this.closest('.card');
             const id_horario = this.getAttribute('data-id');
             const id_ruta = card.querySelector('.route-id').textContent.split(': ')[1];
-            const dia_semana = card.querySelector('.schedule-info p:nth-child(1)').textContent.split(': ')[1];
-            const hora_salida = card.querySelector('.schedule-info p:nth-child(2)').textContent.split(': ')[1];
-            const hora_llegada = card.querySelector('.schedule-info p:nth-child(3)').textContent.split(': ')[1];
+            const dia_semana = card.querySelector('.schedule-info p:nth-child(2)').textContent.split(': ')[1];
+            const hora_salida = card.querySelector('.schedule-info p:nth-child(3)').textContent.split(': ')[1];
+            const hora_llegada = card.querySelector('.schedule-info p:nth-child(4)').textContent.split(': ')[1];
             const frecuencia = card.querySelector('.frequency-info p').textContent.split(': ')[1];
 
             // Rellenar el formulario de edición

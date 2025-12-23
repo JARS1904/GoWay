@@ -443,6 +443,7 @@ body {
     font-size: 14px;
     transition: background-color 0.3s ease, transform 0.3s ease;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .btn-add:hover {
@@ -1323,8 +1324,23 @@ body {
     }
 }
 
+@keyframes slideInCard {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .data-table tr {
     animation: fadeInUp 0.5s ease-out;
+}
+
+.card {
+    animation: slideInCard 0.5s ease-out;
 }
 
 .data-table tr:nth-child(1) { animation-delay: 0.1s; }
@@ -1414,7 +1430,7 @@ body {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
     border: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
