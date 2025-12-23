@@ -1,5 +1,7 @@
 
 <?php
+header('Content-Type: application/json');
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -10,26 +12,33 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Verificar conexión
 if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+    echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
+    exit();
 }
 
-// Preparar y enlazar
-$stmt = $conn->prepare("INSERT INTO conductores (rfc_conductor, rfc_empresa, nombre, licencia, telefono) VALUES (?, ?, ?, ?, ?)");
-$stmt->bind_param("sssss", $rfc_conductor, $rfc_empresa, $nombre, $licencia, $telefono);
-
-// Establecer parámetros y ejecutar
+// Obtener parámetros
 $rfc_conductor = $_POST['rfc_conductor'];
 $rfc_empresa = $_POST['rfc_empresa'];
 $nombre = $_POST['nombre'];
 $licencia = $_POST['licencia'];
 $telefono = $_POST['telefono'];
-$stmt->execute();
 
-echo "Conductor guardado exitosamente";
+// Preparar y enlazar
+$stmt = $conn->prepare("INSERT INTO conductores (rfc_conductor, rfc_empresa, nombre, licencia, telefono) VALUES (?, ?, ?, ?, ?)");
 
-// Redireccionar después de 2 segundos
-header("Refresh: 2; URL=/GoWay/pages/checadores.php");
+if ($stmt === false) {
+    echo json_encode(["success" => false, "message" => "Error en la preparación: " . $conn->error]);
+    exit();
+}
 
+$stmt->bind_param("sssss", $rfc_conductor, $rfc_empresa, $nombre, $licencia, $telefono);
+
+// Ejecutar
+if ($stmt->execute()) {
+    echo json_encode(["success" => true, "message" => "Conductor agregado correctamente"]);
+} else {
+    echo json_encode(["success" => false, "message" => "Error al insertar: " . $stmt->error]);
+}
 
 $stmt->close();
 $conn->close();

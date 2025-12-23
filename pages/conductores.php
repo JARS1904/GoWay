@@ -269,7 +269,15 @@ if (!isset($_SESSION['id'])) {
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_rfc_empresa">RFC Empresa</label>
-                            <input type="text" id="edit_rfc_empresa" name="rfc_empresa" required>
+                            <select id="edit_rfc_empresa" name="rfc_empresa" required>
+                                <?php
+                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
+                                while ($row = $result->fetch_assoc()) {
+                                    echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_nombre">Nombre</label>
@@ -365,8 +373,78 @@ if (!isset($_SESSION['id'])) {
     </script>
 
     <script src="../assets/js/main.js"></script>  
-    <script src="../assets/js/update/actu_conductores.js"></script>
-    <script src="../assets/js/delete/delete_conductores.js"></script>
+    <script src="../assets/js/notifications.js"></script>
     <script src="../assets/js/pagination.js"></script>
+    
+    <script>
+        // Manejar cierre de modal de agregar
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('addRouteModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelModal').addEventListener('click', () => {
+            document.getElementById('addRouteModal').classList.remove('active');
+        });
+
+        // Manejo del formulario de inserción
+        handleInsertForm(document.getElementById('routeForm'), 'Conductor agregado correctamente');
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('addRouteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Usar event delegation para botones de edición
+        const tbody = document.querySelector('tbody');
+        if (tbody) {
+            tbody.addEventListener('click', function(e) {
+                const btn = e.target.closest('.btn-edit');
+                if (btn) {
+                    const row = btn.closest('tr');
+                    const cells = row.querySelectorAll('td');
+                    
+                    document.getElementById('edit_rfc_conductor').value = cells[0].textContent.trim();
+                    document.getElementById('edit_rfc_empresa').value = cells[1].textContent.trim();
+                    document.getElementById('edit_nombre').value = cells[2].textContent.trim();
+                    document.getElementById('edit_licencia').value = cells[3].textContent.trim();
+                    document.getElementById('edit_telefono').value = cells[4].textContent.trim();
+                    
+                    const statusText = cells[5].querySelector('span').textContent.trim();
+                    document.getElementById('edit_activo').value = statusText === 'Sí' ? 1 : 0;
+                    
+                    document.getElementById('editConductoresModal').classList.add('active');
+                }
+            });
+        }
+
+        // Cerrar modal de edición
+        document.getElementById('closeEditConductoresModal').addEventListener('click', () => {
+            document.getElementById('editConductoresModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelEditConductoresModal').addEventListener('click', () => {
+            document.getElementById('editConductoresModal').classList.remove('active');
+        });
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('editConductoresModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Manejo del formulario de edición
+        handleUpdateForm(document.getElementById('editVehicleForm'), 'Conductor actualizado correctamente');
+
+        // Inicializar botones de eliminación
+        initializeDeleteButtons(
+            '.btn-delete',
+            '../controllers/delete/delete_conductores.php',
+            'rfc_conductor',
+            '¿Estás seguro de que deseas eliminar este conductor?'
+        );
+    </script>
 </body>
 </html>

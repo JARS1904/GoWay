@@ -1,6 +1,9 @@
 <?php
+header('Content-Type: application/json');
+
 if (!isset($_POST['rfc_conductor'])) {
-    die("RFC de conductor no proporcionado.");
+    echo json_encode(["success" => false, "message" => "RFC de conductor no proporcionado."]);
+    exit();
 }
 
 $rfc = $_POST['rfc_conductor'];
@@ -8,7 +11,8 @@ $rfc = $_POST['rfc_conductor'];
 $conn = new mysqli("localhost", "root", "", "goway");
 
 if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+    echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
+    exit();
 }
 
 // Iniciar transacción
@@ -30,13 +34,19 @@ try {
     // Confirmar transacción
     $conn->commit();
     
-    header("Location: /GoWay/pages/conductores.php");
-    echo "Conductor eliminado correctamente.";
+    echo json_encode(["success" => true, "message" => "Conductor eliminado correctamente"]);
     exit();
 } catch (Exception $e) {
     // Revertir en caso de error
     $conn->rollback();
-    echo "Error al eliminar el conductor: " . $e->getMessage();
+    echo json_encode(["success" => false, "message" => "Error al eliminar: " . $e->getMessage()]);
+    exit();
+}
+
+$stmt1->close();
+$stmt2->close();
+$conn->close();
+?>
 }
 
 $stmt1->close();
