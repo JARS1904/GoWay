@@ -141,8 +141,8 @@ if (!isset($_SESSION['id'])) {
                         die("Error de conexión: " . $conn->connect_error);
                     }
 
-                    // Consulta para obtener los horarios
-                    $sql = "SELECT * FROM horarios";
+                    // Consulta para obtener los horarios con el nombre de la ruta
+                    $sql = "SELECT h.*, r.nombre FROM horarios h LEFT JOIN rutas r ON h.id_ruta = r.id_ruta";
                     $result = $conn->query($sql);
 
                     echo '<div class="card-container">'; // Contenedor principal para las cards
@@ -157,6 +157,7 @@ if (!isset($_SESSION['id'])) {
                                 </div>
                                 <div class="card-body">
                                     <div class="schedule-info">
+                                        <p><strong>Ruta:</strong> '.(isset($row["nombre"]) ? $row["nombre"] : "No disponible").'</p>
                                         <p><strong>Día:</strong> '.$row["dia_semana"].'</p>
                                         <p><strong>Salida:</strong> '.$row["hora_salida"].'</p>
                                         <p><strong>Llegada:</strong> '.$row["hora_llegada"].'</p>

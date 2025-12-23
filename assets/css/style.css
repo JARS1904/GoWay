@@ -312,7 +312,7 @@ body {
 /* Tarjetas */
 /* ==================== */
 .content {
-    padding: 20px;
+    padding: 20px 20px;
     border-radius: 8px;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
@@ -1395,5 +1395,172 @@ body {
     
     .auth-form .btn {
         border: 2px solid #1d4ed8;
+    }
+}
+
+/* ==================== */
+/* Diseño Moderno de Tarjetas de Horarios */
+/* ==================== */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px 32px;
+    width: 100%;
+    padding: 20px 0px;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    border-color: #3b82f6;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 12px 12px 0 0;
+}
+
+.card-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: white;
+}
+
+.card-header .route-id {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.25);
+    padding: 5px 11px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.card-body {
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.schedule-info p,
+.frequency-info p {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 28px;
+    background-color: #f0f4f9;
+    border-radius: 5px;
+}
+
+.schedule-info p:last-child,
+.frequency-info p:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-info strong,
+.frequency-info strong {
+    color: #1f2937;
+    font-weight: 600;
+    display: inline;
+    margin-bottom: 0;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.card-footer {
+    background-color: #f9fafb;
+    padding: 16px 40px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card-footer small {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action.btn-edit {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-action.btn-edit:hover {
+    background-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-action.btn-delete {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-action.btn-delete:hover {
+    background-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.no-schedules {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+    font-size: 15px;
+    background-color: #f9fafb;
+    border-radius: 12px;
+    border: 2px dashed #d1d5db;
+}
+
+/* ==================== */
+/* Responsive Cards */
+/* ==================== */
+@media (max-width: 1024px) {
+    .card-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 }
