@@ -10,59 +10,6 @@ if (!isset($_SESSION['id'])) {
 <?php
 require_once '../config/conexion_bd.php';
 
-// Procesar el formulario cuando se envía
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    header('Content-Type: application/json');
-    
-    try {
-        // Obtener y sanitizar los datos del formulario
-        $id_vehiculo = isset($_POST['vehiculo']) ? (int)$_POST['vehiculo'] : 0;
-        $rfc_conductor = $conexion->real_escape_string($_POST['conductor'] ?? '');
-        $id_ruta = isset($_POST['ruta']) ? (int)$_POST['ruta'] : 0;
-        $tipo_incidente = $conexion->real_escape_string($_POST['tipoIncidente'] ?? '');
-        $fecha_incidente = $conexion->real_escape_string($_POST['fechaIncidente'] ?? '');
-        $descripcion = $conexion->real_escape_string($_POST['descripcion'] ?? '');
-        $gravedad = $conexion->real_escape_string($_POST['gravedad'] ?? 'media');
-
-        // Validar datos requeridos
-        if (empty($id_vehiculo) || empty($rfc_conductor) || empty($id_ruta) || empty($tipo_incidente) || empty($fecha_incidente) || empty($descripcion)) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Por favor completa todos los campos requeridos']);
-            exit;
-        }
-
-        // Preparar la consulta SQL
-        $sql = "INSERT INTO reportes (id_vehiculo, rfc_conductor, id_ruta, tipo_incidente, 
-                                    fecha_incidente, descripcion, gravedad) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        // Preparar y ejecutar la consulta
-        $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("issssss", 
-            $id_vehiculo, 
-            $rfc_conductor, 
-            $id_ruta, 
-            $tipo_incidente, 
-            $fecha_incidente, 
-            $descripcion, 
-            $gravedad
-        );
-
-        if ($stmt->execute()) {
-            http_response_code(200);
-            echo json_encode(['success' => true, 'message' => 'Reporte guardado exitosamente']);
-        } else {
-            throw new Exception("Error al guardar el reporte: " . $stmt->error);
-        }
-
-        $stmt->close();
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-    }
-    exit;
-}
-
 // Obtener lista de vehículos con placa y modelo
 $sql_vehiculos = "SELECT id_vehiculo, placa, modelo FROM vehiculos ORDER BY placa";
 $result_vehiculos = $conexion->query($sql_vehiculos);
@@ -394,6 +341,7 @@ if ($conexion->error) {
         }
         
     </style>
+    <script src="../assets/js/notifications.js"></script>
 </head>
 <body>
 <div class="container">
@@ -535,7 +483,7 @@ if ($conexion->error) {
                 <!-- Formulario para nuevo reporte -->
                 <div class="report-form-container">
                     <h3>Nuevo Reporte de Incidente</h3>
-                    <form id="incidentForm" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                    <form id="incidentForm" method="POST" action="../controllers/insert_reportes.php">
                         <div class="form-group">
                             <label for="vehiculo">Vehículo *</label>
                             <select id="vehiculo" name="vehiculo" required>
@@ -868,7 +816,7 @@ if ($conexion->error) {
                 document.getElementById('incidentForm').reset();
                 
                 // Mostrar notificación
-                showNotification(data.message || 'Reporte guardado exitosamente', 'success');
+                showNotification(data.message || 'Reporte guardado exitosamente', 'info');
 
                 // Recargar la página después de 2 segundos
                 setTimeout(() => {
@@ -1022,7 +970,7 @@ if ($conexion->error) {
                             updateStats(reportes);
 
                             // Mostrar mensaje de éxito
-                            showNotification('Reporte eliminado exitosamente', 'success');
+                            showNotification('Reporte eliminado exitosamente', 'error');
                         }, 300);
                     } else {
                         // Si no hay elemento visual, solo actualizar
@@ -1034,7 +982,7 @@ if ($conexion->error) {
                             filterReports();
                         }
                         updateStats(reportes);
-                        showNotification('Reporte eliminado exitosamente', 'success');
+                        showNotification('Reporte eliminado exitosamente', 'error');
                     }
                 }
             } else {
@@ -1061,74 +1009,6 @@ if ($conexion->error) {
     }
 
     // Función para mostrar notificaciones (opcional)
-    function showNotification(message, type = 'info') {
-        // Crear elemento de notificación
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.textContent = message;
-
-        // Estilos básicos
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            max-width: 350px;
-        `;
-
-        // Colores según tipo
-        if (type === 'success') {
-            notification.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-        } else if (type === 'error') {
-            notification.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-        } else {
-            notification.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
-        }
-
-        // Animación
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Añadir al documento
-        document.body.appendChild(notification);
-
-        // Auto-eliminar después de 5 segundos
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 300);
-        }, 5000);
-
-        // Permitir cerrar manualmente
-        notification.addEventListener('click', () => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 300);
-        });
-    }
-
     // Función para manejar el cambio de vehículo
     document.getElementById('vehiculo').addEventListener('change', function() {
         const vehiculoId = this.value;
