@@ -158,8 +158,12 @@ if (!isset($_SESSION['id'])) {
                             die("Error de conexión: " . $conn->connect_error);
                         }
                         
-                        // Consulta para obtener las asignaciones
-                        $sql = "SELECT * FROM asignaciones";
+                        // Consulta con JOINs para obtener placa del vehículo y nombre de la ruta
+                        // ANTES: $sql = "SELECT * FROM asignaciones";
+                        $sql = "SELECT a.*, v.placa, r.nombre as nombre_ruta 
+                                FROM asignaciones a 
+                                LEFT JOIN vehiculos v ON a.id_vehiculo = v.id_vehiculo 
+                                LEFT JOIN rutas r ON a.id_ruta = r.id_ruta";
                         $result = $conn->query($sql);
                         
                         if ($result->num_rows > 0) {
@@ -169,9 +173,11 @@ if (!isset($_SESSION['id'])) {
                                 
                                 echo '<tr>
                                         <td data-label="RFC de la Empresa" data-id="'.$row["id_asignacion"].'">'.$row["rfc_empresa"].'</td>
-                                        <td data-label="ID Vehículo">'.$row["id_vehiculo"].'</td>
+                                        <!-- ANTES: <td data-label="ID Vehículo">'.$row["id_vehiculo"].'</td> -->
+                                        <td data-label="ID Vehículo">'.$row["placa"].'</td>
                                         <td data-label="RFC Conductor">'.$row["rfc_conductor"].'</td>
-                                        <td data-label="ID Ruta">'.$row["id_ruta"].'</td>
+                                        <!-- ANTES: <td data-label="ID Ruta">'.$row["id_ruta"].'</td> -->
+                                        <td data-label="ID Ruta">'.$row["nombre_ruta"].'</td>
                                         <td data-label="ID Horario">'.$row["id_horario"].'</td>
                                         <td data-label="Fecha">'.$row["fecha"].'</td>
                                         <td data-label="Activa"><span class="'.$statusClass.'">'.$statusText.'</span></td>
