@@ -56,13 +56,10 @@ try {
 
     $user = $result->fetch_assoc();
 
-    error_log("Contraseña recibida: " . $inputPassword);
-    error_log("Hash almacenado: " . $user['password']);
-    error_log("Resultado de verificación: " . (password_verify($inputPassword, $user['password']) ? "true" : "false"));
+    // Verificar la contraseña (compatible con hash y sin hash)
+    $password_valid = password_verify($inputPassword, $user['password']) || $inputPassword === $user['password'];
     
-    //if (!password_verify($inputPassword, $user['password'])) {
-    // Se cambio el if del paswword con hash por el de texto plano
-    if ($inputPassword !== $user['password']) {
+    if (!$password_valid) {
         sendResponse(401, ["error" => "Contraseña incorrecta"]);
     }
 

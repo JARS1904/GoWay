@@ -163,11 +163,14 @@ if (!isset($_SESSION['id'])) {
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
+                                // Mostrar solo si la contraseña está establecida, sin mostrar el hash completo
+                                $password_display = !empty($row["password"]) ? "●●●●●●●●" : "Sin contraseña";
+                                
                                 echo '<tr>
                                         <td data-label="ID Usuario" data-id="' . $row["id"] . '">' . $row["id"] . '</td>
                                         <td data-label="Nombre">' . $row["nombre"] . '</td>
                                         <td data-label="Email">' . $row["email"] . '</td>
-                                        <td data-label="Password">' . $row["password"] . '</td>
+                                        <td data-label="Password">' . $password_display . '</td>
                                         <td data-label="Rol">' . $row["rol"] . '</td>
                                         <td>
                                             <button class="btn-action btn-edit">Editar</button>

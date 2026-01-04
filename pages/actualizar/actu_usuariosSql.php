@@ -24,6 +24,11 @@ $email = $_POST['email'];
 $password = $_POST['password'];
 $rol = $_POST['rol'];
 
+// Hashear la contraseña si no está vacía
+if (!empty($password)) {
+    $password = password_hash($password, PASSWORD_DEFAULT);
+}
+
 // Preparar la consulta SQL
 $sql = "UPDATE usuarios SET
 nombre = ?,

@@ -48,9 +48,8 @@ switch ($method) {
         
         $nombre = $conn->real_escape_string($data['nombre']);
         $email = $conn->real_escape_string($data['email']);
-        //$hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-        // Se cambio el hash por el texto plano por el momento
-        $plainPassword = $conn->real_escape_string($data['password']);
+        // Hashear la contraseña
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         
         // Verificar si el email ya existe
         $checkEmail = $conn->query("SELECT id FROM usuarios WHERE email = '$email'");
@@ -62,8 +61,7 @@ switch ($method) {
         
         // Usar consulta preparada para mayor seguridad
         $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, 2)");
-        //$stmt->bind_param("sss", $nombre, $email, $hashedPassword);
-        $stmt->bind_param("sss", $nombre, $email, $plainPassword);
+        $stmt->bind_param("sss", $nombre, $email, $hashedPassword);
         
         if ($stmt->execute()) {
             http_response_code(201);
