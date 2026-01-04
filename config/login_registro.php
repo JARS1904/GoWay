@@ -7,10 +7,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $password = $_POST["password"];
     $confirm_password = $_POST["confirm-password"];
-    $role_id = $_POST["role_id"];
+    $role_id = 2; // Por defecto, rol de usuario normal
 
     // Verificar que los campos no estén vacíos
-    if (empty($username) || empty($email) || empty($password) || empty($confirm_password) || empty($role_id)) {
+    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
         //echo "Todos los campos son obligatorios.";
         echo '<script>alert("Todos los campos son obligatorios."); window.location = "../pages/registro.php";</script>';
     } elseif ($password != $confirm_password) {
@@ -30,8 +30,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $query = "INSERT INTO usuarios (nombre, email, password, rol) VALUES ('$username', '$email', '$password', '$role_id')";
             
             if ($conexion->query($query)) {
-                echo "Registro exitoso. Puedes iniciar sesión.";
-                header("location: ../index.php");// Redirigir al usuario a la página de inicio de sesión o login 
+                // Iniciar sesión automáticamente después del registro
+                session_start();
+                $_SESSION['id']     = $conexion->insert_id;
+                $_SESSION['nombre'] = $username;
+                $_SESSION['rol']    = $role_id;
+                
+                echo "Registro exitoso. Bienvenido.";
+                // Redirigir al usuario normal a su página
+                header("location: ../pages/route_selected_screen.php");
             } else {
                 echo "Error en el registro.";
             }

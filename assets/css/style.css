@@ -462,7 +462,7 @@ body {
     overflow: hidden;
     max-width: 800px;
     width: 100%;
-    margin: 11rem auto;
+    margin: 5rem auto;
     min-height: 500px;
 }
 
@@ -630,6 +630,67 @@ body {
     border-left: 4px solid #d32f2f;
     font-size: 14px;
     font-weight: 500;
+}
+
+/* ==================== */
+/* Header de Autenticación */
+/* ==================== */
+.auth-header {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.admin-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: inline-block;
+}
+
+.admin-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+    justify-content: flex-start;
+}
+
+.header-logo {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
+
+.header-right h3 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 /* ==================== */
