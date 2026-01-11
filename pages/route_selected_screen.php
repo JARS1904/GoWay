@@ -50,8 +50,6 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
         .container {
             display: flex;
             flex: 1;
-            max-width: 1600px;
-            margin: 0 auto;
             width: 100%;
         }
 
@@ -62,6 +60,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             border-right: 1px solid var(--medium-gray);
             background-color: white;
             overflow-y: auto;
+            overflow-x: hidden;
             height: calc(100vh - 70px);
             position: sticky;
             top: 70px;
@@ -312,6 +311,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             margin-bottom: 20px;
             transition: all 0.3s;
             cursor: pointer;
+            position: relative;
         }
 
         .route-card:hover {
@@ -341,6 +341,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             font-weight: 700;
             color: var(--primary-dark);
             font-size: 18px;
+            margin-left: 10px;
         }
 
         .route-path {
@@ -685,6 +686,101 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
         .icon-btn i {
             font-size: 14px;
         }
+
+        /* Estilos para el botón de favorita */
+        .favorite-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--dark-gray);
+            transition: all 0.3s ease;
+            padding: 0;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            left: 130px;
+            right: 20px;
+            top: 20px;
+            z-index: 10;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .favorite-btn.active {
+            color: #D32F2F;
+        }
+
+        .favorite-btn.active:hover {
+            transform: scale(1.15);
+        }
+
+        .route-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .route-card-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        /* Filtro de favoritas */
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--medium-gray);
+            background-color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .favorites-list {
+            margin-bottom: 30px;
+        }
+
+        .favorites-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .favorites-section-title i {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -740,6 +836,16 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
 
             <section class="results-section">
                 <h2 class="section-title">Disponibles</h2>
+                
+                <div class="filter-section">
+                    <button class="filter-btn active" id="filterAll" data-filter="all">
+                        <i class="fas fa-list"></i> Todas
+                    </button>
+                    <button class="filter-btn" id="filterFavorites" data-filter="favorites">
+                        <i class="fas fa-heart"></i> Favoritas
+                    </button>
+                </div>
+                
                 <div id="resultsContainer">
                     <div class="no-routes">
                         <p>Seleccione origen y destino para buscar rutas</p>
@@ -770,6 +876,8 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
         // Configuración de API
         const API_BASE_URL = window.location.origin; // Obtiene http://localhost
         const API_URL = `${API_BASE_URL}/GoWay/api/routes_api.php`;
+        const FAVORITES_URL = `${API_BASE_URL}/GoWay/api/favorites_routes_api.php`;
+        const ID_USUARIO = <?php echo isset($_SESSION['id']) ? $_SESSION['id'] : 0; ?>;
         
         // Datos mock para cuando falle la API
         const MOCK_LOCATIONS = ["Centro", "Norte", "Sur", "Este", "Oeste"];
@@ -796,36 +904,142 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             paradas: ["Parada A", "Parada B", "Parada C"]
         }];
 
-        // DOM Elements
+        // Elementos del DOM
         const originSelect = document.getElementById('origin');
         const destinationSelect = document.getElementById('destination');
         const searchForm = document.getElementById('searchForm');
-        const searchBtn = document.getElementById('searchBtn');
         const resultsContainer = document.getElementById('resultsContainer');
         const routeDetailsContainer = document.getElementById('routeDetailsContainer');
+        const searchBtn = document.getElementById('searchBtn');
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toastMessage');
-
-        // Global Variables
-        let locations = [];
+        
+        // Elementos de filtro
+        const filterAllBtn = document.getElementById('filterAll');
+        const filterFavoritesBtn = document.getElementById('filterFavorites');
+        
+        // Estado
         let routes = [];
         let selectedRouteId = null;
+        let favorites = new Set();
+        let currentFilter = 'all';
+        let locations = [];
 
-        // Initialize the application
+        // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Iniciando aplicación...');
             console.log('URL base:', API_BASE_URL);
             console.log('URL API:', API_URL);
             
             fetchLocations();
+            loadFavorites();
             
-            // Form event listeners
+            // Escuchadores de eventos del formulario
             searchForm.addEventListener('submit', handleSearch);
             originSelect.addEventListener('change', updateSearchButton);
             destinationSelect.addEventListener('change', updateSearchButton);
+            
+            // Escuchadores de eventos de filtro
+            filterAllBtn.addEventListener('click', () => {
+                currentFilter = 'all';
+                updateFilterButtons();
+                filterAndDisplayRoutes();
+            });
+            
+            filterFavoritesBtn.addEventListener('click', () => {
+                currentFilter = 'favorites';
+                updateFilterButtons();
+                filterAndDisplayRoutes();
+            });
         });
 
-        // Fetch available locations from API
+        // Cargar rutas favoritas del servidor
+        async function loadFavorites() {
+            try {
+                const response = await fetch(`${FAVORITES_URL}?action=get_favorites&id_usuario=${ID_USUARIO}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                console.log('Response favoritas:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Datos favoritas recibidos:', data);
+                    
+                    if (Array.isArray(data)) {
+                        data.forEach(fav => {
+                            favorites.add(fav.id_ruta);
+                        });
+                        console.log('Favoritas cargadas:', favorites);
+                    }
+                } else {
+                    console.error('Error en respuesta favoritas:', response.status);
+                }
+            } catch (error) {
+                console.error('Error al cargar favoritas:', error);
+            }
+        }
+
+        // Actualizar apariencia de botones de filtro
+        function updateFilterButtons() {
+            filterAllBtn.classList.toggle('active', currentFilter === 'all');
+            filterFavoritesBtn.classList.toggle('active', currentFilter === 'favorites');
+        }
+
+        // Filtrar y mostrar rutas según el filtro actual
+        function filterAndDisplayRoutes() {
+            if (currentFilter === 'favorites') {
+                if (routes.length === 0) {
+                    // Si no hay búsqueda realizada, traer favoritas desde BD
+                    loadFavoritesAndDisplay();
+                } else {
+                    const favoriteRoutes = routes.filter(route => favorites.has(route.id_ruta));
+                    if (favoriteRoutes.length === 0) {
+                        resultsContainer.innerHTML = '<div class="no-routes"><p>No tienes rutas favoritas aún</p></div>';
+                    } else {
+                        displayRoutes(favoriteRoutes);
+                    }
+                }
+            } else {
+                displayRoutes(routes);
+            }
+        }
+
+        async function loadFavoritesAndDisplay() {
+            try {
+                showLoading(true, resultsContainer);
+                
+                const response = await fetch(`${FAVORITES_URL}?action=get_favorites&id_usuario=${ID_USUARIO}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const favoritesData = await response.json();
+                    console.log('Favoritas cargadas:', favoritesData);
+                    
+                    if (Array.isArray(favoritesData) && favoritesData.length > 0) {
+                        displayRoutes(favoritesData);
+                    } else {
+                        resultsContainer.innerHTML = '<div class="no-routes"><p>No tienes rutas favoritas aún</p></div>';
+                    }
+                } else {
+                    resultsContainer.innerHTML = '<div class="no-routes"><p>Error al cargar favoritas</p></div>';
+                }
+            } catch (error) {
+                console.error('Error al cargar favoritas:', error);
+                resultsContainer.innerHTML = '<div class="no-routes"><p>Error al cargar favoritas</p></div>';
+            } finally {
+                showLoading(false, resultsContainer);
+            }
+        }
+
+        // Obtener ubicaciones disponibles de la API
         async function fetchLocations() {
             try {
                 showLoading(true);
@@ -865,15 +1079,15 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             }
         }
 
-        // Populate origin and destination selects with locations
+        // Llenar selects de origen y destino con ubicaciones
         function populateLocationSelects() {
             console.log('Llenando selects con:', locations);
             
-            // Clear existing options (keeping the first empty option)
+            // Limpiar opciones existentes (manteniendo la primera opción vacía)
             while (originSelect.options.length > 1) originSelect.remove(1);
             while (destinationSelect.options.length > 1) destinationSelect.remove(1);
             
-            // Add new options
+            // Agregar nuevas opciones
             locations.forEach(location => {
                 const option1 = document.createElement('option');
                 option1.value = location;
@@ -889,13 +1103,13 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             updateSearchButton();
         }
 
-        // Update search button state based on selections
+        // Actualizar estado del botón de búsqueda según selecciones
         function updateSearchButton() {
             const hasSelection = originSelect.value && destinationSelect.value;
             searchBtn.disabled = !hasSelection;
         }
 
-        // Handle search form submission
+        // Manejar envío de formulario de búsqueda
         async function handleSearch(e) {
             e.preventDefault();
             
@@ -959,7 +1173,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             }
         }
 
-        // Process routes to combine duplicates with different schedules
+        // Procesar rutas para combinar duplicados con diferentes horarios
         function processRoutes(rawRoutes) {
             const uniqueRoutes = {};
             
@@ -967,28 +1181,28 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                 const routeId = route.id_ruta;
                 
                 if (uniqueRoutes[routeId]) {
-                    // Combine schedules
+                    // Combinar horarios
                     const scheduleMap = {};
                     
-                    // Add existing schedules
+                    // Agregar horarios existentes
                     uniqueRoutes[routeId].horarios.forEach(schedule => {
                         const key = `${schedule.dia_semana}-${schedule.hora_salida}-${schedule.hora_llegada}`;
                         scheduleMap[key] = schedule;
                     });
                     
-                    // Add new schedules
+                    // Agregar nuevos horarios
                     route.horarios.forEach(schedule => {
                         const key = `${schedule.dia_semana}-${schedule.hora_salida}-${schedule.hora_llegada}`;
                         scheduleMap[key] = schedule;
                     });
                     
-                    // Update schedules
+                    // Actualizar horarios
                     uniqueRoutes[routeId].horarios = Object.values(scheduleMap);
                 } else {
-                    // Add new route
+                    // Agregar nueva ruta
                     uniqueRoutes[routeId] = {...route};
                     
-                    // Ensure paradas is an array
+                    // Asegurar que paradas es un array
                     if (typeof uniqueRoutes[routeId].paradas === 'string') {
                         uniqueRoutes[routeId].paradas = uniqueRoutes[routeId].paradas.split(', ');
                     }
@@ -998,7 +1212,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             return Object.values(uniqueRoutes);
         }
 
-        // Display routes in the results container
+        // Mostrar rutas en el contenedor de resultados
         function displayRoutes(routesToDisplay) {
             if (!routesToDisplay || routesToDisplay.length === 0) {
                 displayNoRoutes();
@@ -1010,17 +1224,25 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             routesToDisplay.forEach(route => {
                 const routeCard = document.createElement('div');
                 routeCard.className = 'route-card';
+                routeCard.setAttribute('data-route-id', route.id_ruta);
                 if (route.id_ruta === selectedRouteId) {
                     routeCard.classList.add('selected');
                 }
                 
-                // Get unique schedules count
+                // Obtener conteo de horarios únicos
                 const uniqueSchedules = getUniqueSchedules(route.horarios || []);
+                const isFavorite = favorites.has(route.id_ruta);
+                const favoriteIcon = isFavorite ? 'fas fa-heart' : 'far fa-heart';
                 
                 routeCard.innerHTML = `
-                    <div class="route-header">
-                        <i class="fas fa-bus"></i>
-                        <span class="route-company">${route.empresa_nombre || 'Transporte'}</span>
+                    <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-route-id="${route.id_ruta}" title="${isFavorite ? 'Eliminar de favoritas' : 'Agregar a favoritas'}">
+                        <i class="${favoriteIcon}"></i>
+                    </button>
+                    <div class="route-card-header">
+                        <div class="route-card-title">
+                            <i class="fas fa-bus"></i>
+                            <span class="route-company">${route.empresa_nombre || 'Transporte'}</span>
+                        </div>
                     </div>
                     <div class="route-path">
                         <div class="route-origin">
@@ -1041,18 +1263,82 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                     </div>
                 `;
                 
-                // Add click event
-                routeCard.addEventListener('click', () => {
-                    selectedRouteId = route.id_ruta;
-                    updateSelectedRouteCard();
-                    showRouteDetails(route);
+                // Agregar evento de clic a la tarjeta de ruta
+                routeCard.addEventListener('click', (e) => {
+                    // No seleccionar si se hace clic en el botón de favorita
+                    if (!e.target.closest('.favorite-btn')) {
+                        selectedRouteId = route.id_ruta;
+                        updateSelectedRouteCard();
+                        showRouteDetails(route);
+                    }
+                });
+                
+                // Agregar escucha de evento del botón de favorita
+                const favoriteBtn = routeCard.querySelector('.favorite-btn');
+                favoriteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(route.id_ruta, favoriteBtn);
                 });
                 
                 resultsContainer.appendChild(routeCard);
             });
         }
 
-        // Update selected route card style
+        // Alternar estado de favorita para una ruta
+        async function toggleFavorite(routeId, buttonElement) {
+            const isFavorite = favorites.has(routeId);
+            const action = isFavorite ? 'remove_favorite' : 'add_favorite';
+            
+            try {
+                const payload = {
+                    action: action,
+                    id_usuario: ID_USUARIO,
+                    id_ruta: routeId
+                };
+                
+                const response = await fetch(FAVORITES_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Actualizar el estado local
+                        if (isFavorite) {
+                            favorites.delete(routeId);
+                            buttonElement.classList.remove('active');
+                            buttonElement.innerHTML = '<i class="far fa-heart"></i>';
+                            buttonElement.title = 'Agregar a favoritas';
+                            showToast('Eliminado de favoritas');
+                        } else {
+                            favorites.add(routeId);
+                            buttonElement.classList.add('active');
+                            buttonElement.innerHTML = '<i class="fas fa-heart"></i>';
+                            buttonElement.title = 'Eliminar de favoritas';
+                            showToast('Agregado a favoritas');
+                        }
+                        
+                        // Si estamos en vista de favoritas, actualizar lista
+                        if (currentFilter === 'favorites') {
+                            filterAndDisplayRoutes();
+                        }
+                    }
+                } else {
+                    showToast('Error al actualizar favorita');
+                    console.error('Error response:', await response.text());
+                }
+            } catch (error) {
+                console.error('Error al cambiar favorita:', error);
+                showToast('Error al actualizar favorita');
+            }
+        }
+
+        // Actualizar estilo de tarjeta de ruta seleccionada
         function updateSelectedRouteCard() {
             document.querySelectorAll('.route-card').forEach(card => {
                 card.classList.remove('selected');
@@ -1062,7 +1348,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             });
         }
 
-        // Get unique schedules (avoiding duplicates)
+        // Obtener horarios únicos (evitando duplicados)
         function getUniqueSchedules(schedules) {
             const scheduleMap = {};
             
@@ -1074,7 +1360,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             return Object.values(scheduleMap);
         }
 
-        // Display "no routes" message
+        // Mostrar mensaje "sin rutas"
         function displayNoRoutes() {
             resultsContainer.innerHTML = `
                 <div class="no-routes">
@@ -1083,7 +1369,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             `;
         }
 
-        // Show no selection view
+        // Mostrar vista sin selección
         function showNoSelection() {
             routeDetailsContainer.innerHTML = `
                 <div class="no-selection">
@@ -1094,7 +1380,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             `;
         }
 
-        // Show route details in right column
+        // Mostrar detalles de ruta en columna derecha
         function showRouteDetails(route) {
             if (!route) {
                 showNoSelection();
@@ -1102,8 +1388,10 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             }
             
             const uniqueSchedules = getUniqueSchedules(route.horarios || []);
+            const isFavorite = favorites.has(route.id_ruta);
+            const favoriteIcon = isFavorite ? 'fas fa-heart' : 'far fa-heart';
             
-            // Build details content
+            // Construir contenido de detalles
             let contentHTML = `
                 <div class="route-details">
                     <div class="route-full-path">
@@ -1143,7 +1431,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                     <h4 class="info-title">Horarios disponibles</h4>
             `;
             
-            // Add schedules
+            // Agregar horarios
             uniqueSchedules.forEach(schedule => {
                 contentHTML += `
                     <div class="schedule-card">
@@ -1227,7 +1515,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             routeDetailsContainer.innerHTML = contentHTML;
         }
 
-        // Show loading indicator
+        // Mostrar indicador de carga
         function showLoading(show, container = document.body) {
             if (show) {
                 const loadingDiv = document.createElement('div');
@@ -1237,7 +1525,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                     <div class="loading-text">Cargando...</div>
                 `;
                 
-                // Clear only if it's the results container
+                // Limpiar solo si es el contenedor de resultados
                 if (container === resultsContainer) {
                     container.innerHTML = '';
                 }
@@ -1248,7 +1536,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             }
         }
 
-        // Show toast notification
+        // Mostrar notificación toast
         function showToast(message, duration = 3000) {
             toastMessage.textContent = message;
             toast.classList.add('show');
