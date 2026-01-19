@@ -13,6 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     try {
         // Obtener y sanitizar los datos del formulario
+        $id_usuario = $_SESSION['id'];
         $id_vehiculo = isset($_POST['vehiculo']) ? (int)$_POST['vehiculo'] : 0;
         $rfc_conductor = $conexion->real_escape_string($_POST['conductor'] ?? '');
         $id_ruta = isset($_POST['ruta']) ? (int)$_POST['ruta'] : 0;
@@ -30,19 +31,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Preparar la consulta SQL
         $sql = "INSERT INTO reportes (id_vehiculo, rfc_conductor, id_ruta, tipo_incidente, 
-                                    fecha_incidente, descripcion, gravedad) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+                                    fecha_incidente, descripcion, gravedad, id_usuario) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         // Preparar y ejecutar la consulta
         $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("issssss", 
+        $stmt->bind_param("issssssi", 
             $id_vehiculo, 
             $rfc_conductor, 
             $id_ruta, 
             $tipo_incidente, 
             $fecha_incidente, 
             $descripcion, 
-            $gravedad
+            $gravedad,
+            $id_usuario
         );
 
         if ($stmt->execute()) {

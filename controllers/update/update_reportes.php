@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json; charset=utf-8');
 require_once '../../config/conexion_bd.php';
 
@@ -9,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+$id_usuario = $_SESSION['id'] ?? 0;
 $id_vehiculo = isset($_POST['vehiculo']) ? (int) $_POST['vehiculo'] : 0;
 $rfc_conductor = isset($_POST['conductor']) ? $conexion->real_escape_string($_POST['conductor']) : '';
 $id_ruta = isset($_POST['ruta']) ? (int) $_POST['ruta'] : 0;
@@ -38,9 +40,9 @@ try {
     $check_stmt->close();
 
     // Actualizar
-    $sql = "UPDATE reportes SET id_vehiculo = ?, rfc_conductor = ?, id_ruta = ?, tipo_incidente = ?, fecha_incidente = ?, descripcion = ?, gravedad = ?, estado = ? WHERE id = ?";
+    $sql = "UPDATE reportes SET id_vehiculo = ?, rfc_conductor = ?, id_ruta = ?, tipo_incidente = ?, fecha_incidente = ?, descripcion = ?, gravedad = ?, estado = ?, id_usuario = ? WHERE id = ?";
     $stmt = $conexion->prepare($sql);
-    $stmt->bind_param("isisssssi",
+    $stmt->bind_param("isssssssii",
         $id_vehiculo,
         $rfc_conductor,
         $id_ruta,
@@ -49,6 +51,7 @@ try {
         $descripcion,
         $gravedad,
         $estado,
+        $id_usuario,
         $id
     );
 
