@@ -2,7 +2,10 @@
 header('Content-Type: application/json');
 
 // Conexión a la base de datos
-$conn = new mysqli("localhost", "root", "", "goway");
+require_once '../../config/conexion_bd.php';
+
+// Crear conexión
+$conn = $conexion;
 
 // Verificar conexión
 if ($conn->connect_error) {

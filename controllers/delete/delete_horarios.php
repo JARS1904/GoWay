@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once '../../config/conexion_bd.php';
 
 if (!isset($_POST['id_horario'])) {
     http_response_code(400);
@@ -9,7 +10,7 @@ if (!isset($_POST['id_horario'])) {
 
 $id = (int)$_POST['id_horario'];
 
-$conn = new mysqli("localhost", "root", "", "goway");
+$conn = $conexion;
 
 if ($conn->connect_error) {
     http_response_code(500);

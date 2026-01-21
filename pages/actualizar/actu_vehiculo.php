@@ -20,12 +20,13 @@
 
             <section class="content">
                 <?php
+                require_once '../../config/conexion_bd.php';
                 // Obtener el ID del vehículo de la URL
                 $id_vehiculo = isset($_GET['id']) ? $_GET['id'] : null;
                 
                 if ($id_vehiculo) {
                     // Conexión a la base de datos
-                    $conn = new mysqli("localhost", "root", "", "goway");
+                    $conn = $conexion;
                     
                     if ($conn->connect_error) {
                         die("Error de conexión: " . $conn->connect_error);

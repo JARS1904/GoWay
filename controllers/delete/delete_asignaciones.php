@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once '../../config/conexion_bd.php';
 
 if (!isset($_POST['id_asignacion'])) {
     echo json_encode(["success" => false, "message" => "ID de asignación no proporcionado."]);
@@ -8,7 +9,7 @@ if (!isset($_POST['id_asignacion'])) {
 
 $id = $_POST['id_asignacion'];
 
-$conn = new mysqli("localhost", "root", "", "goway");
+$conn = $conexion;
 
 if ($conn->connect_error) {
     echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);

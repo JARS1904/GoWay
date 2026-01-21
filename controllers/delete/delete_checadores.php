@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once '../../config/conexion_bd.php';
 
 if (!isset($_POST['rfc_checador'])) {
     echo json_encode(["success" => false, "message" => "RFC de checador no proporcionado."]);
@@ -8,7 +9,7 @@ if (!isset($_POST['rfc_checador'])) {
 
 $rfc = $_POST['rfc_checador'];
 
-$conn = new mysqli("localhost", "root", "", "goway");
+$conn = $conexion;
 
 if ($conn->connect_error) {
     echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);

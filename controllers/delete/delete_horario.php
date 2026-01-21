@@ -1,11 +1,13 @@
 <?php
+require_once '../../config/conexion_bd.php';
+
 if (!isset($_GET['id'])) {
     die("ID de horario no proporcionado.");
 }
 
 $id = $_GET['id'];
 
-$conn = new mysqli("localhost", "root", "", "goway");
+$conn = $conexion;
 
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);

@@ -5,6 +5,7 @@ if (!isset($_SESSION['id'])) {
     header('Location: pages/login.php');
     exit();
 }
+require_once 'config/conexion_bd.php';
 ?>
 
 <!DOCTYPE html>
@@ -136,7 +137,7 @@ if (!isset($_SESSION['id'])) {
             <section class="content">
                 <h3>Resumen General</h3>
                 <?php
-                $conn = new mysqli("localhost", "root", "", "goway");
+                $conn = $conexion;
 
                 if ($conn->connect_error) {
                     die("Error de conexión: " . $conn->connect_error);
@@ -168,7 +169,7 @@ if (!isset($_SESSION['id'])) {
                 </div>
                 <div class="card">
                     <h4>Conductores Activos</h4>
-                    <p>Total: <?php echo $total_conductores; $conn->close();?></p>
+                    <p>Total: <?php echo $total_conductores; ?></p>
                 </div>
 
                 <button class="btn-add">+ Agregar nuevo servicio</button>

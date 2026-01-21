@@ -5,6 +5,7 @@ if (!isset($_SESSION['id'])) {
     header('Location: login.php');
     exit();
 }
+require_once '../config/conexion_bd.php';
 ?>
 
 <!DOCTYPE html>
@@ -135,11 +136,7 @@ if (!isset($_SESSION['id'])) {
                 <h3>Horarios Disponibles</h3>
                                     <?php
                     // Conexión a la base de datos
-                    $conn = new mysqli("localhost", "root", "", "goway");
-
-                    if ($conn->connect_error) {
-                        die("Error de conexión: " . $conn->connect_error);
-                    }
+                    $conn = $conexion;
 
                     // Consulta para obtener los horarios con el nombre de la ruta
                     $sql = "SELECT h.*, r.nombre FROM horarios h LEFT JOIN rutas r ON h.id_ruta = r.id_ruta";
@@ -180,8 +177,6 @@ if (!isset($_SESSION['id'])) {
                     }
 
                     echo '</div>'; // Cierre del contenedor
-
-                    $conn->close();
                     ?>
 
                 
@@ -206,7 +201,7 @@ if (!isset($_SESSION['id'])) {
                         <select name="id_ruta" id="">
                             
                             <?php
-                            $conn = new mysqli("localhost", "root", "", "goway");
+                            $conn = $conexion;
                             $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
                             while ($row = $result->fetch_assoc()) {
                             echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";
@@ -265,7 +260,7 @@ if (!isset($_SESSION['id'])) {
             <label>Ruta</label>
             <select name="id_ruta" id="edit_id_ruta">
               <?php
-              $conn = new mysqli("localhost", "root", "", "goway");
+              $conn = $conexion;
               $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
               while ($row = $result->fetch_assoc()) {
                 echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";

@@ -1,13 +1,9 @@
 <?php
 header('Content-Type: application/json');
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "goway";
+require_once '../config/conexion_bd.php';
 
 // Crear conexión
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = $conexion;
 
 // Verificar conexión
 if ($conn->connect_error) {

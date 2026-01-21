@@ -5,6 +5,7 @@ if (!isset($_SESSION['id'])) {
     header('Location: login.php');
     exit();
 }
+require_once '../config/conexion_bd.php';
 ?>
 
 <!DOCTYPE html>
@@ -151,11 +152,7 @@ if (!isset($_SESSION['id'])) {
                     <tbody>
                         <?php
                         // Conexión a la base de datos
-                        $conn = new mysqli("localhost", "root", "", "goway");
-                        
-                        if ($conn->connect_error) {
-                            die("Error de conexión: " . $conn->connect_error);
-                        }
+                        $conn = $conexion;
                         
                         // Consulta para obtener los conductores
                         $sql = "SELECT * FROM conductores";
@@ -182,8 +179,6 @@ if (!isset($_SESSION['id'])) {
                         } else {
                             echo '<tr><td colspan="7">No hay conductores registrados</td></tr>';
                         }
-                        
-                        $conn->close();
                         ?>
                     </tbody>
                 </table>
@@ -219,7 +214,7 @@ if (!isset($_SESSION['id'])) {
                             <label>Seleccione RFC de la Empresa</label>
                             <select name="rfc_empresa" required id="">
                                 <?php
-                                    $conn = new mysqli("localhost", "root", "", "goway");
+                                    $conn = $conexion;
                                     $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
                                     while ($row = $result->fetch_assoc()) {
                                     echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
@@ -271,7 +266,7 @@ if (!isset($_SESSION['id'])) {
                             <label for="edit_rfc_empresa">RFC Empresa</label>
                             <select id="edit_rfc_empresa" name="rfc_empresa" required>
                                 <?php
-                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $conn = $conexion;
                                 $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
                                 while ($row = $result->fetch_assoc()) {
                                     echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";

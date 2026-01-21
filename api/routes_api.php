@@ -10,13 +10,10 @@ function sendResponse($statusCode, $data) {
     exit;
 }
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "goway";
+require_once '../config/conexion_bd.php';
 
 try {
-    $conn = new mysqli($servername, $username, $password, $dbname);
+    $conn = $conexion;
     
     if ($conn->connect_error) {
         sendResponse(500, ["error" => "Error de conexión: " . $conn->connect_error]);

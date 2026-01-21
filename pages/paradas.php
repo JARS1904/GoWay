@@ -5,6 +5,7 @@ if (!isset($_SESSION['id'])) {
     header('Location: login.php');
     exit();
 }
+require_once '../config/conexion_bd.php';
 ?>
 
 <!DOCTYPE html>
@@ -152,11 +153,7 @@ if (!isset($_SESSION['id'])) {
                     <tbody>
                         <?php
                         // Conexión a la base de datos
-                        $conn = new mysqli("localhost", "root", "", "goway");
-                        
-                        if ($conn->connect_error) {
-                            die("Error de conexión: " . $conn->connect_error);
-                        }
+                        $conn = $conexion;
                         
                         // Consulta con JOINs para obtener placa del vehículo y nombre de la ruta
                         // ANTES: $sql = "SELECT * FROM asignaciones";
@@ -189,8 +186,6 @@ if (!isset($_SESSION['id'])) {
                         } else {
                             echo '<tr><td colspan="8">No hay asignaciones registradas</td></tr>';
                         }
-                        
-                        $conn->close();
                         ?>
                     </tbody>
                 </table>
@@ -223,7 +218,7 @@ if (!isset($_SESSION['id'])) {
                             <select name="rfc_empresa" required>
                                 <option value="" disabled selected>Seleccionar empresa</option>
                                 <?php
-                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $conn = $conexion;
                                 $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
@@ -236,7 +231,7 @@ if (!isset($_SESSION['id'])) {
                             <select name="id_vehiculo" required>
                                 <option value="" disabled selected>Seleccionar vehículo</option>
                                 <?php
-                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $conn = $conexion;
                                 $result = $conn->query("SELECT id_vehiculo, placa FROM vehiculos");
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['id_vehiculo']}'>{$row['placa']}</option>";
@@ -249,7 +244,7 @@ if (!isset($_SESSION['id'])) {
                             <select name="rfc_conductor" required>
                                 <option value="" disabled selected>Seleccionar conductor</option>
                                 <?php
-                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $conn = $conexion;
                                 $result = $conn->query("SELECT rfc_conductor, nombre FROM conductores");
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['rfc_conductor']}'>{$row['nombre']}</option>";
@@ -266,7 +261,7 @@ if (!isset($_SESSION['id'])) {
                             <select name="id_ruta" required>
                                 <option value="" disabled selected>Seleccionar ruta</option>
                                 <?php
-                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $conn = $conexion;
                                 $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";
@@ -279,7 +274,7 @@ if (!isset($_SESSION['id'])) {
                             <select name="id_horario" required>
                                 <option value="" disabled selected>Seleccionar horario</option>
                                 <?php
-                                $conn = new mysqli("localhost", "root", "", "goway");
+                                $conn = $conexion;
                                 $result = $conn->query("SELECT id_horario, dia_semana FROM horarios");
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['id_horario']}'>{$row['dia_semana']}</option>";
