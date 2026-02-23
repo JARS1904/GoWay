@@ -1,0 +1,175 @@
+@startuml RouteSelectedScreenClass
+!define DIRECTION top to bottom direction
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #FFFFFF
+skinparam classBorderColor #2962FF
+skinparam classAttributeIconSize 0
+skinparam classStereotypeCBackgroundColor #FFB6C1
+skinparam noteBkgColor #FFF9C4
+skinparam noteBorderColor #F57F17
+
+' ============ ENTIDADES PRINCIPALES ============
+class Usuario {
+  --propiedades--
+  id: int
+  nombre: string
+  email: string
+  telefono: string
+  rol: int (2 = Conductor/Pasajero)
+  --métodos--
+  validarSesion(): boolean
+  obtenerFavoritas(): array
+}
+
+class Ruta {
+  --propiedades--
+  id_ruta: int
+  id_empresa: int
+  id_conductor: int
+  id_vehiculo: int
+  origen: string
+  destino: string
+  --métodos--
+  obtenerDetalles(): array
+  obtenerHorarios(): array
+  obtenerParadas(): array
+}
+
+class Empresa {
+  --propiedades--
+  id_empresa: int
+  nombre: string
+  telefono: string
+  email: string
+  direccion: string
+  --métodos--
+  obtenerRutas(): array
+}
+
+class Conductor {
+  --propiedades--
+  id_conductor: int
+  nombre: string
+  licencia: string
+  telefono: string
+  estado: string
+  --métodos--
+  obtenerRutasAsignadas(): array
+}
+
+class Vehiculo {
+  --propiedades--
+  id_vehiculo: int
+  placa: string
+  tipo: string
+  capacidad: int
+  estado: string
+  --métodos--
+  obtenerDetalles(): array
+}
+
+class Horario {
+  --propiedades--
+  id_horario: int
+  id_ruta: int
+  dia_semana: string
+  hora_salida: time
+  hora_llegada: time
+  duracion_estimada: string
+  --métodos--
+  obtenerParadas(): array
+}
+
+class Parada {
+  --propiedades--
+  id_parada: int
+  id_horario: int
+  posicion: int
+  nombre_ubicacion: string
+  hora_paso: time
+  --métodos--
+  obtenerUbicacion(): string
+}
+
+class Favorita {
+  --propiedades--
+  id_favorita: int
+  id_usuario: int
+  id_ruta: int
+  fecha_agregada: datetime
+  --métodos--
+  crear(): boolean
+  eliminar(): boolean
+  obtenerPorUsuario(): array
+}
+
+class Ubicacion {
+  --propiedades--
+  id_ubicacion: int
+  nombre: string
+  latitud: float
+  longitud: float
+  --métodos--
+  obtenerTodas(): array
+  obtenerPorNombre(): object
+}
+
+' ============ RELACIONES ============
+Usuario "1" --> "*" Favorita: tiene
+Usuario "1" --> "*" Ruta: busca
+
+Ruta "1" --> "1" Empresa: pertenece a
+Ruta "1" --> "1" Conductor: es conducida por
+Ruta "1" --> "1" Vehiculo: utiliza
+Ruta "1" --> "*" Horario: tiene
+
+Horario "1" --> "*" Parada: contiene
+Parada "1" --> "1" Ubicacion: refiere a
+
+Ruta "1" --> "2" Ubicacion: conecta\n(origen-destino)
+
+Favorita "1" --> "1" Ruta: referencia
+
+Empresa "1" --> "*" Conductor: emplea
+Empresa "1" --> "*" Vehiculo: posee
+Empresa "1" --> "*" Ruta: ofrece
+
+' ============ NOTAS ============
+note right of Usuario
+  Validación en servidor:
+  session_start()
+  $_SESSION['id'] 
+  $_SESSION['rol'] == 2
+end note
+
+note right of Favorita
+  Tabla: favoritas
+  PK: id_favorita
+  FK: id_usuario
+  FK: id_ruta
+  
+  Operaciones:
+  POST: agregar favorita
+  DELETE: remover favorita
+  GET: obtener favoritas usuario
+end note
+
+note bottom of Ruta
+  Información mostrada en 
+  Route Selected Screen
+  Panel derecho
+end note
+
+note left of Horario
+  Múltiples horarios
+  por ruta
+  (Lunes, Martes, etc)
+end note
+
+note right of Ubicacion
+  Opciones en selectores
+  origen y destino
+  Se cargan en inicialización
+end note
+
+@enduml

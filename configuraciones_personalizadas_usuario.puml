@@ -1,0 +1,200 @@
+@startuml Diagrama_Configuraciones_Usuario
+
+!theme aws-orange
+
+title
+==Diagrama general de configuraciones personalizadas
+**(Aplicación web del usuario)**
+end title
+
+package "**Configuración de Usuario (rol=2)**" as USER_CONFIG {
+    
+    class ConfiguracionPerfil {
+        - userId: int
+        - email: String
+        - rol: int
+        --
+        + login(email: String, password: String): Boolean
+        + logout()
+        + validateSession(): Boolean
+    }
+    
+    class ConfiguracionBusquedaRutas {
+        - origen: String
+        - destino: String
+        --
+        + getUbicaciones(): List<String>
+        + searchRoutes(origen: String, destino: String): List<Ruta>
+        + getDetallesRuta(idRuta: int): Ruta
+        + getHorarios(idRuta: int): List<Horario>
+    }
+    
+    class ConfiguracionRutasFavoritas {
+        - rutasFavoritas: List<Ruta>
+        --
+        + addRutaFavorita(idRuta: int): Boolean
+        + removeRutaFavorita(idFavorita: int): Boolean
+        + getRutasFavoritas(idUsuario: int): List<Ruta>
+    }
+    
+    class ConsultaInformacion {
+        - rutasDisponibles: List<Ruta>
+        --
+        + getDetallesEmpresa(rfcEmpresa: String): Empresa
+        + getConductor(rfcConductor: String): Conductor
+        + getVehiculo(idVehiculo: int): Vehiculo
+        + getParadas(idRuta: int): List<Parada>
+    }
+}
+
+package "**APIs RESTful**" as API {
+    
+    class RoutesAPI {
+        --
+        + GET /api/routes_api.php?action=locations
+        + POST /api/routes_api.php?action=search_routes
+        + GET /api/routes_api.php?action=get_routes
+    }
+    
+    class FavoritesRoutesAPI {
+        --
+        + GET /api/favorites_routes_api.php?action=get_favorites
+        + POST /api/favorites_routes_api.php?action=add_favorite
+        + POST /api/favorites_routes_api.php?action=remove_favorite
+    }
+}
+
+package "**Almacenamiento Persistente**" as STORAGE {
+    
+    class BaseDatos {
+        - conexion: Connection
+        --
+        + connect(): Connection
+        + executeQuery(sql: String): ResultSet
+        + executeUpdate(sql: String): int
+        + prepare(sql: String): PreparedStatement
+        + close()
+    }
+    
+    class TablaUsuarios {
+        - usuarios
+        --
+        + login(email, password): Usuario
+        + validateSession(): Boolean
+        + logout()
+    }
+    
+    class TablaRutas {
+        - rutas
+        --
+        + getUbicaciones(): List<String>
+        + searchRoutes(origen, destino): List<Ruta>
+        + getRuta(idRuta): Ruta
+    }
+    
+    class TablaRutasFavoritas {
+        - rutas_favoritas
+        --
+        + addFavorita(idUsuario, idRuta): Boolean
+        + removeFavorita(idFavorita): Boolean
+        + getFavoritas(idUsuario): List<Ruta>
+    }
+    
+    class TablaHorarios {
+        - horarios
+        --
+        + getHorarios(idRuta): List<Horario>
+    }
+    
+    class TablaEmpresas {
+        - empresas
+        --
+        + getEmpresa(rfc): Empresa
+    }
+    
+    class TablaConductores {
+        - conductores
+        --
+        + getConductor(rfc): Conductor
+    }
+    
+    class TablaVehiculos {
+        - vehiculos
+        --
+        + getVehiculo(id): Vehiculo
+    }
+    
+    class TablaParadas {
+        - paradas
+        --
+        + getParadas(idRuta): List<Parada>
+    }
+}
+
+' ==========================================
+' RELACIONES PRINCIPALES
+' ==========================================
+
+ConfiguracionPerfil ||--|| TablaUsuarios : autentica
+ConfiguracionBusquedaRutas ||--|| TablaRutas : consulta
+ConfiguracionBusquedaRutas ||--|| TablaHorarios : obtiene
+ConfiguracionRutasFavoritas ||--|| TablaRutasFavoritas : almacena
+ConsultaInformacion ||--|| TablaEmpresas : obtiene datos
+ConsultaInformacion ||--|| TablaConductores : obtiene datos
+ConsultaInformacion ||--|| TablaVehiculos : obtiene datos
+ConsultaInformacion ||--|| TablaParadas : obtiene datos
+
+RoutesAPI --> TablaRutas : consulta
+RoutesAPI --> TablaHorarios : consulta
+FavoritesRoutesAPI --> TablaRutasFavoritas : gestiona
+
+ConfiguracionBusquedaRutas --> RoutesAPI : usa
+ConfiguracionRutasFavoritas --> FavoritesRoutesAPI : usa
+ConfiguracionPerfil --> TablaUsuarios : valida
+
+' ==========================================
+' NOTAS INFORMATIVAS
+' ==========================================
+
+note top of USER_CONFIG
+    **Configuración para el usuario final (rol=2)**
+    Acceso a búsqueda de Rutas y Favoritos
+    
+    ✓ Autenticación por email/contraseña
+    ✓ Búsqueda de rutas (origen/destino)
+    ✓ Obtención de ubicaciones disponibles
+    ✓ Gestión de rutas favoritas
+    ✓ Consulta de horarios y detalles
+    ✓ Información de empresa/conductor/vehículo
+    ✓ Paradas disponibles por ruta
+end note
+
+note top of API
+    **Endpoints RESTful**
+    
+    Routes API:
+    • GET locations (obtiene puntos de salida/llegada)
+    • POST search_routes (busca rutas disponibles)
+    • GET get_routes (lista todas las rutas activas)
+    
+    Favorites API:
+    • GET get_favorites (obtiene favoritas del usuario)
+    • POST add_favorite (agrega ruta a favoritos)
+    • POST remove_favorite (elimina de favoritos)
+end note
+
+note bottom of STORAGE
+    **Persistencia en MySQL**
+    
+    Tablas utilizadas:
+    • usuarios (login y validación)
+    • rutas (búsqueda y detalles)
+    • horarios (información de horarios)
+    • rutas_favoritas (gestión de favoritos)
+    • empresas (info de proveedores)
+    • conductores (info del operador)
+    • vehículos (info del transporte)
+    • paradas (paradas de la ruta)
+end note
+
+@enduml

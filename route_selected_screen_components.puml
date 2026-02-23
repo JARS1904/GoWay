@@ -1,0 +1,206 @@
+@startuml RouteSelectedScreenComponents
+!define DIRECTION left to right direction
+skinparam backgroundColor #FEFEFE
+skinparam componentBackgroundColor #BBDEFB
+skinparam componentBorderColor #2962FF
+skinparam interfaceBackgroundColor #C5E1A5
+skinparam interfaceBorderColor #558B2F
+skinparam databaseBackgroundColor #FFE0B2
+skinparam databaseBorderColor #E65100
+skinparam noteBkgColor #FFF9C4
+skinparam noteBorderColor #F57F17
+
+package "Cliente (Navegador)" {
+  component "HTML Structure" as HTML {
+    note right : route_selected_screen.php
+  }
+  
+  component "CSS Styles" as CSS {
+    note right : style.css
+    note right : Responsive\n1200px break
+  }
+  
+  component "JavaScript\nLogic" as JS {
+    note right : main.js
+    note right : card-pagination.js
+    note right : pagination.js
+    note right : notifications.js
+  }
+}
+
+package "Interfaz de Usuario" {
+  component "Header\nComponent" as Header {
+    note right : Logo + Menu Usuario
+  }
+  
+  component "Left Panel\n(Búsqueda)" as LeftPanel {
+    note right : Selectores origen/destino
+    note right : Botones filtro
+    note right : Lista de rutas
+  }
+  
+  component "Right Panel\n(Detalles)" as RightPanel {
+    note right : Información ruta seleccionada
+    note right : Empresa, Horarios, etc.
+  }
+}
+
+package "Capa de Servidor (PHP)" {
+  component "Route Handler" as RouteHandler {
+    note right : route_selected_screen.php
+  }
+  
+  component "Session Manager" as SessionMgr {
+    note right : validar_login.php
+    note right : Verifica rol=2
+  }
+  
+  component "API Router" as APIRouter {
+    note right : routes_api.php
+    note right : favorites_api.php
+    note right : usuarios.php
+  }
+}
+
+package "Base de Datos" {
+  database "Rutas" as DBRoutes {
+    note right : rutas
+  }
+  
+  database "Favoritas" as DBFavoritas {
+    note right : favoritas
+  }
+  
+  database "Usuarios" as DBUsers {
+    note right : usuarios
+  }
+  
+  database "Ubicaciones" as DBLocations {
+    note right : ciudades/paradas
+  }
+  
+  database "Empresas" as DBCompanies {
+    note right : empresas
+  }
+  
+  database "Conductores" as DBDrivers {
+    note right : conductores
+  }
+  
+  database "Vehículos" as DBVehicles {
+    note right : vehiculos
+  }
+  
+  database "Horarios" as DBSchedules {
+    note right : horarios
+  }
+}
+
+' ============ RELACIONES ============
+
+' Cliente → Interfaz
+HTML -.> Header : renderiza
+HTML -.> LeftPanel : renderiza
+HTML -.> RightPanel : renderiza
+
+CSS -.> Header : estilos
+CSS -.> LeftPanel : estilos
+CSS -.> RightPanel : estilos
+
+JS -.> Header : interacción
+JS -.> LeftPanel : interacción
+JS -.> RightPanel : interacción
+
+' Interfaz → Cliente
+Header --> JS : eventos
+LeftPanel --> JS : eventos
+RightPanel --> JS : eventos
+
+' Cliente → Servidor
+JS --> RouteHandler : GET (carga inicial)
+JS --> SessionMgr : verificación
+JS --> APIRouter : GET/POST/DELETE
+
+' Servidor → BD
+RouteHandler --> DBUsers : SELECT
+SessionMgr --> DBUsers : verificar sesión
+
+APIRouter --> DBRoutes : SELECT (búsqueda)
+APIRouter --> DBLocations : SELECT (ubicaciones)
+APIRouter --> DBSchedules : SELECT (horarios)
+APIRouter --> DBCompanies : SELECT (empresa)
+APIRouter --> DBDrivers : SELECT (conductor)
+APIRouter --> DBVehicles : SELECT (vehículo)
+
+APIRouter --> DBFavoritas : SELECT/INSERT/DELETE
+APIRouter --> DBUsers : validar usuario
+
+' Favoritas
+JS --> APIRouter : favoritas\n(GET/POST/DELETE)
+APIRouter --> DBFavoritas : tabla de favoritas
+
+' ============ INTERFACES ============
+
+interface "HTTP/JSON API" as API_Interface
+
+APIRouter -up- API_Interface : implementa
+JS -up- API_Interface : usa
+
+interface "DOM Events" as DOM_Events
+
+Header -left- DOM_Events : dispara
+LeftPanel -left- DOM_Events : dispara
+RightPanel -left- DOM_Events : dispara
+JS -right- DOM_Events : escucha
+
+' ============ NOTAS ============
+note right of SessionMgr
+  Validación crítica:
+  - session_start()
+  - isset($_SESSION['id'])
+  - $_SESSION['rol'] == 2
+  
+  Si falla → redirect login.php
+end note
+
+note right of LeftPanel
+  Componentes internos:
+  • Input origen (dropdown)
+  • Input destino (dropdown)
+  • Botón "Buscar"
+  • Filtros (Ver Todas / Favoritas)
+  • Lista de tarjetas de rutas
+end note
+
+note right of RightPanel
+  Se actualiza cuando:
+  1. Usuario selecciona ruta
+  2. Cambian los detalles mostrados
+  
+  Información mostrada:
+  • Trayecto (origen → destino)
+  • Empresa (nombre, tel, email)
+  • Horarios (días, horas, paradas)
+  • Conductor y Vehículo
+end note
+
+note right of APIRouter
+  Endpoints principales:
+  
+  GET /routes_api.php
+  - Obtener rutas por origen/destino
+  
+  POST /favorites_api.php
+  - action=add_favorite
+  
+  DELETE /favorites_api.php
+  - action=delete_favorite
+  
+  GET /favorites_api.php
+  - action=get_favorites
+  
+  GET /usuarios.php
+  - Obtener ubicaciones
+end note
+
+@enduml

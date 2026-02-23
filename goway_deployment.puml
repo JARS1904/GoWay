@@ -1,0 +1,83 @@
+@startuml GoWayDeployment
+!define DIRECTION top to bottom direction
+skinparam backgroundColor #FEFEFE
+skinparam packageBackgroundColor #E3F2FD
+skinparam packageBorderColor #1976D2
+skinparam rectangleBackgroundColor #BBDEFB
+skinparam rectangleBorderColor #0D47A1
+skinparam arrowColor #1976D2
+
+package "Cliente" {
+  node "Navegador Web" as Browser {
+    component "HTML/CSS/JS" as Frontend
+    component "route_selected_screen.php" as RouteScreen
+    component "Admin Panel" as AdminPanel
+  }
+}
+
+package "Servidor (XAMPP)" {
+  node "Apache + PHP" as WebServer {
+    component "index.php" as Dashboard
+    component "pages/" as Pages {
+      component "usuarios.php" as UserMgmt
+      component "empresas.php" as CompanyMgmt
+      component "rutas.php" as RouteMgmt
+      component "horarios.php" as ScheduleMgmt
+      component "vehiculos.php" as VehicleMgmt
+      component "conductores.php" as DriverMgmt
+      component "checadores.php" as CheckerMgmt
+    }
+    component "api/" as API {
+      component "routes_api.php" as RoutesAPI
+      component "favorites_api.php" as FavoritesAPI
+      component "login.php" as LoginAPI
+      component "usuarios.php" as UsersAPI
+    }
+    component "controllers/" as Controllers {
+      component "insert_*.php" as InsertCtrl
+      component "delete/*.php" as DeleteCtrl
+      component "update/*.php" as UpdateCtrl
+    }
+    component "config/" as Config {
+      component "conexion_bd.php" as DBConfig
+      component "login_registro.php" as AuthConfig
+    }
+  }
+}
+
+package "Base de Datos" {
+  node "MySQL" as Database {
+    database "GoWay_DB" as DB {
+      component "usuarios" as UsersTable
+      component "empresas" as CompaniesTable
+      component "rutas" as RoutesTable
+      component "horarios" as SchedulesTable
+      component "vehiculos" as VehiclesTable
+      component "conductores" as DriversTable
+      component "checadores" as CheckersTable
+      component "favoritas" as FavoritesTable
+    }
+  }
+}
+
+Frontend --> Pages: Request
+Frontend --> API: AJAX/Fetch
+RouteScreen --> RoutesAPI: Búsqueda
+RouteScreen --> FavoritesAPI: Gestión favoritas
+AdminPanel --> Pages: Gestión CRUD
+
+Pages --> Controllers: Procesar datos
+API --> Controllers: Validar datos
+Controllers --> DBConfig: Conexión
+DBConfig --> Database: Query SQL
+
+Database --> UsersTable: Lectura/Escritura
+Database --> CompaniesTable: Lectura/Escritura
+Database --> RoutesTable: Lectura/Escritura
+Database --> SchedulesTable: Lectura/Escritura
+Database --> VehiclesTable: Lectura/Escritura
+Database --> DriversTable: Lectura/Escritura
+Database --> CheckersTable: Lectura/Escritura
+Database --> FavoritesTable: Lectura/Escritura
+
+@enduml

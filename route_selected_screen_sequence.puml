@@ -1,0 +1,68 @@
+@startuml RouteSelectedScreenSequence
+skinparam backgroundColor #FEFEFE
+skinparam sequenceArrowColor #2962FF
+skinparam sequenceParticipantBackgroundColor #BBDEFB
+skinparam sequenceParticipantBorderColor #1565C0
+skinparam sequenceGroupBkgColor #F5F5F5
+skinparam noteBkgColor #FFF9C4
+
+actor Usuario
+participant "Browser" as B
+participant "Server" as S
+participant "API" as API
+database "DB" as DB
+
+group Carga Inicial
+  Usuario -> S: GET route_selected_screen.php
+  activate S
+  S -> S: Validar sesión (rol=2)
+  S -> API: Obtener ubicaciones
+  API -> DB: SELECT ubicaciones
+  API --> S: JSON ubicaciones
+  S -> API: GET favoritas del usuario
+  API -> DB: SELECT favoritas
+  API --> S: JSON favoritas
+  S --> B: HTML + datos
+  deactivate S
+end
+
+group UC-01: Búsqueda de Rutas
+  Usuario -> B: Selecciona origen y destino
+  B -> B: Habilitar botón buscar
+  Usuario -> B: Clic "Buscar"
+  B -> API: POST origen, destino
+  API -> DB: SELECT rutas
+  API --> B: Array rutas
+  B -> B: Renderizar tarjetas
+  B -> B: Seleccionar primera ruta
+end
+
+group UC-02: Ver Detalles
+  Usuario -> B: Clic en tarjeta
+  B -> B: Mostrar detalles en panel derecho
+  note over B: Empresa, horarios,\nparadas, conductor, vehículo
+end
+
+group UC-03: Marcar Favorita
+  Usuario -> B: Clic ♡
+  B -> API: POST add_favorite
+  API -> DB: INSERT favoritas
+  API --> B: {success: true}
+  B -> B: Cambiar icono ♡→♥ (rojo)
+end
+
+group UC-04: Remover Favorita
+  Usuario -> B: Clic ♥
+  B -> API: POST delete_favorite
+  API -> DB: DELETE favorita
+  API --> B: {success: true}
+  B -> B: Cambiar icono ♥→♡ (gris)
+end
+
+group UC-05: Filtrar Favoritas
+  Usuario -> B: Clic "Mis Favoritas"
+  B -> B: Filtrar solo favoritas
+  B -> B: Renderizar filtradas
+end
+
+@enduml

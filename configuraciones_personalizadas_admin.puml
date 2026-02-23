@@ -1,0 +1,177 @@
+@startuml Diagrama_Configuraciones_Administrador
+
+!theme aws-orange
+
+title
+==Diagrama de Configuraciones - Administrador
+**Aplicación GoWay**
+rol = 1 | Hydra Inc.
+end title
+
+package "**Configuración de Administrador (rol=1)**" as ADMIN_CONFIG {
+    
+    class GestionUsuarios {
+        - usuariosRegistrados: List<Usuario>
+        --
+        + crearUsuario(datos: Map): int
+        + listarUsuarios(): List<Usuario>
+        + desactivarUsuario(idUsuario: int): Boolean
+        + validateEmail(email: String): Boolean
+    }
+    
+    class GestionEmpresas {
+        - empresas: List<Empresa>
+        --
+        + registrarEmpresa(datos: Map): String
+        + listarEmpresas(): List<Empresa>
+        + updateEmpresa(rfc: String, datos: Map): Boolean
+        + deleteEmpresa(rfc: String): Boolean
+    }
+    
+    class GestionVehiculos {
+        - vehiculos: List<Vehiculo>
+        --
+        + insertarVehiculo(datos: Map): int
+        + listarVehiculos(): List<Vehiculo>
+        + actualizarVehiculo(idVehiculo: int, datos: Map): Boolean
+        + deleteVehiculo(idVehiculo: int): Boolean
+    }
+    
+    class GestionConductores {
+        - conductores: List<Conductor>
+        --
+        + registrarConductor(datos: Map): String
+        + listarConductores(): List<Conductor>
+        + updateConductor(rfc: String, datos: Map): Boolean
+        + deleteConductor(rfc: String): Boolean
+    }
+    
+    class GestionRutas {
+        - rutas: List<Ruta>
+        --
+        + crearRuta(datos: Map): int
+        + listarRutas(): List<Ruta>
+        + updateRuta(idRuta: int, datos: Map): Boolean
+        + deleteRuta(idRuta: int): Boolean
+        + activarRuta(idRuta: int): Boolean
+    }
+    
+    class GestionHorarios {
+        - horarios: List<Horario>
+        --
+        + crearHorario(datos: Map): int
+        + listarHorarios(idRuta: int): List<Horario>
+        + updateHorario(idHorario: int, datos: Map): Boolean
+        + deleteHorario(idHorario: int): Boolean
+    }
+    
+    class GestionAsignaciones {
+        - asignaciones: List<Asignacion>
+        --
+        + asignarConductor(datos: Map): int
+        + listarAsignaciones(): List<Asignacion>
+        + updateAsignacion(idAsignacion: int, datos: Map): Boolean
+        + deleteAsignacion(idAsignacion: int): Boolean
+    }
+    
+    class GestionReportes {
+        - reportes: List<Reporte>
+        --
+        + crearReporte(datos: Map): int
+        + listarReportes(): List<Reporte>
+        + updateReporte(idReporte: int, datos: Map): Boolean
+        + deleteReporte(idReporte: int): Boolean
+    }
+    
+    class GestionChecadores {
+        - checadores: List<Checador>
+        --
+        + crearChecador(datos: Map): int
+        + listarChecadores(): List<Checador>
+        + updateChecador(idChecador: int, datos: Map): Boolean
+        + deleteChecador(idChecador: int): Boolean
+    }
+    
+    class GestionParadas {
+        - paradas: List<Parada>
+        --
+        + crearParada(datos: Map): int
+        + listarParadas(): List<Parada>
+        + updateParada(idParada: int, datos: Map): Boolean
+        + deleteParada(idParada: int): Boolean
+    }
+}
+
+package "**Almacenamiento Persistente**" as STORAGE {
+    
+    class BaseDatos {
+        - conexion: Connection
+        --
+        + connect(): Connection
+        + executeQuery(sql: String): ResultSet
+        + executeUpdate(sql: String): int
+        + prepare(sql: String): PreparedStatement
+        + close()
+    }
+}
+
+' ==========================================
+' RELACIONES PRINCIPALES
+' ==========================================
+
+GestionUsuarios ||--|| BaseDatos : persiste
+GestionEmpresas ||--|| BaseDatos : persiste
+GestionVehiculos ||--|| BaseDatos : persiste
+GestionConductores ||--|| BaseDatos : persiste
+GestionRutas ||--|| BaseDatos : persiste
+GestionHorarios ||--|| BaseDatos : persiste
+GestionAsignaciones ||--|| BaseDatos : persiste
+GestionReportes ||--|| BaseDatos : persiste
+GestionChecadores ||--|| BaseDatos : persiste
+GestionParadas ||--|| BaseDatos : persiste
+
+GestionRutas "1" --> "*" GestionHorarios : contiene
+GestionHorarios "1" --> "*" GestionAsignaciones : usa
+GestionConductores "1" --> "*" GestionAsignaciones : asigna a
+GestionVehiculos "1" --> "*" GestionAsignaciones : asigna a
+GestionVehiculos "1" --> "*" GestionReportes : reportados en
+GestionConductores "1" --> "*" GestionReportes : reportan
+GestionRutas "1" --> "*" GestionReportes : se reportan
+
+' ==========================================
+' NOTAS INFORMATIVAS
+' ==========================================
+
+note top of ADMIN_CONFIG
+    **Configuración Administrador (rol=1)**
+    Panel de Control Completo del Sistema
+    
+    ✓ Gestión de usuarios del sistema
+    ✓ Administración de empresas
+    ✓ Control de vehículos
+    ✓ Gestión de conductores
+    ✓ Creación y edición de rutas
+    ✓ Configuración de horarios
+    ✓ Asignación de recursos
+    ✓ Gestión de reportes
+    ✓ Control de checadores
+    ✓ Administración de paradas
+end note
+
+note bottom of STORAGE
+    **Persistencia en MySQL/MariaDB**
+    
+    Tablas principales:
+    • usuarios (id, email, password, rol)
+    • empresas (rfc_empresa, nombre, ...)
+    • vehículos (id_vehiculo, placa, modelo, ...)
+    • conductores (rfc_conductor, nombre, licencia, ...)
+    • rutas (id_ruta, nombre, origen, destino, ...)
+    • horarios (id_horario, id_ruta, hora_salida, ...)
+    • asignaciones (id_asignacion, id_horario, rfc_conductor, id_vehiculo, ...)
+    • reportes (id_reporte, id_vehiculo, rfc_conductor, id_ruta, ...)
+    • checadores (id_checador, nombre, ...)
+    • paradas (id_parada, nombre, ubicacion, ...)
+end note
+
+@enduml

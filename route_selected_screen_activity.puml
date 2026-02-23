@@ -1,0 +1,179 @@
+@startuml RouteSelectedScreenActivity
+!define DIRECTION top to bottom direction
+skinparam backgroundColor #FEFEFE
+skinparam activityBackgroundColor #BBDEFB
+skinparam activityBorderColor #2962FF
+skinparam activityArrowColor #2962FF
+skinparam noteBkgColor #FFF9C4
+skinparam noteBorderColor #F57F17
+
+start
+:Usuario accede a
+route_selected_screen.php;
+
+:Sistema valida
+sesión;
+
+if (¿Sesión válida?) then (No)
+  :Redirect a login.php;
+  end
+else (Sí)
+  :Cargar página HTML;
+  :Inyectar CSS y JavaScript;
+  
+  :DOMContentLoaded;
+  
+  :Cargar ubicaciones
+  desde API;
+  
+  :Cargar favoritas
+  del usuario;
+  
+  :Renderizar interface:
+  - Selectores origen/destino
+  - Botón buscar deshabilitado
+  - Lista vacía
+  - Panel derecho vacío;
+  
+  repeat
+    :Usuario interactúa con la página;
+    
+    if (Acción del usuario) then (Selecciona origen/destino)
+      :Validar campos rellenados;
+      if (¿Ambos campos completos?) then (Sí)
+        :Habilitar botón "Buscar";
+      else (No)
+        :Deshabilitar botón "Buscar";
+      endif
+    else if (Clic en "Buscar")
+      :Obtener valores origen/destino;
+      :Realizar GET a /api/routes_api.php;
+      :Mostrar spinner de carga;
+      
+      if (¿Respuesta exitosa?) then (Sí)
+        :Procesar array de rutas;
+        :Limpiar lista anterior;
+        :Renderizar tarjetas de rutas;
+        
+        if (¿Hay rutas?) then (Sí)
+          :Seleccionar primera ruta;
+          :Mostrar detalles en panel derecho;
+          note on the right
+            Muestra:
+            • Trayecto
+            • Info empresa
+            • Horarios
+            • Paradas
+            • Conductor/Vehículo
+          end note
+        else (No)
+          :Mostrar "No hay rutas disponibles";
+          :Panel derecho vacío;
+        endif
+      else (Error)
+        :Mostrar toast de error;
+        :Mantener lista anterior;
+      endif
+    else if (Clic en tarjeta de ruta)
+      :Marcar ruta como seleccionada;
+      :Cambiar estilo (border azul, fondo claro);
+      :Obtener detalles de ruta;
+      :Mostrar en panel derecho;
+    else if (Clic en ♡/♥)
+      :Determinar acción (agregar/remover);
+      
+      if (¿Es agregar?) then (Sí)
+        :Realizar POST a /api/favorites_api.php;
+        :action = add_favorite;
+        note on the right
+          Parámetros:
+          - id_usuario
+          - id_ruta
+        end note
+        
+        if (¿Exitoso?) then (Sí)
+          :Cambiar icono ♡ → ♥;
+          :Cambiar color a rojo;
+          :Agregar a array local de favoritas;
+        else (Error)
+          :Mostrar toast de error;
+        endif
+      else (No - Remover)
+        :Realizar DELETE a /api/favorites_api.php;
+        :action = delete_favorite;
+        
+        if (¿Exitoso?) then (Sí)
+          :Cambiar icono ♥ → ♡;
+          :Cambiar color a gris;
+          :Remover de array local de favoritas;
+          
+          if (¿Filtro "Favoritas" activo?) then (Sí)
+            :Remover tarjeta de la vista;
+          endif
+        else (Error)
+          :Mostrar toast de error;
+        endif
+      endif
+    else if (Clic en "Mis Favoritas")
+      :Marcar botón como activo;
+      note on the right
+        Cambio visual:
+        - Fondo azul
+        - Texto blanco
+      end note
+      
+      :Obtener favoritas de API;
+      
+      if (¿Hay favoritas?) then (Sí)
+        :Filtrar lista actual;
+        :Mostrar solo favoritas;
+      else (No)
+        :Mostrar "Sin favoritas";
+        :Panel derecho vacío;
+      endif
+    else if (Clic en "Ver Todas")
+      :Desmarcar filtro;
+      :Mostrar lista completa;
+    else if (Clic en menú usuario)
+      :Desplegar dropdown;
+      
+      if (Opción seleccionada) then (Sitio web)
+        :Abrir goway.netlify.app;
+      else if (Logout)
+        :Ir a pages/logout.php;
+        end
+      endif
+    endif
+    
+  repeat while (¿Usuario sigue en página?)
+  
+  :Cerrar sesión/salir;
+  end
+endif
+
+end
+
+note right
+  INTERFAZ LAYOUT:
+  
+  LEFT COLUMN (450px):
+  • Búsqueda (origen/destino)
+  • Filtros (Ver Todas / Mis Favoritas)
+  • Lista de rutas con tarjetas
+  
+  RIGHT COLUMN (flex):
+  • Detalles ruta seleccionada
+  • Información empresa
+  • Horarios
+  • Conductor/Vehículo
+  
+  HEADER:
+  • Logo y título
+  • Menú usuario (icono perfil)
+  
+  RESPONSIVE:
+  • 1200px: se apila verticalmente
+  • 600px: ajustes móviles
+end note
+
+@enduml

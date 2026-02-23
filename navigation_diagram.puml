@@ -1,0 +1,251 @@
+@startuml GoWay Navigation Diagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam fontName Arial
+skinparam fontSize 11
+skinparam classBackgroundColor #E8F4F8
+skinparam classBorderColor #2196F3
+skinparam arrowColor #333333
+
+title GoWay - Diagrama de navegación del sistema
+' ==========================================
+' DECLARACIONES Y ESTILOS
+' ==========================================
+
+skinparam actor {
+    backgroundColor #FFF9C4
+    borderColor #F57F17
+}
+
+skinparam state {
+    backgroundColor #E8F4F8
+    borderColor #2196F3
+}
+
+skinparam note {
+    backgroundColor #F5F5F5
+    borderColor #9E9E9E
+}
+
+' ==========================================
+' PUNTOS DE ENTRADA
+' ==========================================
+
+state Login as "Login\nValidar Credenciales" #FFE082 {
+    state SeleccionarRol as "Seleccionar Rol\nUsuario (rol=2)\nAdmin (rol=1)"
+}
+
+' ==========================================
+' SECCIÓN USUARIO (ROL=2)
+' ==========================================
+
+state UsuarioPanel as "APLICACIÓN WEB DEL USUARIO" #C8E6C9 {
+    state RutaSelectedScreen as "Route Selected Screen\nBuscar Rutas y Horarios" #A5D6A7 {
+        state SeleccionarOrigen as "1. Seleccionar Origen\nDropdown de Ubicaciones"
+        state SeleccionarDestino as "2. Seleccionar Destino\nDropdown de Ubicaciones"
+        state BuscarRutas as "3. Buscar Rutas\nConsulta a API (GET)"
+        state MostrarRutas as "4. Mostrar Resultados\nTarjetas de Rutas Disponibles"
+        state SeleccionarRuta as "5. Seleccionar Ruta\nRuta Elegida"
+        state MostrarDetalles as "6. Ver Detalles\nHorarios, Paradas, Tarifas"
+        state MarcarFavorita as "❤️ Marcar como Favorita\nGET /api/favorites_api.php"
+        
+        SeleccionarOrigen --> SeleccionarDestino : Origen seleccionado
+        SeleccionarDestino --> BuscarRutas : Destino seleccionado\n[Botón habilitado]
+        BuscarRutas --> MostrarRutas : Respuesta API
+        MostrarRutas --> SeleccionarRuta : Click en ruta
+        SeleccionarRuta --> MostrarDetalles : Ruta seleccionada
+        MostrarDetalles --> MarcarFavorita : Click corazón (♡)
+        MarcarFavorita --> MostrarDetalles : Ruta guardada (♥)
+    }
+    
+}
+
+' ==========================================
+' SECCIÓN ADMINISTRADOR (ROL=1)
+' ==========================================
+
+state AdminPanel as "SITIO WEB DEL ADMINISTRADOR" #BBDEFB {
+    state GestionRutas as "Gestión de Rutas\nCRUD de Rutas" #90CAF9 {
+        state ListarRutas as "Listar Rutas\nVER todas las rutas"
+        state CrearRuta as "Crear Ruta\nAñadir nueva ruta"
+        state EditarRuta as "Editar Ruta\nActualizar ruta"
+        state EliminarRuta as "Eliminar Ruta\nDar de baja ruta"
+        
+        ListarRutas --> CrearRuta : Click agregar
+        ListarRutas --> EditarRuta : Click editar
+        ListarRutas --> EliminarRuta : Click eliminar
+    }
+    
+    state GestionHorarios as "Gestión de Horarios\nCRUD de Horarios" #90CAF9 {
+        state ListarHorarios as "Listar Horarios\nVER todos los horarios"
+        state CrearHorario as "Crear Horario\nAñadir horario"
+        state EditarHorario as "Editar Horario\nActualizar horario"
+        state EliminarHorario as "Eliminar Horario\nEliminar horario"
+        
+        ListarHorarios --> CrearHorario : Click agregar
+        ListarHorarios --> EditarHorario : Click editar
+        ListarHorarios --> EliminarHorario : Click eliminar
+    }
+    
+    state GestionConductores as "Gestión de Conductores\nCRUD de Conductores" #90CAF9 {
+        state ListarConductores as "Listar Conductores\nVER todos los conductores"
+        state CrearConductor as "Crear Conductor\nRegistrar conductor"
+        state EditarConductor as "Editar Conductor\nActualizar datos"
+        state EliminarConductor as "Eliminar Conductor\nDar de baja"
+        
+        ListarConductores --> CrearConductor : Click agregar
+        ListarConductores --> EditarConductor : Click editar
+        ListarConductores --> EliminarConductor : Click eliminar
+    }
+    
+    state GestionVehiculos as "Gestión de Vehículos\nCRUD de Vehículos" #90CAF9 {
+        state ListarVehiculos as "Listar Vehículos\nVER todos los vehículos"
+        state CrearVehiculo as "Crear Vehículo\nRegistrar vehículo"
+        state EditarVehiculo as "Editar Vehículo\nActualizar datos"
+        state EliminarVehiculo as "Eliminar Vehículo\nDar de baja"
+        
+        ListarVehiculos --> CrearVehiculo : Click agregar
+        ListarVehiculos --> EditarVehiculo : Click editar
+        ListarVehiculos --> EliminarVehiculo : Click eliminar
+    }
+    
+    state GestionEmpresas as "Gestión de Empresas\nCRUD de Empresas" #90CAF9 {
+        state ListarEmpresas as "Listar Empresas\nVER todas las empresas"
+        state CrearEmpresa as "Crear Empresa\nRegistrar empresa"
+        state EditarEmpresa as "Editar Empresa\nActualizar datos"
+        state EliminarEmpresa as "Eliminar Empresa\nDar de baja"
+        
+        ListarEmpresas --> CrearEmpresa : Click agregar
+        ListarEmpresas --> EditarEmpresa : Click editar
+        ListarEmpresas --> EliminarEmpresa : Click eliminar
+    }
+    
+    state GestionChecadores as "Gestión de Checadores\nCRUD de Checadores" #90CAF9 {
+        state ListarChecadores as "Listar Checadores\nVER todos los checadores"
+        state CrearChecador as "Crear Checador\nRegistrar checador"
+        state EditarChecador as "Editar Checador\nActualizar datos"
+        state EliminarChecador as "Eliminar Checador\nDar de baja"
+        
+        ListarChecadores --> CrearChecador : Click agregar
+        ListarChecadores --> EditarChecador : Click editar
+        ListarChecadores --> EliminarChecador : Click eliminar
+    }
+    
+    state GestionUsuarios as "Gestión de Usuarios\nCRUD de Usuarios" #90CAF9 {
+        state ListarUsuarios as "Listar Usuarios\nVER todos los usuarios"
+        state CrearUsuario as "Crear Usuario\nRegistrar usuario"
+        state EditarUsuario as "Editar Usuario\nActualizar datos"
+        state EliminarUsuario as "Eliminar Usuario\nDar de baja"
+        
+        ListarUsuarios --> CrearUsuario : Click agregar
+        ListarUsuarios --> EditarUsuario : Click editar
+        ListarUsuarios --> EliminarUsuario : Click eliminar
+    }
+    
+    state ReportesAdmin as "Generación de Reportes" #90CAF9 {
+        state ListarReportes as "Listar Reportes\nVER todos los reportes"
+        state CrearReporte as "Crear Reporte\nRegistrar reporte"
+        state EditarReporte as "Editar Reporte\nActualizar reporte"
+        state EliminarReporte as "Eliminar Reporte\nDar de baja"
+        
+        ListarReportes --> CrearReporte : Click agregar
+        ListarReportes --> EditarReporte : Click editar
+        ListarReportes --> EliminarReporte : Click eliminar
+    }
+
+}
+
+' ==========================================
+' TRANSICIONES PRINCIPALES
+' ==========================================
+
+Login --> SeleccionarRol : Credenciales OK
+
+SeleccionarRol --> UsuarioPanel : rol=2\n(Usuario/Pasajero)
+SeleccionarRol --> AdminPanel : rol=1\n(Administrador)
+
+GestionRutas --> GestionHorarios : Menú Admin
+GestionRutas --> GestionConductores : Menú Admin
+GestionRutas --> GestionVehiculos : Menú Admin
+GestionRutas --> GestionEmpresas : Menú Admin
+GestionRutas --> GestionChecadores : Menú Admin
+GestionRutas --> GestionUsuarios : Menú Admin
+GestionRutas --> ReportesAdmin : Menú Admin
+
+GestionHorarios --> GestionVehiculos : Menú Admin
+GestionConductores --> GestionEmpresas : Menú Admin
+GestionVehiculos --> GestionChecadores : Menú Admin
+GestionEmpresas --> GestionUsuarios : Menú Admin
+GestionChecadores --> ReportesAdmin : Menú Admin
+
+UsuarioPanel --> Login : Logout\n[Cerrar Sesión]
+AdminPanel --> Login : Logout\n[Cerrar Sesión]
+
+' ==========================================
+' LLAMADAS A API
+' ==========================================
+
+note right of BuscarRutas
+  **GET /api/routes_api.php**
+  Parámetros: origen, destino
+  Retorna: lista de rutas
+end note
+
+note right of MarcarFavorita
+  **POST /api/favorites_api.php**
+  Action: add_favorite / remove_favorite
+  Parámetros: id_ruta, id_usuario
+end note
+
+note right of GestionRutas
+  **Controllers:**
+  - insertar_ruta.php
+  - actualizar_ruta.php
+  - eliminar_ruta.php
+  - routes_api.php
+end note
+
+note right of GestionHorarios
+  **Controllers:**
+  - insert_horarios.php
+  - actu_horariosSql.php
+  - delete_horario.php
+end note
+
+note right of GestionConductores
+  **Controllers:**
+  - insert_conductor.php
+  - actu_conductoresSql.php
+  - delete_conductores.php
+end note
+
+note right of GestionVehiculos
+  **Controllers:**
+  - insert_vehiculos.php
+  - actu_vehiculo.php
+  - delete_vehiculo.php
+end note
+
+note right of GestionEmpresas
+  **Controllers:**
+  - insert_empresa.php
+  - actu_empresasSql.php
+  - delete_empresas.php
+end note
+
+note right of GestionChecadores
+  **Controllers:**
+  - insert_checador.php
+  - actu_checadores.php
+  - delete_checadores.php
+end note
+
+note right of GestionUsuarios
+  **Controllers:**
+  - insert_user.php
+  - actu_usuariosSql.php
+  - delete_usuarios.php
+  - usuarios.php
+end note
+
+@enduml

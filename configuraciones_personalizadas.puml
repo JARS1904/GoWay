@@ -1,0 +1,325 @@
+@startuml Diagrama_Configuraciones_GoWay
+
+!theme aws-orange
+
+title
+==Diagrama General de Configuraciones Personalizadas
+**Sistema Completo GoWay**
+Administrador | Usuario Web | Aplicación Móvil | Hydra Inc.
+end title
+
+' ==========================================
+' CONFIGURACIÓN ADMINISTRADOR (ROL=1)
+' ==========================================
+
+package "**Configuración de Administrador (rol=1)**" as ADMIN_CONFIG {
+    
+    class GestionUsuarios {
+        - usuariosRegistrados: List<Usuario>
+        --
+        + crearUsuario(datos: Map): int
+        + listarUsuarios(): List<Usuario>
+        + desactivarUsuario(idUsuario: int): Boolean
+        + validateEmail(email: String): Boolean
+    }
+    
+    class GestionEmpresas {
+        - empresas: List<Empresa>
+        --
+        + registrarEmpresa(datos: Map): String
+        + listarEmpresas(): List<Empresa>
+        + updateEmpresa(rfc: String, datos: Map): Boolean
+        + deleteEmpresa(rfc: String): Boolean
+    }
+    
+    class GestionVehiculos {
+        - vehiculos: List<Vehiculo>
+        --
+        + insertarVehiculo(datos: Map): int
+        + listarVehiculos(): List<Vehiculo>
+        + actualizarVehiculo(idVehiculo: int, datos: Map): Boolean
+        + deleteVehiculo(idVehiculo: int): Boolean
+    }
+    
+    class GestionConductores {
+        - conductores: List<Conductor>
+        --
+        + registrarConductor(datos: Map): String
+        + listarConductores(): List<Conductor>
+        + updateConductor(rfc: String, datos: Map): Boolean
+        + deleteConductor(rfc: String): Boolean
+    }
+    
+    class GestionRutas {
+        - rutas: List<Ruta>
+        --
+        + crearRuta(datos: Map): int
+        + listarRutas(): List<Ruta>
+        + updateRuta(idRuta: int, datos: Map): Boolean
+        + deleteRuta(idRuta: int): Boolean
+        + activarRuta(idRuta: int): Boolean
+    }
+    
+    class GestionHorarios {
+        - horarios: List<Horario>
+        --
+        + crearHorario(datos: Map): int
+        + listarHorarios(idRuta: int): List<Horario>
+        + updateHorario(idHorario: int, datos: Map): Boolean
+        + deleteHorario(idHorario: int): Boolean
+    }
+    
+    class GestionAsignaciones {
+        - asignaciones: List<Asignacion>
+        --
+        + asignarConductor(datos: Map): int
+        + listarAsignaciones(): List<Asignacion>
+        + updateAsignacion(idAsignacion: int, datos: Map): Boolean
+        + deleteAsignacion(idAsignacion: int): Boolean
+    }
+    
+    class GestionReportes {
+        - reportes: List<Reporte>
+        --
+        + crearReporte(datos: Map): int
+        + listarReportes(): List<Reporte>
+        + updateReporte(idReporte: int, datos: Map): Boolean
+        + deleteReporte(idReporte: int): Boolean
+    }
+    
+    class GestionChecadores {
+        - checadores: List<Checador>
+        --
+        + crearChecador(datos: Map): int
+        + listarChecadores(): List<Checador>
+        + updateChecador(idChecador: int, datos: Map): Boolean
+        + deleteChecador(idChecador: int): Boolean
+    }
+    
+    class GestionParadas {
+        - paradas: List<Parada>
+        --
+        + crearParada(datos: Map): int
+        + listarParadas(): List<Parada>
+        + updateParada(idParada: int, datos: Map): Boolean
+        + deleteParada(idParada: int): Boolean
+    }
+}
+
+' ==========================================
+' CONFIGURACIÓN USUARIO WEB (ROL=2)
+' ==========================================
+
+package "**Configuración de Usuario Web (rol=2)**" as USER_WEB_CONFIG {
+    
+    class ConfiguracionPerfil {
+        - userId: int
+        - email: String
+        - rol: int
+        --
+        + login(email: String, password: String): Boolean
+        + logout()
+        + validateSession(): Boolean
+    }
+    
+    class ConfiguracionBusquedaRutas {
+        - origen: String
+        - destino: String
+        --
+        + getUbicaciones(): List<String>
+        + searchRoutes(origen: String, destino: String): List<Ruta>
+        + getDetallesRuta(idRuta: int): Ruta
+        + getHorarios(idRuta: int): List<Horario>
+    }
+    
+    class ConfiguracionRutasFavoritas {
+        - rutasFavoritas: List<Ruta>
+        --
+        + addRutaFavorita(idRuta: int): Boolean
+        + removeRutaFavorita(idFavorita: int): Boolean
+        + getRutasFavoritas(idUsuario: int): List<Ruta>
+    }
+}
+
+' ==========================================
+' CONFIGURACIÓN APLICACIÓN MÓVIL
+' ==========================================
+
+package "**Configuración de Aplicación Móvil**" as MOBILE_CONFIG {
+    
+    class ConfiguracionTema {
+        - isDarkMode: Boolean
+        --
+        + toggleDarkMode(value: Boolean)
+        + saveThemePreference(isDark: Boolean)
+        + loadThemePreference()
+    }
+    
+    class PerfilUsuarioMovil {
+        - userName: String
+        - userEmail: String
+        - userId: int
+        --
+        + updateProfile()
+        + validateEmail()
+    }
+    
+    class SesionUsuario {
+        - isLoggedIn: Boolean
+        --
+        + initSession()
+        + closeSession()
+        + showLogoutDialog()
+    }
+    
+    class SettingsScreen {
+        - isDarkMode: Boolean
+        - onThemeChange: Function(Boolean)
+        --
+        + initState()
+        + build(BuildContext)
+        + buildMobileLayout()
+        + buildTabletLayout()
+        + buildSettingOption()
+        + showLogoutDialog()
+    }
+    
+    class MyApp {
+        - isDarkMode: Boolean
+        --
+        + build()
+        + loadThemePreference()
+        + toggleTheme(isDark: Boolean)
+    }
+}
+
+' ==========================================
+' ALMACENAMIENTO PERSISTENTE
+' ==========================================
+
+package "**Almacenamiento Persistente**" as STORAGE {
+    
+    class BaseDatos {
+        - conexion: Connection
+        --
+        + connect(): Connection
+        + executeQuery(sql: String): ResultSet
+        + executeUpdate(sql: String): int
+        + prepare(sql: String): PreparedStatement
+        + close()
+    }
+    
+    class SharedPreferences {
+        --
+        + setBool(key: String, value: Boolean)
+        + getBool(key: String): Boolean
+        + setString(key: String, value: String)
+        + getString(key: String): String
+    }
+    
+    class User {
+        + id: int
+        + name: String
+        + email: String
+        --
+        + fromJson(Map<String, dynamic>)
+        + toJson(): Map<String, dynamic>
+        + toString(): String
+    }
+}
+
+' ==========================================
+' RELACIONES - ADMINISTRADOR
+' ==========================================
+
+GestionUsuarios ||--|| BaseDatos : persiste
+GestionEmpresas ||--|| BaseDatos : persiste
+GestionVehiculos ||--|| BaseDatos : persiste
+GestionConductores ||--|| BaseDatos : persiste
+GestionRutas ||--|| BaseDatos : persiste
+GestionHorarios ||--|| BaseDatos : persiste
+GestionAsignaciones ||--|| BaseDatos : persiste
+GestionReportes ||--|| BaseDatos : persiste
+GestionChecadores ||--|| BaseDatos : persiste
+GestionParadas ||--|| BaseDatos : persiste
+
+GestionRutas "1" --> "*" GestionHorarios : contiene
+GestionHorarios "1" --> "*" GestionAsignaciones : usa
+GestionConductores "1" --> "*" GestionAsignaciones : asigna a
+GestionVehiculos "1" --> "*" GestionAsignaciones : asigna a
+
+' ==========================================
+' RELACIONES - USUARIO WEB
+' ==========================================
+
+ConfiguracionPerfil ||--|| BaseDatos : autentica
+ConfiguracionBusquedaRutas ||--|| BaseDatos : consulta
+ConfiguracionRutasFavoritas ||--|| BaseDatos : almacena
+
+' ==========================================
+' RELACIONES - APLICACIÓN MÓVIL
+' ==========================================
+
+ConfiguracionTema ||--|| SharedPreferences : persiste
+PerfilUsuarioMovil ||--|| User : utiliza
+SesionUsuario ||--|| SharedPreferences : guarda estado
+
+SettingsScreen ||--|| ConfiguracionTema : controla
+SettingsScreen ||--|| SesionUsuario : maneja
+MyApp ||--|| ConfiguracionTema : aplica tema
+PerfilUsuarioMovil ||--|| SettingsScreen : se muestra en
+
+' ==========================================
+' NOTAS INFORMATIVAS
+' ==========================================
+
+note top of ADMIN_CONFIG
+    **Panel Administrativo (rol=1)**
+    Control total del sistema
+    
+    ✓ Gestión de usuarios
+    ✓ Administración de empresas
+    ✓ Control de vehículos y conductores
+    ✓ Creación y edición de rutas
+    ✓ Configuración de horarios
+    ✓ Asignación de recursos
+    ✓ Gestión de reportes, checadores y paradas
+end note
+
+note top of USER_WEB_CONFIG
+    **Aplicación Web del Usuario (rol=2)**
+    Búsqueda y gestión de rutas
+    
+    ✓ Autenticación por email/contraseña
+    ✓ Búsqueda de rutas por origen/destino
+    ✓ Consulta de horarios y detalles
+    ✓ Gestión de rutas favoritas
+    ✓ Información de empresa/conductor/vehículo
+end note
+
+note top of MOBILE_CONFIG
+    **Aplicación Móvil**
+    Experiencia de usuario personalizada
+    
+    ✓ Tema oscuro/claro con persistencia
+    ✓ Perfil de usuario personalizado
+    ✓ Gestión de sesión
+    ✓ Pantalla de configuraciones
+    ✓ Diseño responsivo (móvil/tablet)
+end note
+
+note bottom of STORAGE
+    **Persistencia en MySQL + SharedPreferences**
+    
+    Base de Datos:
+    • usuarios, empresas, vehículos, conductores
+    • rutas, horarios, asignaciones
+    • reportes, checadores, paradas, rutas_favoritas
+    
+    Almacenamiento Local (móvil):
+    • isDarkMode, datos de sesión
+    • Preferencias de usuario
+    • Información persistente entre sesiones
+end note
+
+@enduml

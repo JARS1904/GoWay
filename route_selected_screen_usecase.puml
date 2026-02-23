@@ -1,0 +1,126 @@
+@startuml RouteSelectedScreen
+!define DIRECTION top to bottom direction
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #FFFFFF
+skinparam classBorderColor #2962FF
+skinparam actorBackgroundColor #E3F2FD
+skinparam actorBorderColor #1565C0
+skinparam usecaseBackgroundColor #BBDEFB
+skinparam usecaseBorderColor #2962FF
+skinparam noteBkgColor #FFF9C4
+skinparam noteBorderColor #F57F17
+
+left to right direction
+
+' ============ ACTORES ============
+actor "Usuario\nAutenticado\n(Rol=2)" as Usuario
+actor "Sistema\n(Servidor)" as Sistema
+actor "API Backend" as API
+database "Base de\nDatos" as BD
+
+' ============ BÚSQUEDA DE RUTAS ============
+rectangle "BÚSQUEDA Y CONSULTA" {
+  usecase "UC-01: Buscar Rutas\npor Origen/Destino" as UC01
+  usecase "UC-09: Cargar\nUbicaciones" as UC09
+  usecase "Obtener lista de rutas\ncoincidentes" as UC_Search
+}
+
+' ============ VISUALIZACIÓN ============
+rectangle "VISUALIZACIÓN" {
+  usecase "UC-04: Seleccionar\ny Ver Detalles" as UC04
+  usecase "Mostrar información\ncompleta de ruta" as UC_Details
+}
+
+' ============ GESTIÓN DE FAVORITAS ============
+rectangle "GESTIÓN DE FAVORITAS" {
+  usecase "UC-02: Marcar como\nFavorita" as UC02
+  usecase "UC-03: Remover de\nFavoritas" as UC03
+  usecase "UC-05: Filtrar por\nFavoritas" as UC05
+  usecase "UC-06: Ver Todas\nlas Rutas" as UC06
+  usecase "UC-10: Cargar\nFavoritas" as UC10
+}
+
+' ============ SEGURIDAD Y NAVEGACIÓN ============
+rectangle "SEGURIDAD Y USUARIO" {
+  usecase "UC-08: Validar\nSesión" as UC08
+  usecase "UC-07: Menú de\nUsuario" as UC07
+}
+
+' ============ RELACIONES CON ACTORES PRINCIPALES ============
+Usuario --> UC01 : inicia búsqueda
+Usuario --> UC04 : hace clic en ruta
+Usuario --> UC02 : marca corazón
+Usuario --> UC03 : desmarca corazón
+Usuario --> UC05 : filtra favoritas
+Usuario --> UC06 : limpia filtro
+Usuario --> UC07 : abre menú
+
+Sistema --> UC08 : al cargar página
+Sistema --> UC09 : inicialización
+Sistema --> UC10 : carga inicial
+
+' ============ RELACIONES ENTRE CASOS DE USO ============
+UC01 .> UC09 : <<incluye>>
+UC01 .> UC_Search : <<incluye>>
+UC04 .> UC_Details : <<incluye>>
+
+UC02 .> UC04 : <<se ejecuta en>>
+UC03 .> UC04 : <<se ejecuta en>>
+
+UC05 .> UC10 : <<obtiene de>>
+UC06 .> UC_Search : <<refresca>>
+
+UC08 .> UC01 : <<habilita acceso a>>
+UC08 .> UC04 : <<habilita acceso a>>
+
+' ============ RELACIONES CON API Y BD ============
+UC09 --> API : GET ubicaciones
+UC01 --> API : GET rutas
+UC10 --> API : GET favoritas
+UC02 --> API : POST agregar
+UC03 --> API : DELETE remover
+
+API --> BD : consulta/actualiza
+
+' ============ NOTAS ============
+note right of UC08
+  Verificación de sesión:
+  • $_SESSION['id'] debe existir
+  • $_SESSION['rol'] == 2
+  Si fallan → redirect a login.php
+end note
+
+note right of UC01
+  Obtiene ubicaciones de 
+  dropdown y busca rutas 
+  que coincidan
+end note
+
+note right of UC_Details
+  Muestra en panel derecho:
+  • Trayecto (Origen → Destino)
+  • Info empresa (nombre, teléfono, email)
+  • Horarios (días, salida, llegada)
+  • Paradas intermedias
+  • Datos conductor y vehículo
+end note
+
+note right of UC02
+  POST a /api/favorites_api.php
+  action=add_favorite
+  Icono cambia ♡ → ♥ (rojo)
+end note
+
+note right of UC03
+  DELETE a /api/favorites_api.php
+  action=delete_favorite
+  Icono cambia ♥ → ♡ (gris)
+end note
+
+note right of UC05
+  Filtra lista actual
+  Muestra solo favoritas
+  Carga desde API
+end note
+
+@enduml

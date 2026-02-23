@@ -1,0 +1,58 @@
+@startuml AdminPanelSequence
+skinparam backgroundColor #FEFEFE
+skinparam sequenceArrowColor #1976D2
+skinparam sequenceParticipantBackgroundColor #BBDEFB
+skinparam sequenceParticipantBorderColor #0D47A1
+skinparam sequenceGroupBkgColor #F5F5F5
+skinparam noteBkgColor #FFF9C4
+
+actor Admin
+participant "Browser" as B
+participant "Server" as S
+database "DB" as DB
+
+group Carga Inicial
+  Admin -> S: GET [entidad].php
+  activate S
+  S -> S: Validar sesión (rol=1)
+  S -> DB: SELECT registros
+  S --> B: HTML + datos
+  deactivate S
+end
+
+group UC-01: Listar
+  B -> B: Renderizar tabla paginada
+  Admin -> B: Navega páginas
+end
+
+group UC-02: Crear
+  Admin -> B: "Agregar"
+  B -> B: Modal + formulario
+  Admin -> B: Completa datos
+  B -> S: POST insert_[entidad].php
+  S -> DB: INSERT
+  S --> B: {success: true}
+  B -> B: Actualizar tabla
+end
+
+group UC-03: Actualizar
+  Admin -> B: "Editar"
+  B -> B: Modal prellenado
+  Admin -> B: Modifica
+  B -> S: POST update/actu_[entidad].php
+  S -> DB: UPDATE
+  S --> B: {success: true}
+  B -> B: Actualizar fila
+end
+
+group UC-04: Eliminar
+  Admin -> B: "Eliminar"
+  B -> B: Modal confirmación
+  Admin -> B: Confirma
+  B -> S: POST delete/delete_[entidad].php
+  S -> DB: DELETE
+  S --> B: {success: true}
+  B -> B: Remover fila
+end
+
+@enduml

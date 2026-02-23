@@ -1,0 +1,58 @@
+@startuml RouteSelectedScreenDeployment
+skinparam backgroundColor #FEFEFE
+skinparam nodeBackgroundColor #BBDEFB
+skinparam nodeBorderColor #2962FF
+skinparam artifactBackgroundColor #FFE0B2
+skinparam artifactBorderColor #E65100
+skinparam noteBkgColor #FFF9C4
+skinparam noteBorderColor #F57F17
+
+node "Dispositivo del usuario" as UserDevice {
+  artifact "Navegador web" as Browser {
+    artifact "HTML/CSS/JS" as Frontend
+  }
+}
+
+node "Servidor XAMPP" as Server {
+  artifact "Apache + PHP" as Apache {
+    artifact "route_selected_screen.php" as MainPage
+    artifact "API Backend" as API_Backend {
+      artifact "routes_api.php" as RoutesAPI
+      artifact "favorites_api.php" as FavoritesAPI
+      artifact "usuarios.php" as UsersAPI
+    }
+  }
+}
+
+node "Base de datos" as Database {
+  artifact "MySQL/MariaDB" as MySQL {
+    database "goway_db" as DB
+  }
+}
+
+node "Archivos estáticos" as FileSystem {
+  artifact "CSS/JS/Imágenes" as Assets
+}
+
+Browser --> Apache: HTTP GET
+MainPage --> API_Backend: AJAX Calls
+Apache --> MySQL: SQL Queries
+MySQL --> DB: almacena datos
+Frontend --> Assets: carga archivos
+
+note right of Server
+  • Validación de la sesión
+  • Procesar APIs
+  • Ejecutar SQL
+  • Retornar JSON
+end note
+
+note right of Database
+  Tablas:
+  • rutas
+  • favoritas
+  • empresas
+  • conductores
+end note
+
+@enduml
