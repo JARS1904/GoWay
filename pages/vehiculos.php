@@ -165,7 +165,7 @@ require_once '../config/conexion_bd.php';
                             $statusText = $row["activo"] ? 'Sí' : 'No';
                             
                             echo '<tr>
-                                    <td data-label="Placa" data-id="'.$row["id_vehiculo"].'">' . $row["placa"] . '</td>
+                                    <td data-label="Número de placa" data-id="'.$row["id_vehiculo"].'">' . $row["placa"] . '</td>
                                     <td data-label="Modelo">' . $row["modelo"] . '</td>
                                     <td data-label="Capacidad">' . $row["capacidad"] . '</td>
                                     <td data-label="RFC de la Empresa">' . $row["rfc_empresa"] . '</td>
