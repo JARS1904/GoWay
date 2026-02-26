@@ -135,7 +135,7 @@ require_once '../config/conexion_bd.php';
             <section class="content">
                 <div class="section-header">
                     <h3>Horarios Disponibles</h3>
-                    <button class="btn-add">Agregar Nuevo Horario</button>
+                    <button class="btn-add">+ Agregar nuevo horario</button>
                 </div>
                                     <?php
                     // Conexión a la base de datos
