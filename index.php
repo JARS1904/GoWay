@@ -256,23 +256,23 @@ require_once 'config/conexion_bd.php';
                     <h2>Acciones Rápidas</h2>
                     <div class="actions-grid">
                         <a href="pages/rutas.php" class="action-btn">
-                            <span class="action-icon">🛣️</span>
+                            <img class="action-icon" src="assets/images/icons/icons8-rutas-dashboard.png" alt="Rutas">
                             <span>Gestionar Rutas</span>
                         </a>
                         <a href="pages/vehiculos.php" class="action-btn">
-                            <span class="action-icon">🚌</span>
+                            <img class="action-icon" src="assets/images/icons/icons8-vehiculos-dashboard.png" alt="Vehículos">
                             <span>Gestionar Vehículos</span>
                         </a>
                         <a href="pages/conductores.php" class="action-btn">
-                            <span class="action-icon">👤</span>
+                            <img class="action-icon" src="assets/images/icons/icons8-conditores-dashboard.png" alt="Conductores">
                             <span>Gestionar Conductores</span>
                         </a>
                         <a href="pages/horarios.php" class="action-btn">
-                            <span class="action-icon">⏰</span>
+                            <img class="action-icon" src="assets/images/icons/icons8-horario-dashboard.png" alt="Horarios">
                             <span>Gestionar Horarios</span>
                         </a>
                         <a href="pages/checadores.php" class="action-btn">
-                            <span class="action-icon">✓</span>
+                            <img class="action-icon" src="assets/images/icons/icons8-checadores-dashboard.png" alt="Checadores">
                             <span>Gestionar Checadores</span>
                         </a>
                     </div>
