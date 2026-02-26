@@ -135,44 +135,148 @@ require_once 'config/conexion_bd.php';
             </header>
 
             <section class="content">
-                <h3>Resumen General</h3>
-                <?php
-                $conn = $conexion;
-
-                if ($conn->connect_error) {
-                    die("Error de conexión: " . $conn->connect_error);
-                }
-
-                $sql = "SELECT 
-                        (SELECT COUNT(*) FROM empresas) AS total_empresas,
-                        (SELECT COUNT(*) FROM rutas) AS total_rutas,
-                        (SELECT COUNT(*) FROM vehiculos) AS total_vehiculos,
-                        (SELECT COUNT(*) FROM conductores) AS total_conductores";
-                $result = $conn->query($sql);
-                $row = $result->fetch_assoc();
-                $total_empresas = $row['total_empresas'];
-                $total_rutas = $row['total_rutas'];
-                $total_vehiculos = $row['total_vehiculos'];
-                $total_conductores = $row['total_conductores'];
-                ?>
-                <div class="card">
-                    <h4>Empresas Registradas</h4>
-                    <p>Total: <?php echo $total_empresas; ?></p>
-                </div>
-                <div class="card">
-                    <h4>Rutas Activas</h4>
-                    <p>Total: <?php echo $total_rutas; ?></p>
-                </div>
-                <div class="card">
-                    <h4>Vehículos en Operación</h4>
-                    <p>Total: <?php echo $total_vehiculos; ?></p>
-                </div>
-                <div class="card">
-                    <h4>Conductores Activos</h4>
-                    <p>Total: <?php echo $total_conductores; ?></p>
+                <!-- Sección de Bienvenida -->
+                <div class="dashboard-welcome">
+                    <h1>Bienvenido, <?php echo $_SESSION['nombre']; ?></h1>
+                    <p>Aquí puedes ver un resumen del estado general de tu sistema de transporte</p>
                 </div>
 
-                <button class="btn-add">+ Agregar nuevo servicio</button>
+                <!-- Grid de Estadísticas -->
+                <div class="stats-grid">
+                    <?php
+                    $conn = $conexion;
+
+                    if ($conn->connect_error) {
+                        die("Error de conexión: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT 
+                            (SELECT COUNT(*) FROM empresas) AS total_empresas,
+                            (SELECT COUNT(*) FROM rutas) AS total_rutas,
+                            (SELECT COUNT(*) FROM vehiculos) AS total_vehiculos,
+                            (SELECT COUNT(*) FROM conductores) AS total_conductores,
+                            (SELECT COUNT(*) FROM horarios) AS total_horarios,
+                            (SELECT COUNT(*) FROM checadores) AS total_checadores";
+                    $result = $conn->query($sql);
+                    $row = $result->fetch_assoc();
+                    ?>
+
+                    <!-- Tarjeta Empresas -->
+                    <div class="stat-card">
+                        <div class="stat-card-icon empresas">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 21h18M3 10h18M5 6h14M7 3h10"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-card-content">
+                            <h3>Empresas</h3>
+                            <p class="stat-number"><?php echo $row['total_empresas']; ?></p>
+                            <span class="stat-label">Registradas</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Rutas -->
+                    <div class="stat-card">
+                        <div class="stat-card-icon rutas">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 3l15 7-15 7V3z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-card-content">
+                            <h3>Rutas</h3>
+                            <p class="stat-number"><?php echo $row['total_rutas']; ?></p>
+                            <span class="stat-label">Activas</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Vehículos -->
+                    <div class="stat-card">
+                        <div class="stat-card-icon vehiculos">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 5h19l-3 8H4L6 5zm6 0v-2a1 1 0 011-1h4a1 1 0 011 1v2"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-card-content">
+                            <h3>Vehículos</h3>
+                            <p class="stat-number"><?php echo $row['total_vehiculos']; ?></p>
+                            <span class="stat-label">En operación</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Conductores -->
+                    <div class="stat-card">
+                        <div class="stat-card-icon conductores">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="stat-card-content">
+                            <h3>Conductores</h3>
+                            <p class="stat-number"><?php echo $row['total_conductores']; ?></p>
+                            <span class="stat-label">Activos</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Horarios -->
+                    <div class="stat-card">
+                        <div class="stat-card-icon horarios">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-card-content">
+                            <h3>Horarios</h3>
+                            <p class="stat-number"><?php echo $row['total_horarios']; ?></p>
+                            <span class="stat-label">Configurados</span>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Checadores -->
+                    <div class="stat-card">
+                        <div class="stat-card-icon checadores">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11l3 3L22 4"></path>
+                                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-card-content">
+                            <h3>Checadores</h3>
+                            <p class="stat-number"><?php echo $row['total_checadores']; ?></p>
+                            <span class="stat-label">Registrados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección de Acciones Rápidas -->
+                <div class="quick-actions">
+                    <h2>Acciones Rápidas</h2>
+                    <div class="actions-grid">
+                        <a href="pages/rutas.php" class="action-btn">
+                            <span class="action-icon">🛣️</span>
+                            <span>Gestionar Rutas</span>
+                        </a>
+                        <a href="pages/vehiculos.php" class="action-btn">
+                            <span class="action-icon">🚌</span>
+                            <span>Gestionar Vehículos</span>
+                        </a>
+                        <a href="pages/conductores.php" class="action-btn">
+                            <span class="action-icon">👤</span>
+                            <span>Gestionar Conductores</span>
+                        </a>
+                        <a href="pages/horarios.php" class="action-btn">
+                            <span class="action-icon">⏰</span>
+                            <span>Gestionar Horarios</span>
+                        </a>
+                        <a href="pages/checadores.php" class="action-btn">
+                            <span class="action-icon">✓</span>
+                            <span>Gestionar Checadores</span>
+                        </a>
+                    </div>
+                </div>
             </section>
         </main>
     </div>

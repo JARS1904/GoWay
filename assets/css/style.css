@@ -1673,6 +1673,157 @@ body {
 }
 
 /* ==================== */
+/* Dashboard Redesign */
+/* ==================== */
+
+/* Welcome Section */
+.dashboard-welcome {
+    background: linear-gradient(135deg, #0660fe 0%, #0055cc 100%);
+    color: white;
+    padding: 40px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 30px rgba(6, 96, 254, 0.15);
+}
+
+.dashboard-welcome h1 {
+    margin: 0 0 10px 0;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.dashboard-welcome p {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+/* Stat Card */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-card-icon svg {
+    width: 32px;
+    height: 32px;
+    color: white;
+}
+
+.stat-card-icon.empresas {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.stat-card-icon.rutas {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+}
+
+.stat-card-icon.vehiculos {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.stat-card-icon.conductores {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
+.stat-card-icon.horarios {
+    background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+}
+
+.stat-card-icon.checadores {
+    background: linear-gradient(135deg, #06b6d4 0%, #0e7490 100%);
+}
+
+.stat-card-content h3 {
+    margin: 0 0 4px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-card-content .stat-number {
+    margin: 0 0 4px 0;
+    font-size: 32px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.stat-card-content .stat-label {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* Quick Actions Section */
+.quick-actions {
+    margin-top: 40px;
+}
+
+.quick-actions h2 {
+    margin: 0 0 24px 0;
+    font-size: 24px;
+    color: #1f2937;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.action-btn {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    text-decoration: none;
+    color: #374151;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+}
+
+.action-btn:hover {
+    border-color: #0660fe;
+    background: #f0f4ff;
+    transform: translateY(-6px);
+    box-shadow: 0 8px 16px rgba(6, 96, 254, 0.1);
+}
+
+.action-btn .action-icon {
+    font-size: 32px;
+}
+
+/* ==================== */
 /* Responsive Cards */
 /* ==================== */
 @media (max-width: 1024px) {
@@ -1680,11 +1831,37 @@ body {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 24px;
     }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
     .card-container {
         grid-template-columns: 1fr;
         gap: 16px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dashboard-welcome {
+        padding: 24px;
+    }
+    
+    .dashboard-welcome h1 {
+        font-size: 24px;
     }
 }
