@@ -34,7 +34,7 @@ require_once '../config/conexion_bd.php';
                 </div>
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
-                        <span>Admin</span>
+                        <span><?php echo $_SESSION['nombre']; ?></span>
                         <img src="../assets/images/icons/administrador.png" alt="Usuario">
                     </div>
                 </div>
@@ -130,7 +130,7 @@ require_once '../config/conexion_bd.php';
             <header class="header">
                 <h2>Gestión de Empresas</h2>
                 <div class="user-info">
-                    <span>Admin</span>
+                    <span><?php echo $_SESSION['nombre']; ?></span>
                     <img src="../assets/images/icons/administrador.png" alt="Usuario">
                 </div>
             </header>

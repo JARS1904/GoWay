@@ -357,7 +357,7 @@ if ($conexion->error) {
             </div>
             <div class="mobile-topbar-right">
                 <div class="mobile-user-info">
-                    <span>Admin</span>
+                    <span><?php echo $_SESSION['nombre']; ?></span>
                     <img src="../assets/images/icons/administrador.png" alt="Usuario">
                 </div>
             </div>
@@ -453,7 +453,7 @@ if ($conexion->error) {
         <header class="header">
             <h2>Reportes de Incidentes</h2>
             <div class="user-info">
-                <span>Admin</span>
+                <span><?php echo $_SESSION['nombre']; ?></span>
                 <img src="../assets/images/icons/administrador.png" alt="Usuario">
             </div>
         </header>
