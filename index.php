@@ -58,6 +58,30 @@ require_once 'config/conexion_bd.php';
                         </a>
                     </li>
                     <li>
+                        <a href="pages/empresas.php">
+                            <img src="assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
+                            <span>Empresas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="pages/conductores.php">
+                            <img src="assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
+                            <span>Conductores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="pages/vehiculos.php">
+                            <img src="assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
+                            <span>Vehículos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="pages/checadores.php">
+                            <img src="assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
+                            <span>Checadores</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="pages/rutas.php">
                             <img src="assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
                             <span>Rutas</span>
@@ -70,45 +94,21 @@ require_once 'config/conexion_bd.php';
                         </a>
                     </li>
                     <li>
-                        <a href="pages/vehiculos.php">
-                            <img src="assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
-                            <span>Vehículos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="pages/conductores.php">
-                            <img src="assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
-                            <span>Conductores</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="pages/empresas.php">
-                            <img src="assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
-                            <span>Empresas</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="pages/checadores.php">
-                            <img src="assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
-                            <span>Checadores</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="pages/paradas.php">
                             <img src="assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
                             <span>Asignaciones</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/usuarios.php">
-                            <img src="assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
-                            <span>Usuarios</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="pages/reportes.php">
                             <img src="assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
                             <span>Reportes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="pages/usuarios.php">
+                            <img src="assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
+                            <span>Usuarios</span>
                         </a>
                     </li>
                 </ul>
