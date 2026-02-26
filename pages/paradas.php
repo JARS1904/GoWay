@@ -136,7 +136,10 @@ require_once '../config/conexion_bd.php';
             </header>
 
             <section class="content">
-                <h3>Lista de Asignaciones</h3>
+                <div class="section-header">
+                    <h3>Lista de Asignaciones</h3>
+                    <button class="btn-add">+ Agregar nueva asignación</button>
+                </div>
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -194,8 +197,6 @@ require_once '../config/conexion_bd.php';
                     <div class="pagination-info" id="pageInfo">Página 1 de 5</div>
                     <button class="pagination-btn" id="nextPage">Siguiente ›</button>
                 </div>
-
-                <button class="btn-add">+ Agregar nueva asignación</button>
             </section>
         </main>
     </div>

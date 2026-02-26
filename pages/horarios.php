@@ -133,7 +133,10 @@ require_once '../config/conexion_bd.php';
             </header>
 
             <section class="content">
-                <h3>Horarios Disponibles</h3>
+                <div class="section-header">
+                    <h3>Horarios Disponibles</h3>
+                    <button class="btn-add">Agregar Nuevo Horario</button>
+                </div>
                                     <?php
                     // Conexión a la base de datos
                     $conn = $conexion;
@@ -178,9 +181,6 @@ require_once '../config/conexion_bd.php';
 
                     echo '</div>'; // Cierre del contenedor
                     ?>
-
-                
-                <button class="btn-add">Agregar Nuevo Horario</button>
             </section>
         </main>
     </div>

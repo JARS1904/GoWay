@@ -135,7 +135,10 @@ require_once '../config/conexion_bd.php';
             </header>
 
             <section class="content">
-                <h3>Lista de Rutas</h3>
+                <div class="section-header">
+                    <h3>Lista de Rutas</h3>
+                    <button class="btn-add">+ Agregar nueva ruta</button>
+                </div>
 
                 <table class="data-table">
                     <thead>
@@ -184,15 +187,12 @@ require_once '../config/conexion_bd.php';
                         ?>
                     </tbody>
                 </table>
-
                 <!-- Paginación -->
                 <div class="pagination">
                     <button class="pagination-btn" id="prevPage" disabled>‹ Anterior</button>
                     <div class="pagination-info" id="pageInfo">Página 1 de 5</div>
                     <button class="pagination-btn" id="nextPage">Siguiente ›</button>
                 </div>
-
-                <button class="btn-add">+ Agregar nueva ruta</button>
             </section>
         </main>
     </div>
