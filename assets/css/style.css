@@ -1766,6 +1766,12 @@ body {
     color: white;
 }
 
+.stat-card-icon img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
 .stat-card-icon.empresas {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
 }

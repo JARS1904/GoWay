@@ -58,30 +58,6 @@ require_once 'config/conexion_bd.php';
                         </a>
                     </li>
                     <li>
-                        <a href="pages/empresas.php">
-                            <img src="assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
-                            <span>Empresas</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="pages/conductores.php">
-                            <img src="assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
-                            <span>Conductores</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="pages/vehiculos.php">
-                            <img src="assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
-                            <span>Vehículos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="pages/checadores.php">
-                            <img src="assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
-                            <span>Checadores</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="pages/rutas.php">
                             <img src="assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
                             <span>Rutas</span>
@@ -94,21 +70,45 @@ require_once 'config/conexion_bd.php';
                         </a>
                     </li>
                     <li>
+                        <a href="pages/vehiculos.php">
+                            <img src="assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
+                            <span>Vehículos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="pages/conductores.php">
+                            <img src="assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
+                            <span>Conductores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="pages/empresas.php">
+                            <img src="assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
+                            <span>Empresas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="pages/checadores.php">
+                            <img src="assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
+                            <span>Checadores</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="pages/paradas.php">
                             <img src="assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
                             <span>Asignaciones</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/reportes.php">
-                            <img src="assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
-                            <span>Reportes</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="pages/usuarios.php">
                             <img src="assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
                             <span>Usuarios</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="pages/reportes.php">
+                            <img src="assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
+                            <span>Reportes</span>
                         </a>
                     </li>
                 </ul>
@@ -164,9 +164,7 @@ require_once 'config/conexion_bd.php';
                     <!-- Tarjeta Empresas -->
                     <div class="stat-card">
                         <div class="stat-card-icon empresas">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 21h18M3 10h18M5 6h14M7 3h10"></path>
-                            </svg>
+                            <img src="assets/images/icons/icons8-empresa-dashboard-resumen.png" alt="Empresas">
                         </div>
                         <div class="stat-card-content">
                             <h3>Empresas</h3>
@@ -178,9 +176,7 @@ require_once 'config/conexion_bd.php';
                     <!-- Tarjeta Rutas -->
                     <div class="stat-card">
                         <div class="stat-card-icon rutas">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M6 3l15 7-15 7V3z"></path>
-                            </svg>
+                            <img src="assets/images/icons/icons8-ruta-dashboard-resumen.png" alt="Rutas">
                         </div>
                         <div class="stat-card-content">
                             <h3>Rutas</h3>
@@ -192,11 +188,7 @@ require_once 'config/conexion_bd.php';
                     <!-- Tarjeta Vehículos -->
                     <div class="stat-card">
                         <div class="stat-card-icon vehiculos">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="9" cy="21" r="1"></circle>
-                                <circle cx="20" cy="21" r="1"></circle>
-                                <path d="M1 5h19l-3 8H4L6 5zm6 0v-2a1 1 0 011-1h4a1 1 0 011 1v2"></path>
-                            </svg>
+                            <img src="assets/images/icons/icons8-vehiculo-dashboard-resumen.png" alt="Vehículos">
                         </div>
                         <div class="stat-card-content">
                             <h3>Vehículos</h3>
@@ -208,10 +200,7 @@ require_once 'config/conexion_bd.php';
                     <!-- Tarjeta Conductores -->
                     <div class="stat-card">
                         <div class="stat-card-icon conductores">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
+                            <img src="assets/images/icons/icons8-conductor-dashboard-resumen.png" alt="Conductores">
                         </div>
                         <div class="stat-card-content">
                             <h3>Conductores</h3>
@@ -223,10 +212,7 @@ require_once 'config/conexion_bd.php';
                     <!-- Tarjeta Horarios -->
                     <div class="stat-card">
                         <div class="stat-card-icon horarios">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
+                            <img src="assets/images/icons/icons8-horario-dashboard-resumen.png" alt="Horarios">
                         </div>
                         <div class="stat-card-content">
                             <h3>Horarios</h3>
@@ -238,10 +224,7 @@ require_once 'config/conexion_bd.php';
                     <!-- Tarjeta Checadores -->
                     <div class="stat-card">
                         <div class="stat-card-icon checadores">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 11l3 3L22 4"></path>
-                                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
+                            <img src="assets/images/icons/icons8-checador-dashboard-resumen.png" alt="Checadores">
                         </div>
                         <div class="stat-card-content">
                             <h3>Checadores</h3>
