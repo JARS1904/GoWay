@@ -141,11 +141,11 @@ require_once '../config/conexion_bd.php';
                     <thead>
                         <tr>
                             <th>RFC de la empresa</th>
-                            <th>ID vehiculo</th>
+                            <th>Número de placa</th>
                             <th>RFC del conductor</th>
-                            <th>ID Ruta</th>
-                            <th>ID Horario</th>
-                            <th>Fecha</th>
+                            <th>Ruta</th>
+                            <th>Horario</th>
+                            <th>Fecha de creación</th>
                             <th>Activa</th>
                             <th>Acciones</th>
                         </tr>
@@ -170,13 +170,11 @@ require_once '../config/conexion_bd.php';
                                 
                                 echo '<tr>
                                         <td data-label="RFC de la Empresa" data-id="'.$row["id_asignacion"].'">'.$row["rfc_empresa"].'</td>
-                                        <!-- ANTES: <td data-label="ID Vehículo">'.$row["id_vehiculo"].'</td> -->
-                                        <td data-label="ID Vehículo">'.$row["placa"].'</td>
+                                        <td data-label="Número de placa">'.$row["placa"].'</td>
                                         <td data-label="RFC Conductor">'.$row["rfc_conductor"].'</td>
-                                        <!-- ANTES: <td data-label="ID Ruta">'.$row["id_ruta"].'</td> -->
-                                        <td data-label="ID Ruta">'.$row["nombre_ruta"].'</td>
-                                        <td data-label="ID Horario">'.$row["id_horario"].'</td>
-                                        <td data-label="Fecha">'.$row["fecha"].'</td>
+                                        <td data-label="Ruta">'.$row["nombre_ruta"].'</td>
+                                        <td data-label="Horario">'.$row["id_horario"].'</td>
+                                        <td data-label="Fecha de creación">'.$row["fecha"].'</td>
                                         <td data-label="Activa"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
                                             <button class="btn-action btn-delete">Eliminar</button>
@@ -227,7 +225,7 @@ require_once '../config/conexion_bd.php';
                             </select>
                         </div>
                         <div class="modal-form-group">
-                            <label>ID de vehiculo</label>
+                            <label>Vehículo</label>
                             <select name="id_vehiculo" required>
                                 <option value="" disabled selected>Seleccionar vehículo</option>
                                 <?php
@@ -257,7 +255,7 @@ require_once '../config/conexion_bd.php';
                     <!-- Columna derecha -->
                     <div>
                         <div class="modal-form-group">
-                            <label>ID Ruta</label>
+                            <label>Ruta</label>
                             <select name="id_ruta" required>
                                 <option value="" disabled selected>Seleccionar ruta</option>
                                 <?php
@@ -270,7 +268,7 @@ require_once '../config/conexion_bd.php';
                             </select>
                         </div>
                         <div class="modal-form-group">
-                            <label>ID horario</label>
+                            <label>Horario</label>
                             <select name="id_horario" required>
                                 <option value="" disabled selected>Seleccionar horario</option>
                                 <?php
@@ -283,8 +281,8 @@ require_once '../config/conexion_bd.php';
                             </select>
                         </div>
                         <div class="modal-form-group">
-                            <label>Fecha</label>
-                            <input type="date" name="fecha" required placeholder="Fecha">
+                            <label>Fecha de creación</label>
+                            <input type="date" name="fecha" required placeholder="Fecha de creación">
                         </div>
                     </div>
                 </div>

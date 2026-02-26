@@ -141,7 +141,7 @@ require_once '../config/conexion_bd.php';
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>ID usuario</th>
+                            <!-- <th>ID usuario</th> -->
                             <th>Nombre</th>
                             <th>Email</th>
                             <th>Password</th>
@@ -158,17 +158,24 @@ require_once '../config/conexion_bd.php';
                         $sql = "SELECT * FROM usuarios";
                         $result = $conn->query($sql);
 
+                        // Mapeo de roles
+                        $rol_mapping = [
+                            1 => "Administrador",
+                            2 => "Usuario"
+                        ];
+
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 // Mostrar solo si la contraseña está establecida, sin mostrar el hash completo
                                 $password_display = !empty($row["password"]) ? "●●●●●●●●" : "Sin contraseña";
+                                $rol_label = $rol_mapping[$row["rol"]] ?? "Desconocido";
                                 
-                                echo '<tr>
-                                        <td data-label="ID Usuario" data-id="' . $row["id"] . '">' . $row["id"] . '</td>
+                                echo '<tr data-id="' . $row["id"] . '">
+                                        <!-- <td data-label="ID Usuario" data-id="' . $row["id"] . '">' . $row["id"] . '</td> -->
                                         <td data-label="Nombre">' . $row["nombre"] . '</td>
                                         <td data-label="Email">' . $row["email"] . '</td>
                                         <td data-label="Password">' . $password_display . '</td>
-                                        <td data-label="Rol">' . $row["rol"] . '</td>
+                                        <td data-label="Rol" data-rol="' . $row["rol"] . '">' . $rol_label . '</td>
                                         <td>
                                             <button class="btn-action btn-edit">Editar</button>
                                             <button class="btn-action btn-delete">Eliminar</button>
@@ -382,11 +389,11 @@ require_once '../config/conexion_bd.php';
                     const row = btn.closest('tr');
                     const cells = row.querySelectorAll('td');
                     
-                    document.getElementById('edit_id_usuario').value = cells[0].textContent.trim();
-                    document.getElementById('edit_nombre').value = cells[1].textContent.trim();
-                    document.getElementById('edit_email').value = cells[2].textContent.trim();
-                    document.getElementById('edit_password').value = cells[3].textContent.trim();
-                    document.getElementById('edit_rol').value = cells[4].textContent.trim();
+                    document.getElementById('edit_id_usuario').value = row.getAttribute('data-id');
+                    document.getElementById('edit_nombre').value = cells[0].textContent.trim();
+                    document.getElementById('edit_email').value = cells[1].textContent.trim();
+                    document.getElementById('edit_password').value = cells[2].textContent.trim();
+                    document.getElementById('edit_rol').value = cells[3].getAttribute('data-rol');
                     
                     document.getElementById('editUserModal').classList.add('active');
                 }
