@@ -28,22 +28,11 @@ try {
         sendResponse(500, ["error" => "Error de conexión: " . $conn->connect_error]);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // GET ?action=get_assignment_data&id_asignacion=X
-    // Devuelve: placa del vehículo, nombre del conductor y datos de ruta
-    // ─────────────────────────────────────────────────────────────
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if (!isset($_GET['action']) || $_GET['action'] !== 'get_assignment_data') {
-            sendResponse(400, ["error" => "Acción no válida. Use action=get_assignment_data"]);
-        }
-
-        $id_asignacion = isset($_GET['id_asignacion']) ? intval($_GET['id_asignacion']) : 0;
-
-        if ($id_asignacion <= 0) {
-            sendResponse(400, ["error" => "id_asignacion es requerido y debe ser un entero positivo"]);
-        }
-
-        $sql = "SELECT
+    // ────────────────────────────────────────────────────────────────────────
+    // Función auxiliar: obtiene datos completos de una asignación por ID o placa
+    // ────────────────────────────────────────────────────────────────────────
+    function getAsignacionData($conn, $by, $value) {
+        $base_sql = "SELECT
                     a.id_asignacion,
                     a.id_vehiculo,
                     a.rfc_conductor,
@@ -58,24 +47,57 @@ try {
                 FROM asignaciones a
                 JOIN vehiculos   v ON a.id_vehiculo  = v.id_vehiculo
                 JOIN conductores c ON a.rfc_conductor = c.rfc_conductor
-                JOIN rutas       r ON a.id_ruta       = r.id_ruta
-                WHERE a.id_asignacion = ?";
+                JOIN rutas       r ON a.id_ruta       = r.id_ruta";
 
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) {
-            sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+        if ($by === 'id') {
+            $sql  = $base_sql . " WHERE a.id_asignacion = ?";
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) return null;
+            $stmt->bind_param("i", $value);
+        } else {
+            // Por placa: trae la asignación activa más reciente del vehículo
+            $sql  = $base_sql . " WHERE v.placa = ? AND a.activa = 1 ORDER BY a.fecha DESC LIMIT 1";
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) return null;
+            $stmt->bind_param("s", $value);
         }
 
-        $stmt->bind_param("i", $id_asignacion);
         $stmt->execute();
         $result = $stmt->get_result();
+        $row    = $result->num_rows > 0 ? $result->fetch_assoc() : null;
+        $stmt->close();
+        return $row;
+    }
 
-        if ($result->num_rows === 0) {
-            sendResponse(404, ["error" => "No se encontró ninguna asignación con ese ID"]);
+    // ─────────────────────────────────────────────────────────────
+    // GET ?action=get_assignment_data&placa=ABC123
+    //  ó  ?action=get_assignment_data&id_asignacion=X
+    // Devuelve: placa del vehículo, nombre del conductor y datos de ruta
+    // ─────────────────────────────────────────────────────────────
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (!isset($_GET['action']) || $_GET['action'] !== 'get_assignment_data') {
+            sendResponse(400, ["error" => "Acción no válida. Use action=get_assignment_data"]);
         }
 
-        $asignacion = $result->fetch_assoc();
-        $stmt->close();
+        $placa         = isset($_GET['placa'])         ? strtoupper(trim($_GET['placa'])) : '';
+        $id_asignacion = isset($_GET['id_asignacion']) ? intval($_GET['id_asignacion'])   : 0;
+
+        if (empty($placa) && $id_asignacion <= 0) {
+            sendResponse(400, ["error" => "Debes enviar 'placa' o 'id_asignacion'"]);
+        }
+
+        // Placa tiene prioridad si se envían ambos
+        if (!empty($placa)) {
+            $asignacion = getAsignacionData($conn, 'placa', $placa);
+            if (!$asignacion) {
+                sendResponse(404, ["error" => "No se encontró ninguna asignación activa para la placa '$placa'"]);
+            }
+        } else {
+            $asignacion = getAsignacionData($conn, 'id', $id_asignacion);
+            if (!$asignacion) {
+                sendResponse(404, ["error" => "No se encontró ninguna asignación con id_asignacion=$id_asignacion"]);
+            }
+        }
 
         sendResponse(200, [
             "success" => true,
@@ -85,11 +107,12 @@ try {
 
     // ─────────────────────────────────────────────────────────────
     // POST — Crear un nuevo reporte
-    // Body JSON esperado:
-    //   id_asignacion  (int)     — obtiene vehículo, conductor y ruta automáticamente
+    // Body JSON esperado (usa placa O id_asignacion, no ambos):
+    //   placa          (string)  — placa del vehículo (recomendado para usuarios)
+    //   id_asignacion  (int)     — alternativa directa si ya se conoce
     //   id_usuario     (int)     — quién hace el reporte
     //   tipo_incidente (string)
-    //   fecha_hora     (string)  — formato YYYY-MM-DD HH:MM:SS o YYYY-MM-DD
+    //   fecha_hora     (string)  — formato YYYY-MM-DD HH:MM:SS
     //   descripcion    (string)
     //   gravedad       (string)  — baja | media | alta | critica
     // ─────────────────────────────────────────────────────────────
@@ -106,24 +129,26 @@ try {
             sendResponse(400, ["error" => "JSON inválido: " . json_last_error_msg()]);
         }
 
-        // Validar campos requeridos
-        $campos_requeridos = ['id_asignacion', 'id_usuario', 'tipo_incidente', 'fecha_hora', 'descripcion', 'gravedad'];
+        // Validar campos comunes siempre requeridos
+        $campos_requeridos = ['id_usuario', 'tipo_incidente', 'fecha_hora', 'descripcion', 'gravedad'];
         foreach ($campos_requeridos as $campo) {
             if (!isset($data[$campo]) || (is_string($data[$campo]) && trim($data[$campo]) === '')) {
                 sendResponse(400, ["error" => "El campo '$campo' es requerido"]);
             }
         }
 
-        $id_asignacion  = intval($data['id_asignacion']);
+        $placa_post    = isset($data['placa'])         ? strtoupper(trim($data['placa'])) : '';
+        $id_asignacion = isset($data['id_asignacion']) ? intval($data['id_asignacion'])   : 0;
+
+        if (empty($placa_post) && $id_asignacion <= 0) {
+            sendResponse(400, ["error" => "Debes enviar 'placa' o 'id_asignacion'"]);
+        }
+
         $id_usuario     = intval($data['id_usuario']);
         $tipo_incidente = trim($data['tipo_incidente']);
         $fecha_hora     = trim($data['fecha_hora']);
         $descripcion    = trim($data['descripcion']);
         $gravedad       = strtolower(trim($data['gravedad']));
-
-        if ($id_asignacion <= 0) {
-            sendResponse(400, ["error" => "id_asignacion debe ser un entero positivo"]);
-        }
 
         if ($id_usuario <= 0) {
             sendResponse(400, ["error" => "id_usuario debe ser un entero positivo"]);
@@ -135,24 +160,18 @@ try {
             sendResponse(400, ["error" => "Gravedad inválida. Valores aceptados: baja, media, alta, critica"]);
         }
 
-        // Obtener id_vehiculo, rfc_conductor e id_ruta desde la asignación
-        $stmt_asig = $conn->prepare(
-            "SELECT id_vehiculo, rfc_conductor, id_ruta FROM asignaciones WHERE id_asignacion = ?"
-        );
-        if (!$stmt_asig) {
-            sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+        // Resolver asignación: placa tiene prioridad
+        if (!empty($placa_post)) {
+            $asig = getAsignacionData($conn, 'placa', $placa_post);
+            if (!$asig) {
+                sendResponse(404, ["error" => "No se encontró ninguna asignación activa para la placa '$placa_post'"]);
+            }
+        } else {
+            $asig = getAsignacionData($conn, 'id', $id_asignacion);
+            if (!$asig) {
+                sendResponse(404, ["error" => "No se encontró ninguna asignación con id_asignacion=$id_asignacion"]);
+            }
         }
-
-        $stmt_asig->bind_param("i", $id_asignacion);
-        $stmt_asig->execute();
-        $result_asig = $stmt_asig->get_result();
-
-        if ($result_asig->num_rows === 0) {
-            sendResponse(404, ["error" => "No se encontró ninguna asignación con ese ID"]);
-        }
-
-        $asig = $result_asig->fetch_assoc();
-        $stmt_asig->close();
 
         $id_vehiculo   = intval($asig['id_vehiculo']);
         $rfc_conductor = $asig['rfc_conductor'];
