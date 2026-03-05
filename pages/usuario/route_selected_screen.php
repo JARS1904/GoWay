@@ -29,6 +29,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             --black-color: #000000;
             --error-color: #D32F2F;
             --success-color: #388E3C;
+            --header-height: 64px;
         }
 
         * {
@@ -61,9 +62,9 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             background-color: white;
             overflow-y: auto;
             overflow-x: hidden;
-            height: calc(100vh - 70px);
+            height: calc(100vh - var(--header-height));
             position: sticky;
-            top: 70px;
+            top: var(--header-height);
         }
 
         /* Columna derecha */
@@ -72,13 +73,14 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             padding: 20px;
             background-color: var(--light-gray);
             overflow-y: auto;
-            height: calc(100vh - 70px);
+            height: calc(100vh - var(--header-height));
         }
 
         header {
             background-color: white;
-            /*box-shadow: 0 2px 4px rgba(0,0,0,0.1);*/
-            padding: 15px 20px;
+            box-shadow: 0 1px 0 #e8e8e8;
+            padding: 0 24px;
+            height: var(--header-height);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -90,6 +92,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             justify-content: space-between;
             max-width: 1600px;
             margin: 0 auto;
+            height: 100%;
         }
 
         .logo {
@@ -112,7 +115,67 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
         .user-dropdown {
             position: relative;
             display: inline-block;
-            margin-left: auto; /* Para alinear a la derecha */
+            margin-left: auto;
+        }
+
+        /* Nav links visibles en desktop */
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+
+        .header-nav a {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--dark-gray);
+            border: 1.5px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .header-nav a:hover {
+            border-color: var(--medium-gray);
+            color: var(--primary-color);
+            background-color: var(--light-gray);
+        }
+
+        .header-nav a.download-btn {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .header-nav a.download-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .header-nav a.logout {
+            border-color: transparent;
+            color: var(--dark-gray);
+        }
+
+        .header-nav a.logout:hover {
+            border-color: #ffcdd2;
+            background-color: #fff5f5;
+            color: var(--error-color);
+        }
+
+        /* Ocultar dropdown en desktop */
+        @media (min-width: 769px) {
+            .user-dropdown { display: none; }
+        }
+
+        /* Ocultar nav en móvil */
+        @media (max-width: 768px) {
+            .header-nav { display: none; }
+            .user-dropdown { display: inline-block; }
         }
 
         .user-btn {
@@ -182,15 +245,26 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
         }
 
         .search-section {
-            background-color: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            background-color: transparent;
+            border-radius: 0;
+            padding: 10px 0 20px 0;
+            box-shadow: none;
+            margin-bottom: 0;
+        }
+
+        .greeting {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--black-color);
+            margin-bottom: 4px;
+        }
+
+        .greeting span {
+            color: var(--black-color);
         }
 
         .search-title {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             margin-bottom: 20px;
             color: var(--black-color);
@@ -258,14 +332,14 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
         }
 
         .results-section {
-            background-color: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background-color: transparent;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
         }
 
         .section-title {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             margin-bottom: 20px;
             color: var(--black-color);
@@ -305,193 +379,310 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
 
         .route-card {
             background-color: white;
-            border-radius: 18px;
-            border: 2px solid var(--medium-gray);
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            transition: box-shadow 0.2s, transform 0.2s;
             cursor: pointer;
             position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
         }
 
         .route-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
             transform: translateY(-2px);
-            border-color: var(--primary-color);
         }
 
         .route-card.selected {
             border-color: var(--primary-color);
-            background-color: #f0f7ff;
+            box-shadow: 0 4px 16px rgba(41,98,255,0.15);
         }
 
-        .route-header {
+        /* Fila superior de la tarjeta: icono + empresa + corazón */
+        .route-card-header {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            margin-bottom: 14px;
         }
 
-        .route-header i {
-            font-size: 24px;
+        .route-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .route-card-title i {
+            font-size: 20px;
             color: var(--primary-color);
-            margin-right: 10px;
         }
 
         .route-company {
             font-weight: 700;
-            color: var(--primary-dark);
-            font-size: 18px;
-            margin-left: 10px;
+            color: var(--primary-color);
+            font-size: 17px;
         }
 
+        /* Línea divisora dentro de la tarjeta */
+        .route-card-divider {
+            height: 1px;
+            background-color: #f0f0f0;
+            margin: 12px 0;
+        }
+
+        /* Fila origen → destino */
         .route-path {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 0;
             flex-wrap: wrap;
+            font-size: 15px;
+            color: var(--text-color);
         }
 
-        .route-path i {
-            margin: 0 10px;
+        .route-path > i.arrow {
             color: var(--dark-gray);
+            font-size: 13px;
         }
 
         .route-origin, .route-destination {
             display: flex;
             align-items: center;
+            gap: 5px;
         }
 
         .route-origin i {
             color: #D32F2F;
+            font-size: 14px;
         }
 
         .route-destination i {
             color: #388E3C;
+            font-size: 14px;
         }
 
-        .route-info {
+        /* Fila de horarios disponibles + botón */
+        .route-card-footer {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            margin-top: 14px;
         }
 
         .route-schedule {
             display: flex;
             align-items: center;
+            gap: 8px;
+            color: var(--text-color);
+            font-size: 14px;
         }
 
         .route-schedule i {
             color: var(--primary-color);
-            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .route-schedule-count {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .btn-details {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+            width: auto;
+        }
+
+        .btn-details:hover {
+            background-color: var(--primary-dark);
         }
 
         /* Detalles en columna derecha */
         .route-details {
-            background-color: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            height: 100%;
+            background-color: transparent;
+            padding: 0;
+        }
+
+        /* Encabezado de detalle: ruta nombre grande */
+        .route-detail-header {
+            margin-bottom: 20px;
+        }
+
+        .route-detail-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--black-color);
+            margin-bottom: 4px;
         }
 
         .route-full-path {
-            font-size: 24px;
-            margin-bottom: 30px;
-            text-align: center;
-            font-weight: bold;
-            color: var(--black-color);
+            font-size: 15px;
+            color: var(--dark-gray);
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 6px;
         }
 
         .route-full-path i {
-            margin: 0 15px;
+            font-size: 12px;
             color: var(--dark-gray);
         }
 
-        .company-info {
-            background-color: var(--light-gray);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
+        .detail-divider {
+            height: 1px;
+            background-color: var(--medium-gray);
+            margin: 18px 0;
+        }
+
+        /* Tarjeta contenedora blanca */
+        .detail-card {
+            background-color: white;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            padding: 20px 22px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
         }
 
         .info-title {
-            font-size: 20px;
-            font-weight: 500;
-            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 18px;
             color: var(--black-color);
         }
 
+        /* Fila icono + label encima + value abajo */
         .info-row {
             display: flex;
-            margin-bottom: 15px;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
         }
 
         .info-row i {
             font-size: 20px;
             color: var(--primary-color);
-            margin-right: 15px;
-            width: 24px;
+            width: 22px;
             text-align: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-text {
+            display: flex;
+            flex-direction: column;
         }
 
         .info-label {
-            font-weight: 500;
+            font-size: 13px;
             color: var(--dark-gray);
-            width: 120px;
+            font-weight: 400;
+            line-height: 1.3;
         }
 
         .info-value {
-            flex: 1;
-            font-weight: 400;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--black-color);
+            line-height: 1.4;
         }
 
+        /* Encabezado de tarjeta de horario */
         .schedule-card {
             background-color: white;
-            border: 1px solid var(--medium-gray);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
         }
 
         .schedule-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
             align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .schedule-company-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--black-color);
         }
 
         .schedule-day {
             display: flex;
             align-items: center;
+            gap: 6px;
             color: var(--success-color);
             font-weight: 500;
-            font-size: 18px;
+            font-size: 14px;
         }
 
         .schedule-day i {
-            margin-right: 10px;
-            font-size: 20px;
+            font-size: 16px;
         }
 
+        /* Fila origen → destino dentro del horario */
+        .schedule-route-path {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--black-color);
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .schedule-route-path > i {
+            color: var(--dark-gray);
+            font-size: 13px;
+        }
+
+        /* Salida / Llegada */
         .schedule-times {
             display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-            padding: 0 30px;
+            justify-content: flex-start;
+            gap: 40px;
+            margin: 0 0 16px 0;
+            padding: 12px 16px;
+            background-color: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        /* Grid de 2 columnas: detalles a la izquierda, conductor/vehículo a la derecha */
+        .schedule-card-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 24px;
+            align-items: start;
         }
 
         .time-group {
             display: flex;
             align-items: center;
+            gap: 10px;
         }
 
         .time-group i {
-            font-size: 24px;
-            margin-right: 12px;
+            font-size: 18px;
         }
 
         .departure i {
@@ -502,63 +693,96 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             color: var(--error-color);
         }
 
-        .time-value {
-            font-size: 20px;
-            font-weight: 500;
+        .time-text {
+            display: flex;
+            flex-direction: column;
         }
 
         .time-label {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--dark-gray);
         }
 
+        .time-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--black-color);
+            line-height: 1.2;
+        }
+
         .schedule-details {
-            margin-top: 20px;
+            margin-top: 4px;
         }
 
         .detail-row {
             display: flex;
-            margin-bottom: 12px;
             align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-color);
         }
 
         .detail-row i {
-            color: var(--primary-dark);
-            margin-right: 12px;
-            width: 24px;
+            font-size: 16px;
+            width: 20px;
             text-align: center;
-            font-size: 18px;
+            flex-shrink: 0;
         }
 
         .stops-list {
-            margin-left: 36px;
-            list-style-type: disc;
-            color: var(--dark-gray);
+            margin: 4px 0 10px 30px;
+            list-style: none;
+            padding: 0;
         }
 
         .stops-list li {
-            margin-bottom: 8px;
-            font-size: 15px;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: var(--dark-gray);
+            position: relative;
+            padding-left: 14px;
         }
 
+        .stops-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--dark-gray);
+        }
+
+        /* Separador dentro del schedule-card para driver/vehicle */
         .driver-vehicle-info {
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 1px solid var(--medium-gray);
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
         }
 
-        .driver-vehicle-title {
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 15px;
-            color: var(--black-color);
+        .driver-vehicle-row {
             display: flex;
             align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
-        .driver-vehicle-title i {
-            margin-right: 10px;
-            color: var(--primary-color);
+        .driver-vehicle-row i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .driver-vehicle-row strong {
+            font-weight: 600;
+            color: var(--black-color);
+        }
+
+        /* Grid 2 columnas para info de empresa */
+        .info-rows-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 16px;
         }
 
         /* Toast notification */
@@ -687,51 +911,31 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             font-size: 14px;
         }
 
-        /* Estilos para el botón de favorita */
+        /* Botón de favorita */
         .favorite-btn {
             background: none;
             border: none;
             cursor: pointer;
             font-size: 20px;
             color: var(--dark-gray);
-            transition: all 0.3s ease;
+            transition: transform 0.2s ease, color 0.2s;
             padding: 0;
-            border-radius: 0;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            position: absolute;
-            left: 130px;
-            right: 20px;
-            top: 20px;
-            z-index: 10;
+            flex-shrink: 0;
+            margin-left: auto;
+            width: auto;
+            height: auto;
+            line-height: 1;
         }
 
         .favorite-btn:hover {
-            transform: scale(1.15);
+            transform: scale(1.2);
         }
 
         .favorite-btn.active {
             color: #D32F2F;
-        }
-
-        .favorite-btn.active:hover {
-            transform: scale(1.15);
-        }
-
-        .route-card-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        .route-card-title {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 24px;
-            color: var(--primary-color);
         }
 
         /* Filtro de favoritas */
@@ -791,7 +995,17 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                 <h1>GoWay</h1>
             </div>
 
-            <!-- Menú desplegable de usuario con todas las acciones -->
+            <!-- Nav links para desktop -->
+            <nav class="header-nav">
+                <a href="https://goway.netlify.app" target="_blank" class="download-btn">
+                    <i class="fas fa-download"></i> Descargar App
+                </a>
+                <a href="../logout.php" class="logout">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
+            </nav>
+
+            <!-- Menú desplegable solo para móvil -->
             <div class="user-dropdown">
                 <button class="user-btn">
                     <i class="fas fa-user-circle"></i>
@@ -812,6 +1026,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
         <!-- Columna izquierda - Búsqueda y resultados -->
         <div class="left-column">
             <section class="search-section">
+                <p class="greeting">Hola, <span><?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Usuario'); ?></span> &#128075;</p>
                 <h2 class="search-title">¿A dónde quieres ir?</h2>
                 <form id="searchForm" class="search-form">
                     <div class="form-group">
@@ -949,7 +1164,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             filterFavoritesBtn.addEventListener('click', () => {
                 currentFilter = 'favorites';
                 updateFilterButtons();
-                filterAndDisplayRoutes();
+                loadFavoritesAndDisplay();
             });
         });
 
@@ -1235,31 +1450,34 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                 const favoriteIcon = isFavorite ? 'fas fa-heart' : 'far fa-heart';
                 
                 routeCard.innerHTML = `
-                    <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-route-id="${route.id_ruta}" title="${isFavorite ? 'Eliminar de favoritas' : 'Agregar a favoritas'}">
-                        <i class="${favoriteIcon}"></i>
-                    </button>
                     <div class="route-card-header">
                         <div class="route-card-title">
-                            <i class="fas fa-bus"></i>
+                            <i class="fas fa-building"></i>
                             <span class="route-company">${route.empresa_nombre || 'Transporte'}</span>
                         </div>
+                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-route-id="${route.id_ruta}" title="${isFavorite ? 'Eliminar de favoritas' : 'Agregar a favoritas'}">
+                            <i class="${favoriteIcon}"></i>
+                        </button>
                     </div>
                     <div class="route-path">
                         <div class="route-origin">
                             <i class="fas fa-map-marker-alt"></i>
                             <span>${route.origen}</span>
                         </div>
-                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right arrow"></i>
                         <div class="route-destination">
                             <i class="fas fa-map-marker-alt"></i>
                             <span>${route.destino}</span>
                         </div>
                     </div>
-                    <div class="route-info">
+                    <div class="route-card-divider"></div>
+                    <div class="route-card-footer">
                         <div class="route-schedule">
                             <i class="fas fa-calendar-alt"></i>
-                            <span>Horarios disponibles: <strong>${uniqueSchedules.length}</strong></span>
+                            <span>Horarios disponibles:</span>
+                            <span class="route-schedule-count">${uniqueSchedules.length}</span>
                         </div>
+                        <button class="btn-details">Ver detalles</button>
                     </div>
                 `;
                 
@@ -1272,7 +1490,16 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                         showRouteDetails(route);
                     }
                 });
-                
+
+                // Botón "Ver detalles"
+                const detailsBtn = routeCard.querySelector('.btn-details');
+                detailsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectedRouteId = route.id_ruta;
+                    updateSelectedRouteCard();
+                    showRouteDetails(route);
+                });
+
                 // Agregar escucha de evento del botón de favorita
                 const favoriteBtn = routeCard.querySelector('.favorite-btn');
                 favoriteBtn.addEventListener('click', (e) => {
@@ -1394,123 +1621,134 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             // Construir contenido de detalles
             let contentHTML = `
                 <div class="route-details">
-                    <div class="route-full-path">
-                        <span>${route.origen}</span>
-                        <i class="fas fa-arrow-right"></i>
-                        <span>${route.destino}</span>
+                    <div class="route-detail-header">
+                        <div class="route-detail-title">${route.empresa_nombre || 'Ruta'}</div>
+                        <div class="route-full-path">
+                            <span>${route.origen}</span>
+                            <i class="fas fa-arrow-right"></i>
+                            <span>${route.destino}</span>
+                        </div>
                     </div>
-                    
-                    <div class="company-info">
-                        <h4 class="info-title">Información de la empresa</h4>
+
+                    <div class="detail-divider"></div>
+
+                    <div class="detail-card">
+                        <h4 class="info-title">Información de la empresa:</h4>
+                        <div class="info-rows-grid">
                         
                         <div class="info-row">
                             <i class="fas fa-building"></i>
-                            <div class="info-label">Nombre:</div>
-                            <div class="info-value">${route.empresa_nombre || 'No especificado'}</div>
+                            <div class="info-text">
+                                <span class="info-label">Nombre:</span>
+                                <span class="info-value">${route.empresa_nombre || 'No especificado'}</span>
+                            </div>
                         </div>
                         
                         <div class="info-row">
                             <i class="fas fa-phone"></i>
-                            <div class="info-label">Teléfono:</div>
-                            <div class="info-value">${route.empresa_telefono || 'No especificado'}</div>
+                            <div class="info-text">
+                                <span class="info-label">Teléfono:</span>
+                                <span class="info-value">${route.empresa_telefono || 'No especificado'}</span>
+                            </div>
                         </div>
                         
                         <div class="info-row">
                             <i class="fas fa-map-marker-alt"></i>
-                            <div class="info-label">Dirección:</div>
-                            <div class="info-value">${route.empresa_direccion || 'No especificada'}</div>
+                            <div class="info-text">
+                                <span class="info-label">Dirección:</span>
+                                <span class="info-value">${route.empresa_direccion || 'No especificada'}</span>
+                            </div>
                         </div>
                         
                         <div class="info-row">
                             <i class="fas fa-envelope"></i>
-                            <div class="info-label">Email:</div>
-                            <div class="info-value">${route.empresa_email || 'No especificado'}</div>
+                            <div class="info-text">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">${route.empresa_email || 'No especificado'}</span>
+                            </div>
+                        </div>
                         </div>
                     </div>
-                    
-                    <h4 class="info-title">Horarios disponibles</h4>
+
+                    <div class="detail-divider"></div>
+
+                    <h4 class="info-title" style="margin-bottom:14px;font-size:17px;">Horarios disponibles:</h4>
             `;
-            
+
             // Agregar horarios
             uniqueSchedules.forEach(schedule => {
+                const paradas = Array.isArray(route.paradas) ? route.paradas : ['No especificadas'];
                 contentHTML += `
                     <div class="schedule-card">
                         <div class="schedule-header">
+                            <span class="schedule-company-name">${route.empresa_nombre || 'Transporte'}</span>
                             <div class="schedule-day">
-                                <i class="fas fa-calendar-day"></i>
+                                <i class="fas fa-calendar-alt"></i>
                                 ${schedule.dia_semana || 'No especificado'}
                             </div>
                         </div>
-                        
+
+                        <div class="schedule-route-path">
+                            <span>${route.origen}</span>
+                            <i class="fas fa-arrow-right"></i>
+                            <span>${route.destino}</span>
+                        </div>
+
                         <div class="schedule-times">
                             <div class="time-group departure">
-                                <i class="fas fa-flag"></i>
-                                <div>
-                                    <div class="time-label">Salida</div>
-                                    <div class="time-value">${schedule.hora_salida || '--:--'}</div>
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div class="time-text">
+                                    <span class="time-label">Salida</span>
+                                    <span class="time-value">${schedule.hora_salida || '--:--'}</span>
                                 </div>
                             </div>
-                            
                             <div class="time-group arrival">
-                                <i class="fas fa-flag-checkered"></i>
-                                <div>
-                                    <div class="time-label">Llegada</div>
-                                    <div class="time-value">${schedule.hora_llegada || '--:--'}</div>
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div class="time-text">
+                                    <span class="time-label">Llegada</span>
+                                    <span class="time-value">${schedule.hora_llegada || '--:--'}</span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="schedule-details">
-                            <div class="detail-row">
-                                <i class="fas fa-redo"></i>
-                                <div>Frecuencia: ${schedule.frecuencia || 'No especificada'}</div>
+
+                        <div class="schedule-card-body">
+                            <div class="schedule-details">
+                                <div class="detail-row">
+                                    <i class="fas fa-redo" style="color:#FFA000;"></i>
+                                    <span>Frecuencia: ${schedule.frecuencia || 'No especificada'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-traffic-light" style="color:#7B1FA2;"></i>
+                                    <span>Paradas:</span>
+                                </div>
+                                <ul class="stops-list">
+                                    ${paradas.map(stop => `<li>${stop}</li>`).join('')}
+                                </ul>
                             </div>
-                            
-                            <div class="detail-row">
-                                <i class="fas fa-map-marked-alt"></i>
-                                <div>Paradas:</div>
-                            </div>
-                            <ul class="stops-list">
-                                ${(Array.isArray(route.paradas) ? route.paradas : ['No especificadas']).map(stop => `<li>${stop}</li>`).join('')}
-                            </ul>
-                        </div>
-                        
-                        <div class="driver-vehicle-info">
-                            <h4 class="driver-vehicle-title">
-                                <i class="fas fa-user-tie"></i>
-                                Información del conductor y vehículo
-                            </h4>
-                            
-                            <div class="detail-row">
-                                <i class="fas fa-user"></i>
-                                <div class="info-label">Conductor:</div>
-                                <div class="info-value">${schedule.conductor_nombre || 'N/A'}</div>
-                            </div>
-                            <div class="detail-row">
-                                <i class="fas fa-id-card"></i>
-                                <div class="info-label">Licencia:</div>
-                                <div class="info-value">${schedule.conductor_licencia || 'N/A'}</div>
-                            </div>
-                            <div class="detail-row">
-                                <i class="fas fa-bus"></i>
-                                <div class="info-label">Vehículo:</div>
-                                <div class="info-value">${schedule.vehiculo_modelo || 'N/A'}</div>
-                            </div>
-                            <div class="detail-row">
-                                <i class="fas fa-car-alt"></i>
-                                <div class="info-label">Placa:</div>
-                                <div class="info-value">${schedule.vehiculo_placa || 'N/A'}</div>
-                            </div>
-                            <div class="detail-row">
-                                <i class="fas fa-users"></i>
-                                <div class="info-label">Capacidad:</div>
-                                <div class="info-value">${schedule.vehiculo_capacidad || 'N/A'} pasajeros</div>
+
+                            <div class="driver-vehicle-info">
+                                <div class="driver-vehicle-row">
+                                    <i class="fas fa-user" style="color:#1565C0;"></i>
+                                    <span><strong>Conductor: ${schedule.conductor_nombre || 'N/A'}</strong></span>
+                                </div>
+                                <div class="driver-vehicle-row">
+                                    <i class="fas fa-bus" style="color:#1565C0;"></i>
+                                    <span><strong>Vehículo: ${schedule.vehiculo_modelo || 'N/A'}</strong></span>
+                                </div>
+                                <div class="driver-vehicle-row">
+                                    <i class="fas fa-ticket-alt" style="color:#E65100;"></i>
+                                    <span><strong>Placa: ${schedule.vehiculo_placa || 'N/A'}</strong></span>
+                                </div>
+                                <div class="driver-vehicle-row">
+                                    <i class="fas fa-users" style="color:#6A1B9A;"></i>
+                                    <span><strong>Capacidad: ${schedule.vehiculo_capacidad || 'N/A'} pasajeros</strong></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 `;
             });
-            
+
             contentHTML += `</div>`; // Close route-details div
             routeDetailsContainer.innerHTML = contentHTML;
         }
