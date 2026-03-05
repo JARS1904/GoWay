@@ -423,7 +423,7 @@ require_once '../../config/conexion_bd.php';
         // Inicializar botones de eliminación
         initializeDeleteButtons(
             '.btn-delete',
-            '../controllers/delete/delete_usuarios.php',
+            '../../controllers/delete/delete_usuarios.php',
             'id',
             '¿Estás seguro de que deseas eliminar este usuario?'
         );

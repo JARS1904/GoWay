@@ -60,10 +60,15 @@ try {
             $destination = $conn->real_escape_string($data['destination']);
             
             $sql = "SELECT DISTINCT r.id_ruta, r.nombre, r.origen, r.destino, r.rfc_empresa, r.paradas,
+                   r.id_ruta_retorno,
+                   ret.nombre  AS ruta_retorno_nombre,
+                   ret.origen  AS ruta_retorno_origen,
+                   ret.destino AS ruta_retorno_destino,
                    e.nombre AS empresa_nombre, e.telefono AS empresa_telefono,
                    e.direccion AS empresa_direccion, e.email AS empresa_email
                 FROM rutas r
                 JOIN empresas e ON r.rfc_empresa = e.rfc_empresa
+                LEFT JOIN rutas ret ON r.id_ruta_retorno = ret.id_ruta
                 WHERE r.origen = ? AND r.destino = ? AND r.activa = 1";
             
             $stmt = $conn->prepare($sql);

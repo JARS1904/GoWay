@@ -385,7 +385,7 @@ require_once '../../config/conexion_bd.php';
         // Inicializar botones de eliminación
         initializeDeleteButtons(
             '.btn-delete',
-            '../controllers/delete/delete_asignaciones.php',
+            '../../controllers/delete/delete_asignaciones.php',
             'id_asignacion',
             '¿Estás seguro de que deseas eliminar esta asignación?'
         );

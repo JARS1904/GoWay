@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+ini_set('display_errors', 0);
 require_once '../../config/conexion_bd.php';
 
 if (!isset($_POST['id'])) {
@@ -8,13 +9,7 @@ if (!isset($_POST['id'])) {
 }
 
 $id = $_POST['id'];
-
 $conn = $conexion;
-
-if ($conn->connect_error) {
-    echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
-    exit();
-}
 
 // Iniciar transacción
 $conn->begin_transaction();
@@ -34,8 +29,7 @@ try {
     
     echo json_encode(["success" => true, "message" => "Usuario eliminado correctamente"]);
     exit();
-} catch (Exception $e) {
-    // Revertir en caso de error
+} catch (\Throwable $e) {
     $conn->rollback();
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
     exit();

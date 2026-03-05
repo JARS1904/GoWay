@@ -422,7 +422,7 @@ require_once '../../config/conexion_bd.php';
         // Inicializar botones de eliminación
         initializeDeleteButtons(
             '.btn-delete',
-            '../controllers/delete/delete_empresas.php',
+            '../../controllers/delete/delete_empresas.php',
             'rfc_empresa',
             '¿Estás seguro de que deseas eliminar esta empresa?'
         );

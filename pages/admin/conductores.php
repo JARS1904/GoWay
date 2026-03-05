@@ -437,7 +437,7 @@ require_once '../../config/conexion_bd.php';
         // Inicializar botones de eliminación
         initializeDeleteButtons(
             '.btn-delete',
-            '../controllers/delete/delete_conductores.php',
+            '../../controllers/delete/delete_conductores.php',
             'rfc_conductor',
             '¿Estás seguro de que deseas eliminar este conductor?'
         );

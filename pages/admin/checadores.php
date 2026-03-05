@@ -446,7 +446,7 @@ require_once '../../config/conexion_bd.php';
         // Inicializar botones de eliminación
         initializeDeleteButtons(
             '.btn-delete',
-            '../controllers/delete/delete_checadores.php',
+            '../../controllers/delete/delete_checadores.php',
             'rfc_checador',
             '¿Estás seguro de que deseas eliminar este checador?'
         );

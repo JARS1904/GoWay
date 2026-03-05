@@ -147,6 +147,7 @@ require_once '../../config/conexion_bd.php';
                             <th>Origen</th>
                             <th>Destino</th>
                             <th>Paradas</th>
+                            <th>Ruta de retorno</th>
                             <th>Activa</th>
                             <th>RFC de la Empresa</th>
                             <th>Acción</th>
@@ -158,20 +159,31 @@ require_once '../../config/conexion_bd.php';
                         // Conexión a la base de datos
                         $conn = $conexion;
 
-                        // Consulta para obtener las rutas
-                        $sql = "SELECT * FROM rutas";
+                        // Consulta para obtener las rutas con su par de retorno
+                        $sql = "SELECT r.*, ret.nombre AS nombre_retorno
+                                FROM rutas r
+                                LEFT JOIN rutas ret ON r.id_ruta_retorno = ret.id_ruta
+                                ORDER BY r.id_ruta";
                         $result = $conn->query($sql);
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 $statusClass = $row["activa"] ? 'status-active' : 'status-inactive';
                                 $statusText = $row["activa"] ? 'Sí' : 'No';
+
+                                // Badge de retorno
+                                if ($row['id_ruta_retorno']) {
+                                    $retornoBadge = '<span style="display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;white-space:nowrap;">⇄ ' . htmlspecialchars($row['nombre_retorno']) . '</span>';
+                                } else {
+                                    $retornoBadge = '<span style="color:#94a3b8;font-size:12px;">— Sin par</span>';
+                                }
                                 
                                 echo '<tr>
                                         <td data-label="Nombre" data-id="'.$row["id_ruta"].'">'.$row["nombre"].'</td>
-                                        <td data-label="Origen">' . $row["origen"] . '</td>
-                                        <td data-label="Destino">' . $row["destino"] . '</td>
-                                        <td data-label="Paradas">' . $row["paradas"] . '</td>
+                                        <td data-label="Origen">' . htmlspecialchars($row["origen"]) . '</td>
+                                        <td data-label="Destino">' . htmlspecialchars($row["destino"]) . '</td>
+                                        <td data-label="Paradas">' . htmlspecialchars($row["paradas"]) . '</td>
+                                        <td data-label="Ruta de retorno">' . $retornoBadge . '</td>
                                         <td data-label="Activa"><span class="'.$statusClass.'">' . $statusText . '</span></td>
                                         <td data-label="RFC de la Empresa">' . $row["rfc_empresa"] . '</td>
                                         <td>
@@ -181,7 +193,7 @@ require_once '../../config/conexion_bd.php';
                                     </tr>';
                             }
                         } else {
-                            echo '<tr><td colspan="7">No hay rutas registradas</td></tr>';
+                            echo '<tr><td colspan="8">No hay rutas registradas</td></tr>';
                         }
 
                         ?>
