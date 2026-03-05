@@ -137,50 +137,60 @@ require_once '../../config/conexion_bd.php';
                     <h3>Horarios Disponibles</h3>
                     <button class="btn-add">+ Agregar nuevo horario</button>
                 </div>
-                                    <?php
-                    // Conexión a la base de datos
-                    $conn = $conexion;
-
-                    // Consulta para obtener los horarios con el nombre de la ruta
-                    $sql = "SELECT h.*, r.nombre FROM horarios h LEFT JOIN rutas r ON h.id_ruta = r.id_ruta";
-                    $result = $conn->query($sql);
-
-                    echo '<div class="card-container">'; // Contenedor principal para las cards
-
-                    if ($result->num_rows > 0) {
-                        while($row = $result->fetch_assoc()) {
-                            echo '
-                            <div class="card" data-id="'.$row["id_horario"].'">
-                                <div class="card-header">
-                                    <h3>Horario #'.$row["id_horario"].'</h3>
-                                    <span class="route-id">Ruta ID: '.$row["id_ruta"].'</span>
-                                </div>
-                                <div class="card-body">
-                                    <div class="schedule-info">
-                                        <p><strong>Ruta:</strong> '.(isset($row["nombre"]) ? $row["nombre"] : "No disponible").'</p>
-                                        <p><strong>Día:</strong> '.$row["dia_semana"].'</p>
-                                        <p><strong>Salida:</strong> '.$row["hora_salida"].'</p>
-                                        <p><strong>Llegada:</strong> '.$row["hora_llegada"].'</p>
-                                    </div>
-                                    <div class="frequency-info">
-                                        <p><strong>Frecuencia:</strong> '.$row["frecuencia"].'</p>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <small>Creado: '.$row["created_at"].'</small>
-                                    <div class="card-actions">
-                                        <button class="btn-action btn-edit" data-id="'.$row["id_horario"].'">Editar</button>
-                                        <button class="btn-action btn-delete" data-id="'.$row["id_horario"].'">Eliminar</button>
-                                    </div>
-                                </div>
-                            </div>';
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Ruta</th>
+                            <th>Día</th>
+                            <th>Hora salida</th>
+                            <th>Hora llegada</th>
+                            <th>Frecuencia</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $conn = $conexion;
+                        $sql  = "SELECT h.*, r.nombre AS nombre_ruta FROM horarios h LEFT JOIN rutas r ON h.id_ruta = r.id_ruta";
+                        $result = $conn->query($sql);
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                $ruta      = htmlspecialchars($row['nombre_ruta'] ?? 'Sin ruta');
+                                $dia       = htmlspecialchars($row['dia_semana']);
+                                $salida    = htmlspecialchars($row['hora_salida']);
+                                $llegada   = htmlspecialchars($row['hora_llegada']);
+                                $frecuencia = htmlspecialchars($row['frecuencia'] ?? '—');
+                                echo "
+                                <tr data-id=\"{$row['id_horario']}\"
+                                    data-id-ruta=\"{$row['id_ruta']}\"
+                                    data-dia=\"{$dia}\"
+                                    data-salida=\"{$salida}\"
+                                    data-llegada=\"{$llegada}\"
+                                    data-frecuencia=\"{$frecuencia}\">
+                                    <td data-label=\"Ruta\">{$ruta}</td>
+                                    <td data-label=\"Día\">{$dia}</td>
+                                    <td data-label=\"Hora salida\">{$salida}</td>
+                                    <td data-label=\"Hora llegada\">{$llegada}</td>
+                                    <td data-label=\"Frecuencia\">{$frecuencia}</td>
+                                    <td>
+                                        <button class=\"btn-action btn-edit\" data-id=\"{$row['id_horario']}\">Editar</button>
+                                        <button class=\"btn-action btn-delete\" data-id=\"{$row['id_horario']}\">Eliminar</button>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo '<tr><td colspan="6">No hay horarios registrados</td></tr>';
                         }
-                    } else {
-                        echo '<div class="no-schedules">No hay horarios registrados</div>';
-                    }
+                        ?>
+                    </tbody>
+                </table>
 
-                    echo '</div>'; // Cierre del contenedor
-                    ?>
+                <!-- Paginación -->
+                <div class="pagination">
+                    <button class="pagination-btn" id="prevPage" disabled>‹ Anterior</button>
+                    <div class="pagination-info" id="pageInfo">Página 1 de 1</div>
+                    <button class="pagination-btn" id="nextPage">Siguiente ›</button>
+                </div>
             </section>
         </main>
     </div>
@@ -301,22 +311,22 @@ require_once '../../config/conexion_bd.php';
 
 <script src="../../assets/js/notifications.js"></script>
 <script src="../../assets/js/main.js"></script>
-<script src="../../assets/js/card-pagination.js"></script>
+<script src="../../assets/js/pagination.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Manejar inserción de horarios
+    // Inserción
     handleInsertForm(
         document.getElementById('routeForm'),
         'Horario agregado exitosamente'
     );
 
-    // Manejar actualización de horarios
+    // Actualización
     handleUpdateForm(
         document.getElementById('editRouteForm'),
         'Horario actualizado exitosamente'
     );
 
-    // Manejar eliminación de horarios
+    // Eliminación
     initializeDeleteButtons(
         '.btn-delete',
         '/GoWay/controllers/delete/delete_horarios.php',
@@ -324,110 +334,26 @@ document.addEventListener('DOMContentLoaded', function() {
         '¿Estás seguro de que deseas eliminar este horario?'
     );
 
-    // Manejar clics en botones de edición
+    // Editar: leer datos del data-* del tr
     document.querySelectorAll('.btn-edit').forEach(button => {
         button.addEventListener('click', function() {
-            const card = this.closest('.card');
-            const id_horario = this.getAttribute('data-id');
-            const id_ruta = card.querySelector('.route-id').textContent.split(': ')[1];
-            const dia_semana = card.querySelector('.schedule-info p:nth-child(2)').textContent.split(': ')[1];
-            const hora_salida = card.querySelector('.schedule-info p:nth-child(3)').textContent.split(': ')[1];
-            const hora_llegada = card.querySelector('.schedule-info p:nth-child(4)').textContent.split(': ')[1];
-            const frecuencia = card.querySelector('.frequency-info p').textContent.split(': ')[1];
-
-            // Rellenar el formulario de edición
-            document.getElementById('edit_id_horario').value = id_horario;
-            document.getElementById('edit_id_ruta').value = id_ruta;
-            document.getElementById('edit_dia_semana').value = dia_semana;
-            document.getElementById('edit_hora_salida').value = hora_salida;
-            document.getElementById('edit_hora_llegada').value = hora_llegada;
-            document.getElementById('edit_frecuencia').value = frecuencia;
-
-            // Abrir modal de edición
+            const row = this.closest('tr');
+            document.getElementById('edit_id_horario').value  = row.dataset.id;
+            document.getElementById('edit_id_ruta').value     = row.dataset.idRuta;
+            document.getElementById('edit_dia_semana').value  = row.dataset.dia;
+            document.getElementById('edit_hora_salida').value = row.dataset.salida;
+            document.getElementById('edit_hora_llegada').value = row.dataset.llegada;
+            document.getElementById('edit_frecuencia').value  = row.dataset.frecuencia;
             document.getElementById('editRouteModal').classList.add('active');
         });
     });
 
-    // Cerrar modal de edición con botones
-    document.getElementById('closeEditModal')?.addEventListener('click', function() {
-        document.getElementById('editRouteModal').classList.remove('active');
-    });
-
-    document.getElementById('cancelEditModal')?.addEventListener('click', function() {
-        document.getElementById('editRouteModal').classList.remove('active');
-    });
-
-    // Cerrar modal al hacer clic fuera
+    document.getElementById('closeEditModal')?.addEventListener('click', () =>
+        document.getElementById('editRouteModal').classList.remove('active'));
+    document.getElementById('cancelEditModal')?.addEventListener('click', () =>
+        document.getElementById('editRouteModal').classList.remove('active'));
     document.getElementById('editRouteModal')?.addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.classList.remove('active');
-        }
-    });
-
-    // Modal de agregar
-    document.querySelector('.btn-add').addEventListener('click', function() {
-        document.getElementById('addRouteModal').classList.add('active');
-    });
-
-    document.getElementById('closeModal').addEventListener('click', function() {
-        document.getElementById('addRouteModal').classList.remove('active');
-    });
-
-    document.getElementById('cancelModal').addEventListener('click', function() {
-        document.getElementById('addRouteModal').classList.remove('active');
-    });
-
-    document.getElementById('addRouteModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.classList.remove('active');
-        }
-    });
-
-    // Funciones para el sidebar responsivo (móvil)
-    window.toggleSidebar = function() {
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        
-        if (sidebar && overlay) {
-            sidebar.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevenir scroll cuando sidebar está abierto
-        }
-    };
-
-    window.closeSidebar = function() {
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        
-        if (sidebar && overlay) {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = 'auto'; // Restaurar scroll
-        }
-    };
-
-    // Cerrar sidebar al hacer clic en enlaces del menú (solo en móvil)
-    const sidebarLinks = document.querySelectorAll('.sidebar nav a');
-    sidebarLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            if (window.innerWidth <= 768) {
-                closeSidebar();
-            }
-        });
-    });
-
-    // Cerrar sidebar con tecla ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeSidebar();
-        }
-    });
-
-    // Cerrar sidebar si se redimensiona a pantalla grande
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            closeSidebar();
-        }
+        if (e.target === this) this.classList.remove('active');
     });
 });
 </script>
