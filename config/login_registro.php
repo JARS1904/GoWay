@@ -36,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['nombre'] = $username;
                 $_SESSION['email']  = $email;
                 $_SESSION['rol']    = $role_id;
+                $_SESSION['foto']   = null;
                 
                 echo "Registro exitoso. Bienvenido.";
                 // Redirigir al usuario normal a su página

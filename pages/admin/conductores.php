@@ -6,6 +6,7 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 require_once '../../config/conexion_bd.php';
+require_once '../../config/sync_session_foto.php';
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +36,7 @@ require_once '../../config/conexion_bd.php';
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
                         <span><?php echo $_SESSION['nombre']; ?></span>
-                        <img src="../../assets/images/icons/administrador.png" alt="Usuario">
+                        <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
                     </div>
                 </div>
             </div>
@@ -131,7 +132,7 @@ require_once '../../config/conexion_bd.php';
                 <h2>Gestión de Conductores</h2>
                 <div class="user-info">
                     <span><?php echo $_SESSION['nombre']; ?></span>
-                    <img src="../../assets/images/icons/administrador.png" alt="Usuario">
+                    <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
                 </div>
             </header>
 
@@ -165,13 +166,18 @@ require_once '../../config/conexion_bd.php';
                             while($row = $result->fetch_assoc()) {
                                 $statusClass = $row["activo"] ? 'status-active' : 'status-inactive';
                                 $statusText = $row["activo"] ? 'Sí' : 'No';
+                                $nombre_esc = htmlspecialchars($row["nombre"]);
+                                $initial = htmlspecialchars(mb_strtoupper(mb_substr($row["nombre"], 0, 1)));
+                                $avatar = !empty($row["foto"])
+                                    ? '<img src="../../assets/images/profiles/' . htmlspecialchars($row["foto"]) . '" class="avatar-img" alt="foto">'
+                                    : '<div class="avatar-initials">' . $initial . '</div>';
                                 
                                 echo '<tr>
-                                        <td data-label="RFC del Conductor" data-id="'.$row["rfc_conductor"].'">' . $row["rfc_conductor"] . '</td>
-                                        <td data-label="RFC de la Empresa">'.$row["rfc_empresa"].'</td>
-                                        <td data-label="Nombre">'.$row["nombre"].'</td>
-                                        <td data-label="Licencia">'.$row["licencia"].'</td>
-                                        <td data-label="Teléfono">'.$row["telefono"].'</td>
+                                        <td data-label="RFC del Conductor" data-id="'.$row["rfc_conductor"].'">' . htmlspecialchars($row["rfc_conductor"]) . '</td>
+                                        <td data-label="RFC de la Empresa">'.htmlspecialchars($row["rfc_empresa"]).'</td>
+                                        <td data-label="Nombre" data-nombre="' . $nombre_esc . '"><div class="avatar-cell">' . $avatar . '<span>' . $nombre_esc . '</span></div></td>
+                                        <td data-label="Licencia">'.htmlspecialchars($row["licencia"]).'</td>
+                                        <td data-label="Teléfono">'.htmlspecialchars($row["telefono"]).'</td>
                                         <td data-label="Activo"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
                                             <button class="btn-action btn-edit">Editar</button>
@@ -203,7 +209,7 @@ require_once '../../config/conexion_bd.php';
                 <h3>Agregar nuevo conductor</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../../controllers/insert_conductor.php" method="POST">
+            <form id="routeForm" action="../../controllers/insert_conductor.php" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>
@@ -239,6 +245,11 @@ require_once '../../config/conexion_bd.php';
                             <label>Telefono</label>
                             <input id="telefono" name="telefono" required></input>
                         </div>
+                        <div class="modal-form-group">
+                            <label>Foto de perfil</label>
+                            <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="input-foto">
+                            <small class="form-hint">Opcional · JPG, PNG o WebP · Máx. 2 MB</small>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -256,7 +267,7 @@ require_once '../../config/conexion_bd.php';
                 <h3>Editar Conductor</h3>
                 <button class="modal-close" id="closeEditConductoresModal">×</button>
             </div>
-            <form id="editVehicleForm" action="actualizar/actu_conductoresSql.php" method="POST">
+            <form id="editVehicleForm" action="actualizar/actu_conductoresSql.php" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div>
                         <div class="modal-form-group">
@@ -295,6 +306,11 @@ require_once '../../config/conexion_bd.php';
                                 <option value="1">Sí</option>
                                 <option value="0">No</option>
                             </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Cambiar foto</label>
+                            <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="input-foto">
+                            <small class="form-hint">Dejar vacío para conservar la foto actual</small>
                         </div>
                     </div>
                 </div>
@@ -403,7 +419,7 @@ require_once '../../config/conexion_bd.php';
                     
                     document.getElementById('edit_rfc_conductor').value = cells[0].textContent.trim();
                     document.getElementById('edit_rfc_empresa').value = cells[1].textContent.trim();
-                    document.getElementById('edit_nombre').value = cells[2].textContent.trim();
+                    document.getElementById('edit_nombre').value = cells[2].dataset.nombre;
                     document.getElementById('edit_licencia').value = cells[3].textContent.trim();
                     document.getElementById('edit_telefono').value = cells[4].textContent.trim();
                     

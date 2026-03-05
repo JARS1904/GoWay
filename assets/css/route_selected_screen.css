@@ -1012,6 +1012,11 @@ select:focus {
     line-height: 1;
 }
 
+.profile-nav-mini-img {
+    object-fit: cover;
+    background: none;
+}
+
 /* ── Profile Side Panel ───────────────────────── */
 .profile-overlay {
     display: none;
@@ -1102,6 +1107,12 @@ select:focus {
     text-transform: uppercase;
     margin-bottom: 14px;
     line-height: 1;
+}
+
+.profile-avatar-photo {
+    object-fit: cover;
+    background: none;
+    display: block;
 }
 
 .profile-user-name {

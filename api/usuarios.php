@@ -5,6 +5,7 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 require_once '../config/conexion_bd.php';
+require_once '../controllers/upload_foto.php';
 
 // Crear conexión
 $conn = $conexion;
@@ -15,12 +16,18 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'GET':
         // Obtener usuarios (excluyendo contraseñas por seguridad)
-        $sql = "SELECT id, nombre, email FROM usuarios";
+        $sql = "SELECT id, nombre, email, foto FROM usuarios";
         $result = $conn->query($sql);
         
         $usuarios = [];
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
+                // Convertir filename a URL relativa accesible
+                if (!empty($row['foto'])) {
+                    $row['foto_url'] = 'assets/images/profiles/' . $row['foto'];
+                } else {
+                    $row['foto_url'] = null;
+                }
                 $usuarios[] = $row;
             }
         }
@@ -28,9 +35,14 @@ switch ($method) {
         break;
         
     case 'POST':
-        // Añadir nuevo usuario con protección contra SQL injection
-        $data = json_decode(file_get_contents("php://input"), true);
-        
+        // Soporta multipart/form-data (con foto) o JSON (sin foto)
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        if (strpos($contentType, 'multipart/form-data') !== false) {
+            $data = $_POST;
+        } else {
+            $data = json_decode(file_get_contents("php://input"), true) ?? [];
+        }
+
         // Validar datos requeridos
         if (empty($data['nombre']) || empty($data['email']) || empty($data['password'])) {
             http_response_code(400);
@@ -38,26 +50,31 @@ switch ($method) {
             break;
         }
         
-        $nombre = $conn->real_escape_string($data['nombre']);
-        $email = $conn->real_escape_string($data['email']);
-        // Hashear la contraseña
+        $nombre = $data['nombre'];
+        $email  = $data['email'];
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         
         // Verificar si el email ya existe
-        $checkEmail = $conn->query("SELECT id FROM usuarios WHERE email = '$email'");
-        if ($checkEmail->num_rows > 0) {
+        $stmt = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows > 0) {
+            $stmt->close();
             http_response_code(409);
             echo json_encode(["error" => "El email ya está registrado"]);
             break;
         }
-        
-        // Usar consulta preparada para mayor seguridad
-        $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, 2)");
-        $stmt->bind_param("sss", $nombre, $email, $hashedPassword);
+        $stmt->close();
+
+        $foto = uploadFoto($_FILES['foto'] ?? [], 'usuario');
+
+        $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password, rol, foto) VALUES (?, ?, ?, 2, ?)");
+        $stmt->bind_param("ssss", $nombre, $email, $hashedPassword, $foto);
         
         if ($stmt->execute()) {
+            $new_id = $conn->insert_id;
             http_response_code(201);
-            echo json_encode(["message" => "Usuario creado correctamente"]);
+            echo json_encode(["message" => "Usuario creado correctamente", "id" => $new_id]);
         } else {
             http_response_code(500);
             echo json_encode(["error" => "Error al crear usuario: " . $conn->error]);
@@ -67,9 +84,23 @@ switch ($method) {
         break;
         
     case 'PUT':
-        // Actualizar usuario
-        $data = json_decode(file_get_contents("php://input"), true);
-        
+        // Soporta multipart/form-data (con foto) o JSON (sin foto)
+        // Nota: PHP no puebla $_FILES en PUT; para subir foto en PUT usar POST con _method=PUT
+        // o enviar como multipart con method override
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+        // Soporte para method override: POST con campo _method=PUT
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_method']) && strtoupper($_POST['_method']) === 'PUT') {
+            $data = $_POST;
+            $files = $_FILES;
+        } elseif (strpos($contentType, 'application/json') !== false) {
+            $data = json_decode(file_get_contents("php://input"), true) ?? [];
+            $files = [];
+        } else {
+            $data = json_decode(file_get_contents("php://input"), true) ?? [];
+            $files = [];
+        }
+
         if (empty($data['id'])) {
             http_response_code(400);
             echo json_encode(["error" => "ID de usuario no proporcionado"]);
@@ -77,35 +108,62 @@ switch ($method) {
         }
         
         $id = intval($data['id']);
-        $nombre = $conn->real_escape_string($data['nombre']);
-        $email = $conn->real_escape_string($data['email']);
-        
+
         // Verificar si el usuario existe
-        $checkUser = $conn->query("SELECT id FROM usuarios WHERE id = $id");
-        if ($checkUser->num_rows == 0) {
+        $stmt = $conn->prepare("SELECT id FROM usuarios WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows == 0) {
+            $stmt->close();
             http_response_code(404);
             echo json_encode(["error" => "Usuario no encontrado"]);
             break;
         }
+        $stmt->close();
         
         // Actualizar solo los campos proporcionados
-        $updates = [];
-        if (isset($data['nombre'])) $updates[] = "nombre = '$nombre'";
-        if (isset($data['email'])) $updates[] = "email = '$email'";
-        
-        if (!empty($updates)) {
-            $sql = "UPDATE usuarios SET " . implode(", ", $updates) . " WHERE id = $id";
-            
-            if ($conn->query($sql) === TRUE) {
-                echo json_encode(["message" => "Usuario actualizado correctamente"]);
-            } else {
-                http_response_code(500);
-                echo json_encode(["error" => "Error al actualizar usuario"]);
-            }
-        } else {
+        $params  = [];
+        $types   = '';
+        $setClauses = [];
+
+        if (isset($data['nombre'])) {
+            $setClauses[] = "nombre = ?";
+            $types .= 's';
+            $params[] = $data['nombre'];
+        }
+        if (isset($data['email'])) {
+            $setClauses[] = "email = ?";
+            $types .= 's';
+            $params[] = $data['email'];
+        }
+
+        $nueva_foto = uploadFoto($files['foto'] ?? [], 'usuario');
+        if ($nueva_foto !== null) {
+            $setClauses[] = "foto = ?";
+            $types .= 's';
+            $params[] = $nueva_foto;
+        }
+
+        if (empty($setClauses)) {
             http_response_code(400);
             echo json_encode(["error" => "No hay datos para actualizar"]);
+            break;
         }
+
+        $types .= 'i';
+        $params[] = $id;
+
+        $sql = "UPDATE usuarios SET " . implode(", ", $setClauses) . " WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+
+        if ($stmt->execute()) {
+            echo json_encode(["message" => "Usuario actualizado correctamente"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["error" => "Error al actualizar usuario"]);
+        }
+        $stmt->close();
         break;
         
     case 'DELETE':
@@ -118,13 +176,16 @@ switch ($method) {
         
         $id = intval($_GET['id']);
         
-        // Verificar si el usuario existe
-        $checkUser = $conn->query("SELECT id FROM usuarios WHERE id = $id");
-        if ($checkUser->num_rows == 0) {
+        $stmt = $conn->prepare("SELECT id FROM usuarios WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows == 0) {
+            $stmt->close();
             http_response_code(404);
             echo json_encode(["error" => "Usuario no encontrado"]);
             break;
         }
+        $stmt->close();
         
         $stmt = $conn->prepare("DELETE FROM usuarios WHERE id = ?");
         $stmt->bind_param("i", $id);

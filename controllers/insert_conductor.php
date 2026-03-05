@@ -2,34 +2,31 @@
 <?php
 header('Content-Type: application/json');
 require_once '../config/conexion_bd.php';
+require_once __DIR__ . '/upload_foto.php';
 
-// Crear conexión
 $conn = $conexion;
 
-// Verificar conexión
 if ($conn->connect_error) {
     echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
     exit();
 }
 
-// Obtener parámetros
 $rfc_conductor = $_POST['rfc_conductor'];
-$rfc_empresa = $_POST['rfc_empresa'];
-$nombre = $_POST['nombre'];
-$licencia = $_POST['licencia'];
-$telefono = $_POST['telefono'];
+$rfc_empresa   = $_POST['rfc_empresa'];
+$nombre        = $_POST['nombre'];
+$licencia      = $_POST['licencia'];
+$telefono      = $_POST['telefono'];
+$foto          = uploadFoto($_FILES['foto'] ?? [], 'conductor');
 
-// Preparar y enlazar
-$stmt = $conn->prepare("INSERT INTO conductores (rfc_conductor, rfc_empresa, nombre, licencia, telefono) VALUES (?, ?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO conductores (rfc_conductor, rfc_empresa, nombre, licencia, telefono, foto) VALUES (?, ?, ?, ?, ?, ?)");
 
 if ($stmt === false) {
     echo json_encode(["success" => false, "message" => "Error en la preparación: " . $conn->error]);
     exit();
 }
 
-$stmt->bind_param("sssss", $rfc_conductor, $rfc_empresa, $nombre, $licencia, $telefono);
+$stmt->bind_param("ssssss", $rfc_conductor, $rfc_empresa, $nombre, $licencia, $telefono, $foto);
 
-// Ejecutar
 if ($stmt->execute()) {
     echo json_encode(["success" => true, "message" => "Conductor agregado correctamente"]);
 } else {

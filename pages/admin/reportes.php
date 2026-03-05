@@ -9,6 +9,7 @@ if (!isset($_SESSION['id'])) {
 
 <?php
 require_once '../../config/conexion_bd.php';
+require_once '../../config/sync_session_foto.php';
 
 // Obtener lista de vehículos con placa y modelo
 $sql_vehiculos = "SELECT id_vehiculo, placa, modelo FROM vehiculos ORDER BY placa";
@@ -358,7 +359,7 @@ if ($conexion->error) {
             <div class="mobile-topbar-right">
                 <div class="mobile-user-info">
                     <span><?php echo $_SESSION['nombre']; ?></span>
-                    <img src="../../assets/images/icons/administrador.png" alt="Usuario">
+                    <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
                 </div>
             </div>
         </div>
@@ -454,7 +455,7 @@ if ($conexion->error) {
             <h2>Reportes de Incidentes</h2>
             <div class="user-info">
                 <span><?php echo $_SESSION['nombre']; ?></span>
-                <img src="../../assets/images/icons/administrador.png" alt="Usuario">
+                <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
             </div>
         </header>
 

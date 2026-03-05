@@ -20,8 +20,9 @@ if(mysqli_num_rows($resultado_verificacion) > 0) {
     if(password_verify($password, $usuario['password'])) {
         // Contraseña válida, redirigir al usuario a la página de inicio
             session_start();
-            $_SESSION['id'] = $usuario['id']; // Guardar el ID del usuario en la sesión
-            $_SESSION['nombre'] = $usuario['nombre']; // Guardar el nombre del usuario en la sesión
+            $_SESSION['id'] = $usuario['id'];
+            $_SESSION['nombre'] = $usuario['nombre'];
+            $_SESSION['foto'] = $usuario['foto'];
             echo '<script>alert("Bienvenido de nuevo."); window.location = "../index.php";</script>';
         } else {
         // Contraseña incorrecta

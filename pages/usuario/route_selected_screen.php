@@ -6,6 +6,14 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
     header("Location: ../login.php");
     exit();
 }
+
+// Consultar foto fresca de la BD (no depender de la sesión)
+require_once '../../config/conexion_bd.php';
+$stmt = $conexion->prepare("SELECT foto FROM usuarios WHERE id = ?");
+$stmt->bind_param("i", $_SESSION['id']);
+$stmt->execute();
+$_user_foto = $stmt->get_result()->fetch_assoc()['foto'] ?? null;
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +44,11 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                     <i class="fas fa-sign-out-alt"></i> Cerrar sesión
                 </a>
                 <button class="profile-nav-btn" onclick="openProfilePanel()">
-                    <span class="profile-nav-mini-avatar"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></span>
+                    <?php if (!empty($_user_foto)): ?>
+                        <img src="../../assets/images/profiles/<?php echo htmlspecialchars($_user_foto); ?>" class="profile-nav-mini-avatar profile-nav-mini-img" alt="foto">
+                    <?php else: ?>
+                        <span class="profile-nav-mini-avatar"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></span>
+                    <?php endif; ?>
                     Mi Perfil
                 </button>
             </nav>
@@ -144,7 +156,11 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
             </div>
 
             <div class="profile-avatar-section">
-                <div class="profile-avatar-circle"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></div>
+                <?php if (!empty($_user_foto)): ?>
+                    <img src="../../assets/images/profiles/<?php echo htmlspecialchars($_user_foto); ?>" class="profile-avatar-circle profile-avatar-photo" alt="foto">
+                <?php else: ?>
+                    <div class="profile-avatar-circle"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></div>
+                <?php endif; ?>
                 <div class="profile-user-name"><?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Usuario'); ?></div>
                 <div class="profile-user-email"><?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?></div>
             </div>

@@ -6,6 +6,7 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 require_once '../../config/conexion_bd.php';
+require_once '../../config/sync_session_foto.php';
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +37,7 @@ require_once '../../config/conexion_bd.php';
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
                         <span><?php echo $_SESSION['nombre']; ?></span>
-                        <img src="../../assets/images/icons/administrador.png" alt="Usuario">
+                        <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
                     </div>
                 </div>
             </div>
@@ -132,7 +133,7 @@ require_once '../../config/conexion_bd.php';
                 <h2>Gestión de Usuarios</h2>
                 <div class="user-info">
                     <span><?php echo $_SESSION['nombre']; ?></span>
-                    <img src="../../assets/images/icons/administrador.png" alt="Usuario">
+                    <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
                 </div>
             </header>
 
@@ -169,14 +170,17 @@ require_once '../../config/conexion_bd.php';
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
-                                // Mostrar solo si la contraseña está establecida, sin mostrar el hash completo
                                 $password_display = !empty($row["password"]) ? "●●●●●●●●" : "Sin contraseña";
                                 $rol_label = $rol_mapping[$row["rol"]] ?? "Desconocido";
+                                $nombre_esc = htmlspecialchars($row["nombre"]);
+                                $initial = htmlspecialchars(mb_strtoupper(mb_substr($row["nombre"], 0, 1)));
+                                $avatar = !empty($row["foto"])
+                                    ? '<img src="../../assets/images/profiles/' . htmlspecialchars($row["foto"]) . '" class="avatar-img" alt="foto">'
+                                    : '<div class="avatar-initials">' . $initial . '</div>';
                                 
                                 echo '<tr data-id="' . $row["id"] . '">
-                                        <!-- <td data-label="ID Usuario" data-id="' . $row["id"] . '">' . $row["id"] . '</td> -->
-                                        <td data-label="Nombre">' . $row["nombre"] . '</td>
-                                        <td data-label="Email">' . $row["email"] . '</td>
+                                        <td data-label="Nombre" data-nombre="' . $nombre_esc . '"><div class="avatar-cell">' . $avatar . '<span>' . $nombre_esc . '</span></div></td>
+                                        <td data-label="Email">' . htmlspecialchars($row["email"]) . '</td>
                                         <td data-label="Password">' . $password_display . '</td>
                                         <td data-label="Rol" data-rol="' . $row["rol"] . '">' . $rol_label . '</td>
                                         <td>
@@ -210,7 +214,7 @@ require_once '../../config/conexion_bd.php';
                 <h3>Agregar nuevo usuario</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../../controllers/insert_user.php" method="POST">
+            <form id="routeForm" action="../../controllers/insert_user.php" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>
@@ -238,6 +242,11 @@ require_once '../../config/conexion_bd.php';
                                 <option value="2">Usuario</option>
                             </select>
                         </div>
+                        <div class="modal-form-group">
+                            <label>Foto de perfil</label>
+                            <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="input-foto">
+                            <small class="form-hint">Opcional · JPG, PNG o WebP · Máx. 2 MB</small>
+                        </div>
                     </div>
                 </div>
 
@@ -256,7 +265,7 @@ require_once '../../config/conexion_bd.php';
                 <h3>Editar usuario</h3>
                 <button class="modal-close" id="closeEditModal">&times;</button>
             </div>
-            <form id="editUserForm" action="actualizar/actu_usuariosSql.php" method="POST">
+            <form id="editUserForm" action="actualizar/actu_usuariosSql.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" id="edit_id_usuario" name="id_usuario">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
@@ -283,6 +292,11 @@ require_once '../../config/conexion_bd.php';
                                 <option value="1">Administrador</option>
                                 <option value="2">Usuario</option>
                             </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Cambiar foto</label>
+                            <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="input-foto">
+                            <small class="form-hint">Dejar vacío para conservar la foto actual</small>
                         </div>
                     </div>
                 </div>
@@ -391,7 +405,7 @@ require_once '../../config/conexion_bd.php';
                     const cells = row.querySelectorAll('td');
                     
                     document.getElementById('edit_id_usuario').value = row.getAttribute('data-id');
-                    document.getElementById('edit_nombre').value = cells[0].textContent.trim();
+                    document.getElementById('edit_nombre').value = cells[0].dataset.nombre;
                     document.getElementById('edit_email').value = cells[1].textContent.trim();
                     document.getElementById('edit_password').value = cells[2].textContent.trim();
                     document.getElementById('edit_rol').value = cells[3].getAttribute('data-rol');

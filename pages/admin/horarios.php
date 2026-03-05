@@ -6,6 +6,7 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 require_once '../../config/conexion_bd.php';
+require_once '../../config/sync_session_foto.php';
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +33,7 @@ require_once '../../config/conexion_bd.php';
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
                         <span><?php echo $_SESSION['nombre']; ?></span>
-                        <img src="../../assets/images/icons/administrador.png" alt="Usuario">
+                        <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
                     </div>
                 </div>
             </div>
@@ -128,7 +129,7 @@ require_once '../../config/conexion_bd.php';
                 <h2>Gestión de Horarios</h2>
                 <div class="user-info">
                     <span><?php echo $_SESSION['nombre']; ?></span>
-                    <img src="../../assets/images/icons/administrador.png" alt="Usuario">
+                    <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
                 </div>
             </header>
 

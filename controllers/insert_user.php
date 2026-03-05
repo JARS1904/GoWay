@@ -2,29 +2,29 @@
 <?php
 header('Content-Type: application/json');
 require_once '../config/conexion_bd.php';
+require_once __DIR__ . '/upload_foto.php';
 
-// Crear conexión
 $conn = $conexion;
 
-// Verificar conexión
 if ($conn->connect_error) {
     echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
     exit();
 }
 
-// Preparar y enlazar
-$stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, ?)");
-$stmt->bind_param("ssss", $nombre, $email, $password, $rol);
+$nombre   = $_POST['nombre'];
+$email    = $_POST['email'];
+$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+$rol      = $_POST['rol'];
+$foto     = uploadFoto($_FILES['foto'] ?? [], 'usuario');
 
-// Establecer parámetros y ejecutar
-$nombre = $_POST['nombre'];
-$email = $_POST['email'];
-$password = $_POST['password'];
-$rol = $_POST['rol'];
+$stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password, rol, foto) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssss", $nombre, $email, $password, $rol, $foto);
 
-$stmt->execute();
-
-echo json_encode(["success" => true, "message" => "Usuario agregado correctamente"]);
+if ($stmt->execute()) {
+    echo json_encode(["success" => true, "message" => "Usuario agregado correctamente"]);
+} else {
+    echo json_encode(["success" => false, "message" => "Error al insertar: " . $stmt->error]);
+}
 
 $stmt->close();
 $conn->close();

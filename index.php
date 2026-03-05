@@ -1,4 +1,4 @@
-<!--Se agreo para el manejo de sesión-->
+<!--Se agreo para el manejo de sesi├│n-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -6,6 +6,7 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 require_once 'config/conexion_bd.php';
+require_once 'config/sync_session_foto.php';
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +15,7 @@ require_once 'config/conexion_bd.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Transporte Público</title>
+    <title>Dashboard - Transporte P├║blico</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="icon" href="assets/images/logo.png" type="image/png">
 </head>
@@ -24,25 +25,25 @@ require_once 'config/conexion_bd.php';
         <!-- Overlay para fondo oscuro -->
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-        <!-- Barra Superior Móvil -->
+        <!-- Barra Superior M├│vil -->
         <div class="mobile-topbar">
             <div class="mobile-topbar-content">
                 <div class="mobile-topbar-left">
-                    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+                    <button class="toggle-btn" onclick="toggleSidebar()">Ôÿ░</button>
                     <h1 class="mobile-page-title">Dashboard</h1>
                 </div>
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
                         <span><?php echo $_SESSION['nombre']; ?></span>
-                        <img src="assets/images/icons/administrador.png" alt="Usuario">
+                        <?php echo !empty($_SESSION['foto']) ? '<img src="assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="assets/images/icons/administrador.png" alt="Usuario">'; ?>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Menú Lateral -->
+        <!-- Men├║ Lateral -->
         <aside id="sidebar" class="sidebar">
-            <!-- Botón de Cerrar para Móvil -->
+            <!-- Bot├│n de Cerrar para M├│vil -->
             <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
             
             <div class="logo">
@@ -71,8 +72,8 @@ require_once 'config/conexion_bd.php';
                     </li>
                     <li>
                         <a href="pages/admin/vehiculos.php">
-                            <img src="assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
-                            <span>Vehículos</span>
+                            <img src="assets/images/icons/icon_vehiculos.png" alt="Veh├¡culos" class="icon">
+                            <span>Veh├¡culos</span>
                         </a>
                     </li>
                     <li>
@@ -114,10 +115,10 @@ require_once 'config/conexion_bd.php';
                 </ul>
             </nav>
 
-            <!-- Botón de Cerrar Sesión -->
+            <!-- Bot├│n de Cerrar Sesi├│n -->
             <div class="logout-button">
                 <a href="pages/login.php" id="logout">
-                    <img src="assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesión" class="icon">
+                    <img src="assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesi├│n" class="icon">
                     <span>Cerrar sesión</span>
                 </a>
             </div>
@@ -130,24 +131,24 @@ require_once 'config/conexion_bd.php';
                 <h2>Dashboard</h2>
                 <div class="user-info">
                     <span><?php echo $_SESSION['nombre']; ?></span>
-                    <img src="assets/images/icons/administrador.png" alt="Usuario">
+                    <?php echo !empty($_SESSION['foto']) ? '<img src="assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="assets/images/icons/administrador.png" alt="Usuario">'; ?>
                 </div>
             </header>
 
             <section class="content">
-                <!-- Sección de Bienvenida -->
+                <!-- Secci├│n de Bienvenida -->
                 <div class="dashboard-welcome">
                     <h1>Bienvenido, <?php echo $_SESSION['nombre']; ?></h1>
-                    <p>Aquí puedes ver un resumen del estado general de tu sistema de transporte</p>
+                    <p>Aqu├¡ puedes ver un resumen del estado general de tu sistema de transporte</p>
                 </div>
 
-                <!-- Grid de Estadísticas -->
+                <!-- Grid de Estad├¡sticas -->
                 <div class="stats-grid">
                     <?php
                     $conn = $conexion;
 
                     if ($conn->connect_error) {
-                        die("Error de conexión: " . $conn->connect_error);
+                        die("Error de conexi├│n: " . $conn->connect_error);
                     }
 
                     $sql = "SELECT 
@@ -185,15 +186,15 @@ require_once 'config/conexion_bd.php';
                         </div>
                     </div>
 
-                    <!-- Tarjeta Vehículos -->
+                    <!-- Tarjeta Veh├¡culos -->
                     <div class="stat-card">
                         <div class="stat-card-icon vehiculos">
-                            <img src="assets/images/icons/icons8-vehiculo-dashboard-resumen.png" alt="Vehículos">
+                            <img src="assets/images/icons/icons8-vehiculo-dashboard-resumen.png" alt="Veh├¡culos">
                         </div>
                         <div class="stat-card-content">
-                            <h3>Vehículos</h3>
+                            <h3>Veh├¡culos</h3>
                             <p class="stat-number"><?php echo $row['total_vehiculos']; ?></p>
-                            <span class="stat-label">En operación</span>
+                            <span class="stat-label">En operaci├│n</span>
                         </div>
                     </div>
 
@@ -234,17 +235,17 @@ require_once 'config/conexion_bd.php';
                     </div>
                 </div>
 
-                <!-- Sección de Acciones Rápidas -->
+                <!-- Secci├│n de Acciones R├ípidas -->
                 <div class="quick-actions">
-                    <h2>Acciones Rápidas</h2>
+                    <h2>Acciones R├ípidas</h2>
                     <div class="actions-grid">
                         <a href="pages/admin/rutas.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-rutas-dashboard.png" alt="Rutas">
                             <span>Gestionar Rutas</span>
                         </a>
                         <a href="pages/admin/vehiculos.php" class="action-btn">
-                            <img class="action-icon" src="assets/images/icons/icons8-vehiculos-dashboard.png" alt="Vehículos">
-                            <span>Gestionar Vehículos</span>
+                            <img class="action-icon" src="assets/images/icons/icons8-vehiculos-dashboard.png" alt="Veh├¡culos">
+                            <span>Gestionar Veh├¡culos</span>
                         </a>
                         <a href="pages/admin/conductores.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-conditores-dashboard.png" alt="Conductores">
@@ -311,7 +312,7 @@ require_once 'config/conexion_bd.php';
     </div>
 
     <script>
-        // Funciones para el menú hamburguesa
+        // Funciones para el men├║ hamburguesa
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -320,7 +321,7 @@ require_once 'config/conexion_bd.php';
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
             
-            // Ocultar/mostrar botón hamburguesa
+            // Ocultar/mostrar bot├│n hamburguesa
             if (sidebar.classList.contains('active')) {
                 toggleBtn.style.opacity = '0';
                 toggleBtn.style.visibility = 'hidden';
@@ -329,7 +330,7 @@ require_once 'config/conexion_bd.php';
                 toggleBtn.style.visibility = 'visible';
             }
             
-            // Prevenir scroll del body cuando el menú está abierto
+            // Prevenir scroll del body cuando el men├║ est├í abierto
             document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
         }
 
@@ -341,14 +342,14 @@ require_once 'config/conexion_bd.php';
             sidebar.classList.remove('active');
             overlay.classList.remove('active');
             
-            // Mostrar botón hamburguesa al cerrar
+            // Mostrar bot├│n hamburguesa al cerrar
             toggleBtn.style.opacity = '1';
             toggleBtn.style.visibility = 'visible';
             
             document.body.style.overflow = '';
         }
 
-        // Cerrar sidebar al hacer clic en un enlace (en móvil)
+        // Cerrar sidebar al hacer clic en un enlace (en m├│vil)
         document.querySelectorAll('.sidebar nav a').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {

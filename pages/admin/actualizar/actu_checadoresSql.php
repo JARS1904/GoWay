@@ -2,45 +2,40 @@
 <?php
 header('Content-Type: application/json');
 require_once '../../../config/conexion_bd.php';
+require_once '../../../controllers/upload_foto.php';
 
-// Crear conexión
 $conn = $conexion;
 
-// Verificar conexión
 if ($conn->connect_error) {
     echo json_encode(["success" => false, "message" => "Error de conexión: " . $conn->connect_error]);
     exit();
 }
 
-// Recoger datos del formulario
 $rfc_checador = $_POST['rfc_checador'];
-$rfc_empresa = $_POST['rfc_empresa'];
-$nombre = $_POST['nombre'];
-$usuario = $_POST['usuario'];
-$contrasena = $_POST['password'];
-$activo = $_POST['activo'];
+$rfc_empresa  = $_POST['rfc_empresa'];
+$nombre       = $_POST['nombre'];
+$usuario      = $_POST['usuario'];
+$contrasena   = $_POST['password'];
+$activo       = $_POST['activo'];
 
-// Preparar la consulta SQL
-$sql = "UPDATE checadores SET
-rfc_empresa = ?,
-nombre = ?,
-usuario = ?,
-contrasena = ?,
-activo = ?
-WHERE rfc_checador = ?";
+$nueva_foto = uploadFoto($_FILES['foto'] ?? [], 'checador');
 
-// Preparar statement
-$stmt = $conn->prepare($sql);
-
-if ($stmt === false) {
-    echo json_encode(["success" => false, "message" => "Error en la preparación: " . $conn->error]);
-    exit();
+if ($nueva_foto !== null) {
+    $stmt = $conn->prepare("UPDATE checadores SET rfc_empresa=?, nombre=?, usuario=?, contrasena=?, activo=?, foto=? WHERE rfc_checador=?");
+    if ($stmt === false) {
+        echo json_encode(["success" => false, "message" => "Error en la preparación: " . $conn->error]);
+        exit();
+    }
+    $stmt->bind_param("ssssisss", $rfc_empresa, $nombre, $usuario, $contrasena, $activo, $nueva_foto, $rfc_checador);
+} else {
+    $stmt = $conn->prepare("UPDATE checadores SET rfc_empresa=?, nombre=?, usuario=?, contrasena=?, activo=? WHERE rfc_checador=?");
+    if ($stmt === false) {
+        echo json_encode(["success" => false, "message" => "Error en la preparación: " . $conn->error]);
+        exit();
+    }
+    $stmt->bind_param("ssssis", $rfc_empresa, $nombre, $usuario, $contrasena, $activo, $rfc_checador);
 }
 
-// Vincular parámetros
-$stmt->bind_param("ssssis", $rfc_empresa, $nombre, $usuario, $contrasena, $activo, $rfc_checador);
-
-// Ejecutar consulta
 if ($stmt->execute()) {
     echo json_encode(["success" => true, "message" => "Checador actualizado correctamente"]);
 } else {
@@ -50,4 +45,3 @@ if ($stmt->execute()) {
 $stmt->close();
 $conn->close();
 ?>
-

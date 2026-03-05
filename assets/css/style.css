@@ -1775,6 +1775,75 @@ body {
     font-weight: 500;
 }
 
+/* ==================== */
+/* Avatars de perfil    */
+/* ==================== */
+
+/* Celda de tabla con avatar + nombre */
+.avatar-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+/* Imagen circular en tabla */
+.avatar-img {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+/* Placeholder inicial cuando no hay foto */
+.avatar-initials {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+/* Avatar circular en header (foto de sesión) */
+.header-user-avatar {
+    border-radius: 50%;
+    object-fit: cover;
+    width: 40px;
+    height: 40px;
+}
+
+.mobile-user-info .header-user-avatar {
+    width: 35px;
+    height: 35px;
+    border: 2px solid white;
+}
+
+/* Input de archivo en modales */
+.input-foto {
+    display: block;
+    width: 100%;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #9ca3af;
+}
+
 .card-actions {
     display: flex;
     gap: 8px;
