@@ -29,6 +29,7 @@ if (isset($_POST['btningresar'])) {
                     session_start();
                     $_SESSION['id']     = $usuario['id'];
                     $_SESSION['nombre'] = $usuario['nombre'];
+                    $_SESSION['email']  = $usuario['email'];
                     $_SESSION['rol']    = $usuario['rol'];
                     
                     // Redirigir usuario normal

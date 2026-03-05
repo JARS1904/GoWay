@@ -17,975 +17,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="../../assets/images/logo.png" type="image/png">
-    <style>
-        :root {
-            --primary-color: #2962FF;
-            --primary-dark: #1565C0;
-            --secondary-color: #FFC107;
-            --text-color: #333;
-            --light-gray: #f5f5f5;
-            --medium-gray: #e0e0e0;
-            --dark-gray: #757575;
-            --black-color: #000000;
-            --error-color: #D32F2F;
-            --success-color: #388E3C;
-            --header-height: 64px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            color: var(--text-color);
-            background-color: var(--light-gray);
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .container {
-            display: flex;
-            flex: 1;
-            width: 100%;
-        }
-
-        /* Columna izquierda */
-        .left-column {
-            flex: 0 0 450px;
-            padding: 20px;
-            border-right: 1px solid var(--medium-gray);
-            background-color: white;
-            overflow-y: auto;
-            overflow-x: hidden;
-            height: calc(100vh - var(--header-height));
-            position: sticky;
-            top: var(--header-height);
-        }
-
-        /* Columna derecha */
-        .right-column {
-            flex: 1;
-            padding: 20px;
-            background-color: var(--light-gray);
-            overflow-y: auto;
-            height: calc(100vh - var(--header-height));
-        }
-
-        header {
-            background-color: white;
-            box-shadow: 0 1px 0 #e8e8e8;
-            padding: 0 24px;
-            height: var(--header-height);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 1600px;
-            margin: 0 auto;
-            height: 100%;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .logo img {
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--black-color);
-        }
-
-        /* Estilos para el menú desplegable (app web del usuario)*/
-        .user-dropdown {
-            position: relative;
-            display: inline-block;
-            margin-left: auto;
-        }
-
-        /* Nav links visibles en desktop */
-        .header-nav {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-left: auto;
-        }
-
-        .header-nav a {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--dark-gray);
-            border: 1.5px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .header-nav a:hover {
-            border-color: var(--medium-gray);
-            color: var(--primary-color);
-            background-color: var(--light-gray);
-        }
-
-        .header-nav a.download-btn {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .header-nav a.download-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .header-nav a.logout {
-            border-color: transparent;
-            color: var(--dark-gray);
-        }
-
-        .header-nav a.logout:hover {
-            border-color: #ffcdd2;
-            background-color: #fff5f5;
-            color: var(--error-color);
-        }
-
-        /* Ocultar dropdown en desktop */
-        @media (min-width: 769px) {
-            .user-dropdown { display: none; }
-        }
-
-        /* Ocultar nav en móvil */
-        @media (max-width: 768px) {
-            .header-nav { display: none; }
-            .user-dropdown { display: inline-block; }
-        }
-
-        .user-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .user-btn:hover {
-            background-color: var(--primary-dark);
-            transform: scale(1.05);
-        }
-
-        .user-btn i {
-            font-size: 18px;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: white;
-            min-width: 200px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            z-index: 1000;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .dropdown-content a {
-            color: #333;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #f5f5f5;
-            color: var(--primary-color);
-        }
-
-        .dropdown-content a i {
-            width: 20px;
-            text-align: center;
-        }
-
-        .user-dropdown:hover .dropdown-content {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .search-section {
-            background-color: transparent;
-            border-radius: 0;
-            padding: 10px 0 20px 0;
-            box-shadow: none;
-            margin-bottom: 0;
-        }
-
-        .greeting {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--black-color);
-            margin-bottom: 4px;
-        }
-
-        .greeting span {
-            color: var(--black-color);
-        }
-
-        .search-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--black-color);
-        }
-
-        .search-form {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark-gray);
-        }
-
-        select, button {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--medium-gray);
-            border-radius: 18px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .btn i {
-            margin-right: 8px;
-        }
-
-        .btn:disabled {
-            background-color: var(--medium-gray);
-            cursor: not-allowed;
-        }
-
-        .divider {
-            height: 1px;
-            background-color: var(--medium-gray);
-            margin: 25px 0;
-        }
-
-        .results-section {
-            background-color: transparent;
-            border-radius: 0;
-            padding: 0;
-            box-shadow: none;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--black-color);
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            flex-direction: column;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(0,0,0,0.1);
-            border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
-            margin-bottom: 10px;
-        }
-
-        .loading-text {
-            color: var(--dark-gray);
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .no-routes {
-            text-align: center;
-            padding: 30px;
-            color: var(--dark-gray);
-        }
-
-        .route-card {
-            background-color: white;
-            border-radius: 16px;
-            border: 1px solid #e8e8e8;
-            padding: 18px 20px;
-            margin-bottom: 14px;
-            transition: box-shadow 0.2s, transform 0.2s;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-        }
-
-        .route-card:hover {
-            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-            transform: translateY(-2px);
-        }
-
-        .route-card.selected {
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 16px rgba(41,98,255,0.15);
-        }
-
-        /* Fila superior de la tarjeta: icono + empresa + corazón */
-        .route-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 14px;
-        }
-
-        .route-card-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-        }
-
-        .route-card-title i {
-            font-size: 20px;
-            color: var(--primary-color);
-        }
-
-        .route-company {
-            font-weight: 700;
-            color: var(--primary-color);
-            font-size: 17px;
-        }
-
-        /* Línea divisora dentro de la tarjeta */
-        .route-card-divider {
-            height: 1px;
-            background-color: #f0f0f0;
-            margin: 12px 0;
-        }
-
-        /* Fila origen → destino */
-        .route-path {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 0;
-            flex-wrap: wrap;
-            font-size: 15px;
-            color: var(--text-color);
-        }
-
-        .route-path > i.arrow {
-            color: var(--dark-gray);
-            font-size: 13px;
-        }
-
-        .route-origin, .route-destination {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .route-origin i {
-            color: #D32F2F;
-            font-size: 14px;
-        }
-
-        .route-destination i {
-            color: #388E3C;
-            font-size: 14px;
-        }
-
-        /* Fila de horarios disponibles + botón */
-        .route-card-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 14px;
-        }
-
-        .route-schedule {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-color);
-            font-size: 14px;
-        }
-
-        .route-schedule i {
-            color: var(--primary-color);
-            font-size: 16px;
-        }
-
-        .route-schedule-count {
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-        .btn-details {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 5px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            white-space: nowrap;
-            width: auto;
-        }
-
-        .btn-details:hover {
-            background-color: var(--primary-dark);
-        }
-
-        /* Detalles en columna derecha */
-        .route-details {
-            background-color: transparent;
-            padding: 0;
-        }
-
-        /* Encabezado de detalle: ruta nombre grande */
-        .route-detail-header {
-            margin-bottom: 20px;
-        }
-
-        .route-detail-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--black-color);
-            margin-bottom: 4px;
-        }
-
-        .route-full-path {
-            font-size: 15px;
-            color: var(--dark-gray);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .route-full-path i {
-            font-size: 12px;
-            color: var(--dark-gray);
-        }
-
-        .detail-divider {
-            height: 1px;
-            background-color: var(--medium-gray);
-            margin: 18px 0;
-        }
-
-        /* Tarjeta contenedora blanca */
-        .detail-card {
-            background-color: white;
-            border-radius: 16px;
-            border: 1px solid #e8e8e8;
-            padding: 20px 22px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-        }
-
-        .info-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 18px;
-            color: var(--black-color);
-        }
-
-        /* Fila icono + label encima + value abajo */
-        .info-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-row i {
-            font-size: 20px;
-            color: var(--primary-color);
-            width: 22px;
-            text-align: center;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .info-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .info-label {
-            font-size: 13px;
-            color: var(--dark-gray);
-            font-weight: 400;
-            line-height: 1.3;
-        }
-
-        .info-value {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--black-color);
-            line-height: 1.4;
-        }
-
-        /* Encabezado de tarjeta de horario */
-        .schedule-card {
-            background-color: white;
-            border-radius: 16px;
-            border: 1px solid #e8e8e8;
-            padding: 18px 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-        }
-
-        .schedule-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .schedule-company-name {
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--black-color);
-        }
-
-        .schedule-day {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--success-color);
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .schedule-day i {
-            font-size: 16px;
-        }
-
-        /* Fila origen → destino dentro del horario */
-        .schedule-route-path {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--black-color);
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .schedule-route-path > i {
-            color: var(--dark-gray);
-            font-size: 13px;
-        }
-
-        /* Salida / Llegada */
-        .schedule-times {
-            display: flex;
-            justify-content: flex-start;
-            gap: 40px;
-            margin: 0 0 16px 0;
-            padding: 12px 16px;
-            background-color: #f8f9ff;
-            border-radius: 10px;
-        }
-
-        /* Grid de 2 columnas: detalles a la izquierda, conductor/vehículo a la derecha */
-        .schedule-card-body {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0 24px;
-            align-items: start;
-        }
-
-        .time-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .time-group i {
-            font-size: 18px;
-        }
-
-        .departure i {
-            color: var(--primary-color);
-        }
-
-        .arrival i {
-            color: var(--error-color);
-        }
-
-        .time-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .time-label {
-            font-size: 12px;
-            color: var(--dark-gray);
-        }
-
-        .time-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--black-color);
-            line-height: 1.2;
-        }
-
-        .schedule-details {
-            margin-top: 4px;
-        }
-
-        .detail-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-
-        .detail-row i {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .stops-list {
-            margin: 4px 0 10px 30px;
-            list-style: none;
-            padding: 0;
-        }
-
-        .stops-list li {
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: var(--dark-gray);
-            position: relative;
-            padding-left: 14px;
-        }
-
-        .stops-list li::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: var(--dark-gray);
-        }
-
-        /* Separador dentro del schedule-card para driver/vehicle */
-        .driver-vehicle-info {
-            margin-top: 0;
-            padding-top: 0;
-            border-top: none;
-        }
-
-        .driver-vehicle-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .driver-vehicle-row i {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .driver-vehicle-row strong {
-            font-weight: 600;
-            color: var(--black-color);
-        }
-
-        /* Grid 2 columnas para info de empresa */
-        .info-rows-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px 16px;
-        }
-
-        /* Toast notification */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: var(--error-color);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            z-index: 1100;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .toast i {
-            margin-right: 10px;
-        }
-
-        /* No selection view */
-        .no-selection {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            color: var(--dark-gray);
-        }
-
-        .no-selection i {
-            font-size: 60px;
-            color: var(--medium-gray);
-            margin-bottom: 20px;
-        }
-
-        .no-selection h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: var(--dark-gray);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 1200px) {
-            .container {
-                flex-direction: column;
-            }
-            
-            .left-column {
-                flex: 1;
-                border-right: none;
-                border-bottom: 1px solid var(--medium-gray);
-                height: auto;
-                position: static;
-            }
-            
-            .right-column {
-                flex: 1;
-                height: auto;
-            }
-            
-            .route-details {
-                margin-top: 30px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .info-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .info-label {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-            
-            .schedule-times {
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-                padding: 0;
-            }
-            
-            .route-full-path {
-                flex-direction: column;
-            }
-            
-            .route-full-path i {
-                margin: 10px 0;
-                transform: rotate(90deg);
-            }
-        }
-
-        .icon-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-left: 15px; /* Separación del logo */
-        }
-
-        .icon-btn:hover {
-            background-color: var(--primary-dark);
-            transform: scale(1.05);
-        }
-
-        .icon-btn i {
-            font-size: 14px;
-        }
-
-        /* Botón de favorita */
-        .favorite-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--dark-gray);
-            transition: transform 0.2s ease, color 0.2s;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            margin-left: auto;
-            width: auto;
-            height: auto;
-            line-height: 1;
-        }
-
-        .favorite-btn:hover {
-            transform: scale(1.2);
-        }
-
-        .favorite-btn.active {
-            color: #D32F2F;
-        }
-
-        /* Filtro de favoritas */
-        .filter-section {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--medium-gray);
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            border: 2px solid var(--medium-gray);
-            background-color: white;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .filter-btn:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .filter-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .favorites-list {
-            margin-bottom: 30px;
-        }
-
-        .favorites-section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--secondary-color);
-            display: flex;
-            align-items: center;
-        }
-
-        .favorites-section-title i {
-            margin-right: 8px;
-        }
-    </style>
+    <link rel="stylesheet" href="../../assets/css/route_selected_screen.css">
 </head>
 <body>
     <header>
@@ -1003,6 +35,10 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                 <a href="../logout.php" class="logout">
                     <i class="fas fa-sign-out-alt"></i> Cerrar sesión
                 </a>
+                <button class="profile-nav-btn" onclick="openProfilePanel()">
+                    <span class="profile-nav-mini-avatar"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></span>
+                    Mi Perfil
+                </button>
             </nav>
 
             <!-- Menú desplegable solo para móvil -->
@@ -1011,6 +47,9 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                     <i class="fas fa-user-circle"></i>
                 </button>
                 <div class="dropdown-content">
+                    <a href="#" onclick="openProfilePanel(); return false;">
+                        <i class="fas fa-user-circle"></i> Mi Perfil
+                    </a>
                     <a href="https://goway.netlify.app" target="_blank">
                         <i class="fas fa-download"></i> Descargar App
                     </a>
@@ -1086,6 +125,81 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
         <i class="fas fa-exclamation-circle"></i>
         <span id="toastMessage"></span>
     </div>
+
+    <!-- Profile Panel Overlay -->
+    <div id="profileOverlay" class="profile-overlay" onclick="closeProfilePanel()"></div>
+
+    <!-- Profile Side Panel -->
+    <div id="profilePanel" class="profile-panel">
+
+        <div class="panel-views-wrapper" id="panelViewsWrapper">
+
+        <!-- Vista principal del perfil -->
+        <div id="panelViewMain" class="panel-view">
+            <div class="profile-panel-header">
+                <h2>Mi Perfil</h2>
+                <button class="profile-close-btn" onclick="closeProfilePanel()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-circle"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></div>
+                <div class="profile-user-name"><?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Usuario'); ?></div>
+                <div class="profile-user-email"><?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?></div>
+            </div>
+
+            <div class="profile-menu-list">
+                <div class="profile-menu-item" onclick="showTerminos()">
+                    <div class="profile-menu-icon"><i class="fas fa-file-alt"></i></div>
+                    <span class="profile-menu-label">Términos y condiciones</span>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </div>
+
+                <div class="profile-menu-item" onclick="toggleConfiguracion()">
+                    <div class="profile-menu-icon"><i class="fas fa-cog"></i></div>
+                    <span class="profile-menu-label">Configuración</span>
+                    <i class="fas fa-chevron-right chevron" id="configChevron"></i>
+                </div>
+                <div id="configExpanded" class="config-expanded">
+                    <div class="config-version-row">
+                        <span class="config-version-label">Versión de la aplicación</span>
+                        <span class="config-version-value">1.0.0</span>
+                    </div>
+                    <a href="../logout.php" class="config-logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Términos y condiciones -->
+        <div id="panelViewTerms" class="panel-view">
+            <div class="panel-view-header">
+                <button class="panel-back-btn" onclick="showMainView()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Términos y condiciones</h2>
+            </div>
+            <div class="terms-content">
+                <h3>1. Uso del servicio</h3>
+                <p>GoWay es una plataforma de consulta de rutas de transporte público. El usuario acepta utilizar el servicio de manera responsable y conforme a las leyes aplicables.</p>
+                <h3>2. Datos personales</h3>
+                <p>Los datos personales proporcionados durante el registro serán utilizados exclusivamente para la prestación del servicio y no serán compartidos con terceros sin consentimiento expreso.</p>
+                <h3>3. Exactitud de la información</h3>
+                <p>GoWay no garantiza la exactitud absoluta de los horarios y rutas mostrados. Se recomienda verificar la información directamente con las empresas de transporte.</p>
+                <h3>4. Favoritas y cuenta</h3>
+                <p>Las rutas marcadas como favoritas se almacenan vinculadas a su cuenta de usuario. Al eliminar su cuenta, esta información será eliminada permanentemente.</p>
+                <h3>5. Modificaciones</h3>
+                <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios serán notificados a través de la plataforma.</p>
+                <h3>6. Contacto</h3>
+                <p>Para cualquier consulta relacionada con estos términos, puede contactarnos a través de los canales oficiales de GoWay.</p>
+            </div>
+        </div>
+
+        </div><!-- /panel-views-wrapper -->
+    </div><!-- /profilePanel -->
 
     <script>
         // Configuración de API
@@ -1783,6 +897,59 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                 toast.classList.remove('show');
             }, duration);
         }
+
+        // ── Profile Panel ────────────────────────────────
+        function openProfilePanel() {
+            document.getElementById('profilePanel').classList.add('open');
+            document.getElementById('profileOverlay').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProfilePanel() {
+            document.getElementById('profilePanel').classList.remove('open');
+            document.getElementById('profileOverlay').style.display = 'none';
+            document.body.style.overflow = '';
+            // Reset to main view
+            document.getElementById('panelViewsWrapper').classList.remove('show-terms');
+        }
+
+        function toggleConfiguracion() {
+            const expanded = document.getElementById('configExpanded');
+            const chevron = document.getElementById('configChevron');
+            const isOpen = expanded.style.display === 'block';
+            expanded.style.display = isOpen ? 'none' : 'block';
+            chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+        }
+
+        function showTerminos() {
+            document.getElementById('panelViewTerms').querySelector('.terms-content').scrollTop = 0;
+            document.getElementById('panelViewsWrapper').classList.add('show-terms');
+        }
+
+        function showMainView() {
+            document.getElementById('panelViewsWrapper').classList.remove('show-terms');
+        }
+
+        // Cerrar con Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeProfilePanel();
+        });
+
+        // ── Mobile dropdown toggle ────────────────────
+        const userDropdown = document.querySelector('.user-dropdown');
+        const userBtn = document.querySelector('.user-btn');
+        if (userBtn) {
+            userBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('open');
+            });
+        }
+        document.addEventListener('click', () => {
+            if (userDropdown) userDropdown.classList.remove('open');
+        });
+        document.querySelector('.dropdown-content')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
     </script>
 </body>
 </html>

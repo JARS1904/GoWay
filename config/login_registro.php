@@ -34,6 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 session_start();
                 $_SESSION['id']     = $conexion->insert_id;
                 $_SESSION['nombre'] = $username;
+                $_SESSION['email']  = $email;
                 $_SESSION['rol']    = $role_id;
                 
                 echo "Registro exitoso. Bienvenido.";
