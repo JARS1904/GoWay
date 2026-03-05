@@ -931,7 +931,7 @@ if ($conexion->error) {
         const formData = new FormData();
         formData.append('id', id);
 
-        fetch('../controllers/delete/delete_reportes.php', {
+        fetch('../../controllers/delete/delete_reportes.php', {
             method: 'POST',
             body: formData
         })
@@ -1132,7 +1132,7 @@ if ($conexion->error) {
 
         const formData = new FormData(this);
         // enviar a endpoint
-        fetch('../controllers/update/update_reportes.php', {
+        fetch('../../controllers/update/update_reportes.php', {
             method: 'POST',
             body: formData
         })

@@ -28,21 +28,28 @@ if ($id <= 0) {
 
 try {
     // Verificar existencia
-    $check_sql = "SELECT id FROM reportes WHERE id = ?";
-    $check_stmt = $conexion->prepare($check_sql);
-    $check_stmt->bind_param("i", $id);
+    $check_stmt = $conexion->prepare('SELECT id FROM reportes WHERE id = ?');
+    if (!$check_stmt) {
+        echo json_encode(['success' => false, 'message' => 'Error preparando consulta: ' . $conexion->error]);
+        exit;
+    }
+    $check_stmt->bind_param('i', $id);
     $check_stmt->execute();
     $check_stmt->store_result();
-    if ($check_stmt->num_rows == 0) {
+    if ($check_stmt->num_rows === 0) {
         echo json_encode(['success' => false, 'message' => 'El reporte no existe']);
         exit;
     }
     $check_stmt->close();
 
     // Actualizar
-    $sql = "UPDATE reportes SET id_vehiculo = ?, rfc_conductor = ?, id_ruta = ?, tipo_incidente = ?, fecha_incidente = ?, descripcion = ?, gravedad = ?, estado = ?, id_usuario = ? WHERE id = ?";
+    $sql = 'UPDATE reportes SET id_vehiculo = ?, rfc_conductor = ?, id_ruta = ?, tipo_incidente = ?, fecha_incidente = ?, descripcion = ?, gravedad = ?, estado = ?, id_usuario = ? WHERE id = ?';
     $stmt = $conexion->prepare($sql);
-    $stmt->bind_param("isssssssii",
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'message' => 'Error preparando actualización: ' . $conexion->error]);
+        exit;
+    }
+    $stmt->bind_param('isssssssii',
         $id_vehiculo,
         $rfc_conductor,
         $id_ruta,
@@ -62,8 +69,8 @@ try {
     }
 
     $stmt->close();
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Exception: ' . $e->getMessage()]);
+} catch (\Throwable $e) {
+    echo json_encode(['success' => false, 'message' => 'Error interno: ' . $e->getMessage()]);
 }
 
 $conexion->close();
