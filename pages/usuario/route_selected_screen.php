@@ -3,7 +3,7 @@ session_start();
 
 // Verificar si el usuario está logueado y tiene rol=2
 if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
 ?>
@@ -16,7 +16,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
     <title>GoWay - Rutas de Transporte</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="icon" href="../assets/images/logo.png" type="image/png">
+    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
     <style>
         :root {
             --primary-color: #2962FF;
@@ -787,7 +787,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
     <header>
         <div class="header-content">
             <div class="logo">
-                <img src="../assets/images/logo.png" alt="GoWay Logo">
+                <img src="../../assets/images/logo.png" alt="GoWay Logo">
                 <h1>GoWay</h1>
             </div>
 
@@ -800,7 +800,7 @@ if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
                     <a href="https://goway.netlify.app" target="_blank">
                         <i class="fas fa-download"></i> Descargar App
                     </a>
-                    <a href="logout.php">
+                    <a href="../logout.php">
                         <i class="fas fa-sign-out-alt"></i> Cerrar sesión
                     </a>
                 </div>

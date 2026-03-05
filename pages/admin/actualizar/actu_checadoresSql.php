@@ -1,7 +1,7 @@
 
 <?php
 header('Content-Type: application/json');
-require_once '../../config/conexion_bd.php';
+require_once '../../../config/conexion_bd.php';
 
 // Crear conexión
 $conn = $conexion;
@@ -13,24 +13,21 @@ if ($conn->connect_error) {
 }
 
 // Recoger datos del formulario
-$id = $_POST['id_usuario'];
+$rfc_checador = $_POST['rfc_checador'];
+$rfc_empresa = $_POST['rfc_empresa'];
 $nombre = $_POST['nombre'];
-$email = $_POST['email'];
-$password = $_POST['password'];
-$rol = $_POST['rol'];
-
-// Hashear la contraseña si no está vacía
-if (!empty($password)) {
-    $password = password_hash($password, PASSWORD_DEFAULT);
-}
+$usuario = $_POST['usuario'];
+$contrasena = $_POST['password'];
+$activo = $_POST['activo'];
 
 // Preparar la consulta SQL
-$sql = "UPDATE usuarios SET
+$sql = "UPDATE checadores SET
+rfc_empresa = ?,
 nombre = ?,
-email = ?,
-password = ?,
-rol = ?
-WHERE id = ?";
+usuario = ?,
+contrasena = ?,
+activo = ?
+WHERE rfc_checador = ?";
 
 // Preparar statement
 $stmt = $conn->prepare($sql);
@@ -41,13 +38,13 @@ if ($stmt === false) {
 }
 
 // Vincular parámetros
-$stmt->bind_param("ssssi", $nombre, $email, $password, $rol, $id);
+$stmt->bind_param("ssssis", $rfc_empresa, $nombre, $usuario, $contrasena, $activo, $rfc_checador);
 
 // Ejecutar consulta
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Usuario actualizado correctamente"]);
+    echo json_encode(["success" => true, "message" => "Checador actualizado correctamente"]);
 } else {
-    echo json_encode(["success" => false, "message" => "Error en la actualización: " . $stmt->error]);
+    echo json_encode(["success" => false, "message" => "Error al actualizar: " . $stmt->error]);
 }
 
 $stmt->close();

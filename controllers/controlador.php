@@ -33,7 +33,7 @@ if (isset($_POST['btningresar'])) {
                     
                     // Redirigir usuario normal
                     if ($usuario['rol'] == 2) { // Usuario normal
-                        header("Location: ../pages/route_selected_screen.php");
+                        header("Location: ../pages/usuario/route_selected_screen.php");
                     }
                     exit();
                 }

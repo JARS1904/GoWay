@@ -18,7 +18,7 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
-    header("Location: /GoWay/pages/horarios.php?mensaje=Horario eliminado exitosamente");
+    header("Location: /GoWay/pages/admin/horarios.php?mensaje=Horario eliminado exitosamente");
     exit();
 } else {
     echo "Error al eliminar el horario: " . $conn->error;

@@ -58,55 +58,55 @@ require_once 'config/conexion_bd.php';
                         </a>
                     </li>
                     <li>
-                        <a href="pages/empresas.php">
+                        <a href="pages/admin/empresas.php">
                             <img src="assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
                             <span>Empresas</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/conductores.php">
+                        <a href="pages/admin/conductores.php">
                             <img src="assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
                             <span>Conductores</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/vehiculos.php">
+                        <a href="pages/admin/vehiculos.php">
                             <img src="assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
                             <span>Vehículos</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/rutas.php">
+                        <a href="pages/admin/rutas.php">
                             <img src="assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
                             <span>Rutas</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/horarios.php">
+                        <a href="pages/admin/horarios.php">
                             <img src="assets/images/icons/icon_horarios.png" alt="Horarios" class="icon">
                             <span>Horarios</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/paradas.php">
+                        <a href="pages/admin/paradas.php">
                             <img src="assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
                             <span>Asignaciones</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/checadores.php">
+                        <a href="pages/admin/checadores.php">
                             <img src="assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
                             <span>Checadores</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/reportes.php">
+                        <a href="pages/admin/reportes.php">
                             <img src="assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
                             <span>Reportes</span>
                         </a>
                     </li>
                     <li>
-                        <a href="pages/usuarios.php">
+                        <a href="pages/admin/usuarios.php">
                             <img src="assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
                             <span>Usuarios</span>
                         </a>
@@ -238,23 +238,23 @@ require_once 'config/conexion_bd.php';
                 <div class="quick-actions">
                     <h2>Acciones Rápidas</h2>
                     <div class="actions-grid">
-                        <a href="pages/rutas.php" class="action-btn">
+                        <a href="pages/admin/rutas.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-rutas-dashboard.png" alt="Rutas">
                             <span>Gestionar Rutas</span>
                         </a>
-                        <a href="pages/vehiculos.php" class="action-btn">
+                        <a href="pages/admin/vehiculos.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-vehiculos-dashboard.png" alt="Vehículos">
                             <span>Gestionar Vehículos</span>
                         </a>
-                        <a href="pages/conductores.php" class="action-btn">
+                        <a href="pages/admin/conductores.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-conditores-dashboard.png" alt="Conductores">
                             <span>Gestionar Conductores</span>
                         </a>
-                        <a href="pages/horarios.php" class="action-btn">
+                        <a href="pages/admin/horarios.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-horario-dashboard.png" alt="Horarios">
                             <span>Gestionar Horarios</span>
                         </a>
-                        <a href="pages/checadores.php" class="action-btn">
+                        <a href="pages/admin/checadores.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-checadores-dashboard.png" alt="Checadores">
                             <span>Gestionar Checadores</span>
                         </a>

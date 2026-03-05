@@ -2,10 +2,10 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location: login.php');
+    header('Location: ../login.php');
     exit();
 }
-require_once '../config/conexion_bd.php';
+require_once '../../config/conexion_bd.php';
 ?>
 
 <!DOCTYPE html>
@@ -14,11 +14,11 @@ require_once '../config/conexion_bd.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asignaciones - Transporte Público</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
-    <link rel="icon" href="../assets/images/logo.png" type="image/png">
+    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
 </head>
 <body>
     <div class="container">
@@ -35,7 +35,7 @@ require_once '../config/conexion_bd.php';
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
                         <span><?php echo $_SESSION['nombre']; ?></span>
-                        <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                        <img src="../../assets/images/icons/administrador.png" alt="Usuario">
                     </div>
                 </div>
             </div>
@@ -47,68 +47,68 @@ require_once '../config/conexion_bd.php';
             <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
             
             <div class="logo">
-                <img src="../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
+                <img src="../../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
                 <h1>GoWay</h1>
             </div>
             <nav>
                 <ul>
                     <li>
-                        <a href="../index.php">
-                            <img src="../assets/images/icons/icon_dashboard.png" alt="Dashboard" class="icon">
+                        <a href="../../index.php">
+                            <img src="../../assets/images/icons/icon_dashboard.png" alt="Dashboard" class="icon">
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <a href="empresas.php">
-                            <img src="../assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
+                            <img src="../../assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
                             <span>Empresas</span>
                         </a>
                     </li>
                     <li>
                         <a href="conductores.php">
-                            <img src="../assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
+                            <img src="../../assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
                             <span>Conductores</span>
                         </a>
                     </li>
                     <li>
                         <a href="vehiculos.php">
-                            <img src="../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
+                            <img src="../../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
                             <span>Vehículos</span>
                         </a>
                     </li>
                     <li>
                         <a href="rutas.php">
-                            <img src="../assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
+                            <img src="../../assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
                             <span>Rutas</span>
                         </a>
                     </li>
                     <li>
                         <a href="horarios.php">
-                            <img src="../assets/images/icons/icon_horarios.png" alt="Horarios" class="icon">
+                            <img src="../../assets/images/icons/icon_horarios.png" alt="Horarios" class="icon">
                             <span>Horarios</span>
                         </a>
                     </li>
                     <li>
                         <a href="paradas.php">
-                            <img src="../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
+                            <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
                             <span>Asignaciones</span>
                         </a>
                     </li>
                     <li>
                         <a href="checadores.php">
-                            <img src="../assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
+                            <img src="../../assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
                             <span>Checadores</span>
                         </a>
                     </li>
                     <li>
                         <a href="reportes.php">
-                            <img src="../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
+                            <img src="../../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
                             <span>Reportes</span>
                         </a>
                     </li>
                     <li>
                         <a href="usuarios.php">
-                            <img src="../assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
+                            <img src="../../assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
                             <span>Usuarios</span>
                         </a>
                     </li>
@@ -117,8 +117,8 @@ require_once '../config/conexion_bd.php';
 
             <!-- Botón de Cerrar Sesión -->
             <div class="logout-button">
-                <a href="login.php" id="logout">
-                    <img src="../assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesión" class="icon"> 
+                <a href="../login.php" id="logout">
+                    <img src="../../assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesión" class="icon"> 
                     <span>Cerrar sesión</span>
                 </a>
             </div>
@@ -131,7 +131,7 @@ require_once '../config/conexion_bd.php';
                 <h2>Gestión de Asignaciones</h2>
                 <div class="user-info">
                     <span><?php echo $_SESSION['nombre']; ?></span>
-                    <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                    <img src="../../assets/images/icons/administrador.png" alt="Usuario">
                 </div>
             </header>
 
@@ -208,7 +208,7 @@ require_once '../config/conexion_bd.php';
                 <h3>Agregar nueva Asignacion</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../controllers/insert_asignaciones.php" method="POST">
+            <form id="routeForm" action="../../controllers/insert_asignaciones.php" method="POST">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>
@@ -358,9 +358,9 @@ require_once '../config/conexion_bd.php';
         });
     </script>
 
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/notifications.js"></script>
-    <script src="../assets/js/pagination.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/notifications.js"></script>
+    <script src="../../assets/js/pagination.js"></script>
     
     <script>
         // Manejar cierre de modal de agregar

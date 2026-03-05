@@ -1,7 +1,7 @@
 
 <?php
 header('Content-Type: application/json');
-require_once '../../config/conexion_bd.php';
+require_once '../../../config/conexion_bd.php';
 
 // Crear conexión
 $conn = $conexion;
@@ -45,4 +45,5 @@ if ($stmt->execute()) {
 $stmt->close();
 $conn->close();
 ?>
+
 

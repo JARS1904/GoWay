@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../../../assets/css/style.css">
     <title>Actualizar Vehículo</title>
 </head>
 <body>
@@ -14,13 +14,13 @@
                 <h2>Editar Vehículo</h2>
                 <div class="user-info">
                     <span>Admin</span>
-                    <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                    <img src="../../../assets/images/icons/administrador.png" alt="Usuario">
                 </div>
             </header>
 
             <section class="content">
                 <?php
-                require_once '../../config/conexion_bd.php';
+                require_once '../../../config/conexion_bd.php';
                 // Obtener el ID del vehículo de la URL
                 $id_vehiculo = isset($_GET['id']) ? $_GET['id'] : null;
                 
@@ -42,7 +42,7 @@
                     if ($result->num_rows > 0) {
                         $vehiculo = $result->fetch_assoc();
                 ?>
-                <form id="editVehicleForm" action="controllers/update/actu_vehiculos.php" method="POST" class="form-container">
+                <form id="editVehicleForm" action="../../controllers/update/actu_vehiculos.php" method="POST" class="form-container">
                     <input type="hidden" id="edit_id_vehiculo" name="id_vehiculo" value="<?php echo $vehiculo['id_vehiculo']; ?>">
                     
                     <div class="form-columns">

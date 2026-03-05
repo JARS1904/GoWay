@@ -2,10 +2,10 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location: login.php');
+    header('Location: ../login.php');
     exit();
 }
-require_once '../config/conexion_bd.php';
+require_once '../../config/conexion_bd.php';
 ?>
 
 <!DOCTYPE html>
@@ -13,13 +13,14 @@ require_once '../config/conexion_bd.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empresas - Transporte Público</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Usuarios - Transporte Público</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
-    <link rel="icon" href="../assets/images/logo.png" type="image/png">
+    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
 </head>
+
 <body>
     <div class="container">
         <!-- Overlay para fondo oscuro -->
@@ -30,12 +31,12 @@ require_once '../config/conexion_bd.php';
             <div class="mobile-topbar-content">
                 <div class="mobile-topbar-left">
                     <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-                    <h1 class="mobile-page-title">Gestión de Empresas</h1>
+                    <h1 class="mobile-page-title">Gestión de Usuarios</h1>
                 </div>
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
                         <span><?php echo $_SESSION['nombre']; ?></span>
-                        <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                        <img src="../../assets/images/icons/administrador.png" alt="Usuario">
                     </div>
                 </div>
             </div>
@@ -47,68 +48,68 @@ require_once '../config/conexion_bd.php';
             <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
             
             <div class="logo">
-                <img src="../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
+                <img src="../../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
                 <h1>GoWay</h1>
             </div>
             <nav>
                 <ul>
                     <li>
-                        <a href="../index.php">
-                            <img src="../assets/images/icons/icon_dashboard.png" alt="Dashboard" class="icon">
+                        <a href="../../index.php">
+                            <img src="../../assets/images/icons/icon_dashboard.png" alt="Dashboard" class="icon">
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <a href="empresas.php">
-                            <img src="../assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
+                            <img src="../../assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
                             <span>Empresas</span>
                         </a>
                     </li>
                     <li>
                         <a href="conductores.php">
-                            <img src="../assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
+                            <img src="../../assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
                             <span>Conductores</span>
                         </a>
                     </li>
                     <li>
                         <a href="vehiculos.php">
-                            <img src="../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
+                            <img src="../../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
                             <span>Vehículos</span>
                         </a>
                     </li>
                     <li>
                         <a href="rutas.php">
-                            <img src="../assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
+                            <img src="../../assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
                             <span>Rutas</span>
                         </a>
                     </li>
                     <li>
                         <a href="horarios.php">
-                            <img src="../assets/images/icons/icon_horarios.png" alt="Horarios" class="icon">
+                            <img src="../../assets/images/icons/icon_horarios.png" alt="Horarios" class="icon">
                             <span>Horarios</span>
                         </a>
                     </li>
                     <li>
                         <a href="paradas.php">
-                            <img src="../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
+                            <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
                             <span>Asignaciones</span>
                         </a>
                     </li>
                     <li>
                         <a href="checadores.php">
-                            <img src="../assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
+                            <img src="../../assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
                             <span>Checadores</span>
                         </a>
                     </li>
                     <li>
                         <a href="reportes.php">
-                            <img src="../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
+                            <img src="../../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
                             <span>Reportes</span>
                         </a>
                     </li>
                     <li>
                         <a href="usuarios.php">
-                            <img src="../assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
+                            <img src="../../assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
                             <span>Usuarios</span>
                         </a>
                     </li>
@@ -117,8 +118,8 @@ require_once '../config/conexion_bd.php';
 
             <!-- Botón de Cerrar Sesión -->
             <div class="logout-button">
-                <a href="login.php" id="logout">
-                    <img src="../assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesión" class="icon"> 
+                <a href="../login.php" id="logout">
+                    <img src="../../assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesión" class="icon">
                     <span>Cerrar sesión</span>
                 </a>
             </div>
@@ -128,27 +129,26 @@ require_once '../config/conexion_bd.php';
         <main class="main-content" id="mainContent">
             <!-- Header para escritorio -->
             <header class="header">
-                <h2>Gestión de Empresas</h2>
+                <h2>Gestión de Usuarios</h2>
                 <div class="user-info">
                     <span><?php echo $_SESSION['nombre']; ?></span>
-                    <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                    <img src="../../assets/images/icons/administrador.png" alt="Usuario">
                 </div>
             </header>
 
             <section class="content">
                 <div class="section-header">
-                    <h3>Lista de Empresas</h3>
-                    <button class="btn-add">+ Agregar nueva empresa</button>
+                    <h3>Lista de Usuarios</h3>
+                    <button class="btn-add">+ Agregar nuevo usuario</button>
                 </div>
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>RFC de la empresa</th>
+                            <!-- <th>ID usuario</th> -->
                             <th>Nombre</th>
-                            <th>Dirección</th>
-                            <th>Teléfono</th>
                             <th>Email</th>
-                            <th>Activa</th>
+                            <th>Password</th>
+                            <th>Rol</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
@@ -156,23 +156,29 @@ require_once '../config/conexion_bd.php';
                         <?php
                         // Conexión a la base de datos
                         $conn = $conexion;
-                        
-                        // Consulta para obtener las empresas
-                        $sql = "SELECT * FROM empresas";
+
+                        // Consulta para obtener los usuarios
+                        $sql = "SELECT * FROM usuarios";
                         $result = $conn->query($sql);
-                        
+
+                        // Mapeo de roles
+                        $rol_mapping = [
+                            1 => "Administrador",
+                            2 => "Usuario"
+                        ];
+
                         if ($result->num_rows > 0) {
-                            while($row = $result->fetch_assoc()) {
-                                $statusClass = $row["activo"] ? 'status-active' : 'status-inactive';
-                                $statusText = $row["activo"] ? 'Sí' : 'No';
+                            while ($row = $result->fetch_assoc()) {
+                                // Mostrar solo si la contraseña está establecida, sin mostrar el hash completo
+                                $password_display = !empty($row["password"]) ? "●●●●●●●●" : "Sin contraseña";
+                                $rol_label = $rol_mapping[$row["rol"]] ?? "Desconocido";
                                 
-                                echo '<tr>
-                                        <td data-label="RFC de la Empresa" data-id="'.$row["rfc_empresa"].'">'.$row["rfc_empresa"].'</td>
-                                        <td data-label="Nombre">'.$row["nombre"].'</td>
-                                        <td data-label="Dirección">'.$row["direccion"].'</td>
-                                        <td data-label="Teléfono">'.$row["telefono"].'</td>
-                                        <td data-label="Email">'.$row["email"].'</td>
-                                        <td data-label="Activa"><span class="'.$statusClass.'">'.$statusText.'</span></td>
+                                echo '<tr data-id="' . $row["id"] . '">
+                                        <!-- <td data-label="ID Usuario" data-id="' . $row["id"] . '">' . $row["id"] . '</td> -->
+                                        <td data-label="Nombre">' . $row["nombre"] . '</td>
+                                        <td data-label="Email">' . $row["email"] . '</td>
+                                        <td data-label="Password">' . $password_display . '</td>
+                                        <td data-label="Rol" data-rol="' . $row["rol"] . '">' . $rol_label . '</td>
                                         <td>
                                             <button class="btn-action btn-edit">Editar</button>
                                             <button class="btn-action btn-delete">Eliminar</button>
@@ -180,8 +186,9 @@ require_once '../config/conexion_bd.php';
                                     </tr>';
                             }
                         } else {
-                            echo '<tr><td colspan="7">No hay empresas registradas</td></tr>';
+                            echo '<tr><td colspan="6">No hay usuarios registrados</td></tr>';
                         }
+
                         ?>
                     </tbody>
                 </table>
@@ -196,40 +203,40 @@ require_once '../config/conexion_bd.php';
         </main>
     </div>
 
-    <!-- Modal para agregar nueva Empresa -->
+    <!-- Modal para agregar nuevo usuario -->
     <div class="modal-overlay" id="addRouteModal">
         <div class="modal-container">
             <div class="modal-header">
-                <h3>Agregar nueva empresa</h3>
+                <h3>Agregar nuevo usuario</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../controllers/insert_empresa.php" method="POST">
+            <form id="routeForm" action="../../controllers/insert_user.php" method="POST">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>
                         <div class="modal-form-group">
-                            <label for="nombre">RFC de la Empresa</label>
-                            <input type="text" id="rfc_empresa" name="rfc_empresa" placeholder="" required>
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ingresa un nombre de usuario" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="destino">Nombre de Empresa</label>
-                            <input type="text" id="nombre_empresa" name="nombre_empresa" placeholder="" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label for="destino">Direccion de Empresa</label>
-                            <input type="text" id="direccion_empresa" name="direccion_empresa" placeholder="" required>
+                            <label for="Email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="Ingresa un correo electrónico" required>
                         </div>
                     </div>
-                    
+
                     <!-- Columna derecha -->
                     <div>
                         <div class="modal-form-group">
-                            <label for="origen">Telefono</label>
-                            <input type="text" id="tel_empresa" name="tel_empresa" placeholder="" required>
+                            <label for="password">Contraseña</label>
+                            <input type="text" id="password" name="password" placeholder="Ingresa una contraseña" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="paradas">E-mail</label>
-                            <input type="email" id="email_empresa" name="email_empresa" placeholder=""></input>
+                            <label for="rol">Rol</label>
+                            <select id="rol" name="rol" required>
+                                <option value="" disabled selected>Seleccionar rol</option>
+                                <option value="1">Administrador</option>
+                                <option value="2">Usuario</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -242,49 +249,46 @@ require_once '../config/conexion_bd.php';
         </div>
     </div>
 
-    <!-- Modal para editar empresas -->
-    <div class="modal-overlay" id="editEmpresasModal">
+    <!-- Modal para edición de usuarios -->
+    <div class="modal-overlay" id="editUserModal">
         <div class="modal-container">
             <div class="modal-header">
-                <h3>Editar Empresa</h3>
-                <button class="modal-close" id="closeEditEmpresasModal">×</button>
+                <h3>Editar usuario</h3>
+                <button class="modal-close" id="closeEditModal">&times;</button>
             </div>
-            <form id="editEmpresasForm" action="../pages/actualizar/actu_empresasSql.php" method="POST">
+            <form id="editUserForm" action="actualizar/actu_usuariosSql.php" method="POST">
+                <input type="hidden" id="edit_id_usuario" name="id_usuario">
                 <div class="modal-body">
+                    <!-- Columna izquierda -->
                     <div>
                         <div class="modal-form-group">
-                            <label for="edit_rfc_empresa">RFC de la empresa</label>
-                            <input type="text" id="edit_rfc_empresa" name="rfc_empresa" required>
+                            <label>Nombre</label>
+                            <input type="text" id="edit_nombre" name="nombre" placeholder="Ingresa el nombre del usuario">
                         </div>
                         <div class="modal-form-group">
-                            <label for="edit_nombre_empresa">Nombre de Empresa</label>
-                            <input type="text" id="edit_nombre_empresa" name="nombre_empresa" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label for="edit_direccion_empresa">Direccion de Empresa</label>
-                            <input type="text" id="edit_direccion_empresa" name="direccion_empresa" required>
+                            <label for="edit_email">E-mail</label>
+                            <input type="email" id="edit_email" name="email" placeholder="Ingresa un correo electrónico">
                         </div>
                     </div>
+
+                    <!-- Columna derecha -->
                     <div>
                         <div class="modal-form-group">
-                            <label for="edit_telefono">Telefono</label>
-                            <input type="text" id="edit_telefono" name="telefono" required>
+                            <label for="edit_password">Contraseña</label>
+                            <input type="text" id="edit_password" name="password" placeholder="Ingresa una contraseña">
                         </div>
                         <div class="modal-form-group">
-                            <label for="edit_email_empresa">E-mail</label>
-                            <input type="text" id="edit_email_empresa" name="email_empresa" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label for="edit_activo">Activo</label>
-                            <select id="edit_activo" name="activo">
-                                <option value="1">Sí</option>
-                                <option value="0">No</option>
+                            <label for="edit_rol">Rol</label>
+                            <select id="edit_rol" name="rol" required>
+                                <option value="1">Administrador</option>
+                                <option value="2">Usuario</option>
                             </select>
                         </div>
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelEditEmpresasModal">Cancelar</button>
+                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelEditModal">Cancelar</button>
                     <button type="submit" class="modal-btn modal-btn-save">Guardar cambios</button>
                 </div>
             </form>
@@ -353,9 +357,9 @@ require_once '../config/conexion_bd.php';
         });
     </script>
 
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/notifications.js"></script>
-    <script src="../assets/js/pagination.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/notifications.js"></script>
+    <script src="../../assets/js/pagination.js"></script>
     
     <script>
         // Manejar cierre de modal de agregar
@@ -368,7 +372,7 @@ require_once '../config/conexion_bd.php';
         });
 
         // Manejo del formulario de inserción
-        handleInsertForm(document.getElementById('routeForm'), 'Empresa agregada correctamente');
+        handleInsertForm(document.getElementById('routeForm'), 'Usuario agregado correctamente');
 
         // Cerrar modal al hacer clic fuera
         document.getElementById('addRouteModal').addEventListener('click', function(e) {
@@ -386,45 +390,42 @@ require_once '../config/conexion_bd.php';
                     const row = btn.closest('tr');
                     const cells = row.querySelectorAll('td');
                     
-                    document.getElementById('edit_rfc_empresa').value = cells[0].textContent.trim();
-                    document.getElementById('edit_nombre_empresa').value = cells[1].textContent.trim();
-                    document.getElementById('edit_direccion_empresa').value = cells[2].textContent.trim();
-                    document.getElementById('edit_telefono').value = cells[3].textContent.trim();
-                    document.getElementById('edit_email_empresa').value = cells[4].textContent.trim();
+                    document.getElementById('edit_id_usuario').value = row.getAttribute('data-id');
+                    document.getElementById('edit_nombre').value = cells[0].textContent.trim();
+                    document.getElementById('edit_email').value = cells[1].textContent.trim();
+                    document.getElementById('edit_password').value = cells[2].textContent.trim();
+                    document.getElementById('edit_rol').value = cells[3].getAttribute('data-rol');
                     
-                    const statusText = cells[5].querySelector('span').textContent.trim();
-                    document.getElementById('edit_activo').value = statusText === 'Sí' ? 1 : 0;
-                    
-                    document.getElementById('editEmpresasModal').classList.add('active');
+                    document.getElementById('editUserModal').classList.add('active');
                 }
             });
         }
 
         // Cerrar modal de edición
-        document.getElementById('closeEditEmpresasModal').addEventListener('click', () => {
-            document.getElementById('editEmpresasModal').classList.remove('active');
+        document.getElementById('closeEditModal').addEventListener('click', () => {
+            document.getElementById('editUserModal').classList.remove('active');
         });
 
-        document.getElementById('cancelEditEmpresasModal').addEventListener('click', () => {
-            document.getElementById('editEmpresasModal').classList.remove('active');
+        document.getElementById('cancelEditModal').addEventListener('click', () => {
+            document.getElementById('editUserModal').classList.remove('active');
         });
 
         // Cerrar modal al hacer clic fuera
-        document.getElementById('editEmpresasModal').addEventListener('click', function(e) {
+        document.getElementById('editUserModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 this.classList.remove('active');
             }
         });
 
         // Manejo del formulario de edición
-        handleUpdateForm(document.getElementById('editEmpresasForm'), 'Empresa actualizada correctamente');
+        handleUpdateForm(document.getElementById('editUserForm'), 'Usuario actualizado correctamente');
 
         // Inicializar botones de eliminación
         initializeDeleteButtons(
             '.btn-delete',
-            '../controllers/delete/delete_empresas.php',
-            'rfc_empresa',
-            '¿Estás seguro de que deseas eliminar esta empresa?'
+            '../controllers/delete/delete_usuarios.php',
+            'id',
+            '¿Estás seguro de que deseas eliminar este usuario?'
         );
     </script>
 </body>

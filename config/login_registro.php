@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 echo "Registro exitoso. Bienvenido.";
                 // Redirigir al usuario normal a su página
-                header("location: ../pages/route_selected_screen.php");
+                header("location: ../pages/usuario/route_selected_screen.php");
             } else {
                 echo "Error en el registro.";
             }

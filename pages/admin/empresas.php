@@ -2,10 +2,10 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location: login.php');
+    header('Location: ../login.php');
     exit();
 }
-require_once '../config/conexion_bd.php';
+require_once '../../config/conexion_bd.php';
 ?>
 
 <!DOCTYPE html>
@@ -13,12 +13,12 @@ require_once '../config/conexion_bd.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checadores - Transporte Público</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Empresas - Transporte Público</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
-    <link rel="icon" href="../assets/images/logo.png" type="image/png">
+    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
 </head>
 <body>
     <div class="container">
@@ -30,12 +30,12 @@ require_once '../config/conexion_bd.php';
             <div class="mobile-topbar-content">
                 <div class="mobile-topbar-left">
                     <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-                    <h1 class="mobile-page-title">Gestión de Checadores</h1>
+                    <h1 class="mobile-page-title">Gestión de Empresas</h1>
                 </div>
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
                         <span><?php echo $_SESSION['nombre']; ?></span>
-                        <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                        <img src="../../assets/images/icons/administrador.png" alt="Usuario">
                     </div>
                 </div>
             </div>
@@ -47,68 +47,68 @@ require_once '../config/conexion_bd.php';
             <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
             
             <div class="logo">
-                <img src="../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
+                <img src="../../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
                 <h1>GoWay</h1>
             </div>
             <nav>
                 <ul>
                     <li>
-                        <a href="../index.php">
-                            <img src="../assets/images/icons/icon_dashboard.png" alt="Dashboard" class="icon">
+                        <a href="../../index.php">
+                            <img src="../../assets/images/icons/icon_dashboard.png" alt="Dashboard" class="icon">
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <a href="empresas.php">
-                            <img src="../assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
+                            <img src="../../assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
                             <span>Empresas</span>
                         </a>
                     </li>
                     <li>
                         <a href="conductores.php">
-                            <img src="../assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
+                            <img src="../../assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
                             <span>Conductores</span>
                         </a>
                     </li>
                     <li>
                         <a href="vehiculos.php">
-                            <img src="../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
+                            <img src="../../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
                             <span>Vehículos</span>
                         </a>
                     </li>
                     <li>
                         <a href="rutas.php">
-                            <img src="../assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
+                            <img src="../../assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
                             <span>Rutas</span>
                         </a>
                     </li>
                     <li>
                         <a href="horarios.php">
-                            <img src="../assets/images/icons/icon_horarios.png" alt="Horarios" class="icon">
+                            <img src="../../assets/images/icons/icon_horarios.png" alt="Horarios" class="icon">
                             <span>Horarios</span>
                         </a>
                     </li>
                     <li>
                         <a href="paradas.php">
-                            <img src="../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
+                            <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
                             <span>Asignaciones</span>
                         </a>
                     </li>
                     <li>
                         <a href="checadores.php">
-                            <img src="../assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
+                            <img src="../../assets/images/icons/icon_checadores.png" alt="Checadores" class="icon">
                             <span>Checadores</span>
                         </a>
                     </li>
                     <li>
                         <a href="reportes.php">
-                            <img src="../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
+                            <img src="../../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
                             <span>Reportes</span>
                         </a>
                     </li>
                     <li>
                         <a href="usuarios.php">
-                            <img src="../assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
+                            <img src="../../assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
                             <span>Usuarios</span>
                         </a>
                     </li>
@@ -117,8 +117,8 @@ require_once '../config/conexion_bd.php';
 
             <!-- Botón de Cerrar Sesión -->
             <div class="logout-button">
-                <a href="login.PHP" id="logout">
-                    <img src="../assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesión" class="icon"> 
+                <a href="../login.php" id="logout">
+                    <img src="../../assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesión" class="icon"> 
                     <span>Cerrar sesión</span>
                 </a>
             </div>
@@ -128,28 +128,28 @@ require_once '../config/conexion_bd.php';
         <main class="main-content" id="mainContent">
             <!-- Header para escritorio -->
             <header class="header">
-                <h2>Gestión de Checadores</h2>
+                <h2>Gestión de Empresas</h2>
                 <div class="user-info">
                     <span><?php echo $_SESSION['nombre']; ?></span>
-                    <img src="../assets/images/icons/administrador.png" alt="Usuario">
+                    <img src="../../assets/images/icons/administrador.png" alt="Usuario">
                 </div>
             </header>
 
             <section class="content">
                 <div class="section-header">
-                    <h3>Lista de Checadores</h3>
-                    <button class="btn-add">+ Agregar nuevo checador</button>
+                    <h3>Lista de Empresas</h3>
+                    <button class="btn-add">+ Agregar nueva empresa</button>
                 </div>
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>RFC del checador</th>
                             <th>RFC de la empresa</th>
                             <th>Nombre</th>
-                            <th>Usuario</th>
-                            <th>Contraseña</th>
-                            <th>Activo</th>
-                            <th>Acciones</th>
+                            <th>Dirección</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Activa</th>
+                            <th>Acción</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -157,8 +157,8 @@ require_once '../config/conexion_bd.php';
                         // Conexión a la base de datos
                         $conn = $conexion;
                         
-                        // Consulta para obtener los checadores
-                        $sql = "SELECT * FROM checadores";
+                        // Consulta para obtener las empresas
+                        $sql = "SELECT * FROM empresas";
                         $result = $conn->query($sql);
                         
                         if ($result->num_rows > 0) {
@@ -167,12 +167,12 @@ require_once '../config/conexion_bd.php';
                                 $statusText = $row["activo"] ? 'Sí' : 'No';
                                 
                                 echo '<tr>
-                                        <td data-label="RFC del Checador" data-id="'.$row["rfc_checador"].'">'.$row["rfc_checador"].'</td>
-                                        <td data-label="RFC de la Empresa">'.$row["rfc_empresa"].'</td>
+                                        <td data-label="RFC de la Empresa" data-id="'.$row["rfc_empresa"].'">'.$row["rfc_empresa"].'</td>
                                         <td data-label="Nombre">'.$row["nombre"].'</td>
-                                        <td data-label="Usuario">'.$row["usuario"].'</td>
-                                        <td data-label="Contraseña">'.$row["contrasena"].'</td>
-                                        <td data-label="Estado"><span class="'.$statusClass.'">'.$statusText.'</span></td>
+                                        <td data-label="Dirección">'.$row["direccion"].'</td>
+                                        <td data-label="Teléfono">'.$row["telefono"].'</td>
+                                        <td data-label="Email">'.$row["email"].'</td>
+                                        <td data-label="Activa"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
                                             <button class="btn-action btn-edit">Editar</button>
                                             <button class="btn-action btn-delete">Eliminar</button>
@@ -180,12 +180,12 @@ require_once '../config/conexion_bd.php';
                                     </tr>';
                             }
                         } else {
-                            echo '<tr><td colspan="7">No hay checadores registrados</td></tr>';
+                            echo '<tr><td colspan="7">No hay empresas registradas</td></tr>';
                         }
                         ?>
                     </tbody>
                 </table>
-                
+
                 <!-- Paginación -->
                 <div class="pagination">
                     <button class="pagination-btn" id="prevPage" disabled>‹ Anterior</button>
@@ -196,56 +196,40 @@ require_once '../config/conexion_bd.php';
         </main>
     </div>
 
-    <!-- Modal para agregar nuevo checador -->
+    <!-- Modal para agregar nueva Empresa -->
     <div class="modal-overlay" id="addRouteModal">
         <div class="modal-container">
             <div class="modal-header">
-                <h3>Agregar nuevo checador</h3>
+                <h3>Agregar nueva empresa</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../controllers/insert_checador.php" method="POST">
+            <form id="routeForm" action="../../controllers/insert_empresa.php" method="POST">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>
                         <div class="modal-form-group">
-                            <label>RFC de Checador</label>
-                            <input type="text" id="" name="rfc_checador" placeholder="" required>
+                            <label for="nombre">RFC de la Empresa</label>
+                            <input type="text" id="rfc_empresa" name="rfc_empresa" placeholder="" required>
                         </div>
                         <div class="modal-form-group">
-                            <label>RFC de la Empresa</label>
-                            <select name="rfc_empresa" id="">
-                                <?php
-                                $conn = $conexion;
-                                $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
-                                while ($row = $result->fetch_assoc()) {
-                                echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
-                                }
-                                ?>
-                            </select>
+                            <label for="destino">Nombre de Empresa</label>
+                            <input type="text" id="nombre_empresa" name="nombre_empresa" placeholder="" required>
                         </div>
                         <div class="modal-form-group">
-                            <label>Nombre</label>
-                            <input type="text" id="" name="nombre" placeholder="" required>
+                            <label for="destino">Direccion de Empresa</label>
+                            <input type="text" id="direccion_empresa" name="direccion_empresa" placeholder="" required>
                         </div>
                     </div>
                     
                     <!-- Columna derecha -->
                     <div>
                         <div class="modal-form-group">
-                            <label>Usuario</label>
-                            <select name="usuario" id="">
-                                <?php
-                                $conn = $conexion;
-                                $result = $conn->query("SELECT email, nombre FROM usuarios");
-                                while ($row = $result->fetch_assoc()) {
-                                echo "<option value='{$row['email']}'>{$row['nombre']}</option>";
-                                }
-                                ?>
-                            </select>
+                            <label for="origen">Telefono</label>
+                            <input type="text" id="tel_empresa" name="tel_empresa" placeholder="" required>
                         </div>
                         <div class="modal-form-group">
-                            <label>Contraseña</label>
-                            <input type="text" id="" name="password" placeholder=""></input>
+                            <label for="paradas">E-mail</label>
+                            <input type="email" id="email_empresa" name="email_empresa" placeholder=""></input>
                         </div>
                     </div>
                 </div>
@@ -258,45 +242,37 @@ require_once '../config/conexion_bd.php';
         </div>
     </div>
 
-    <!-- Modal para editar checadores -->
-    <div class="modal-overlay" id="editChecadoresModal">
+    <!-- Modal para editar empresas -->
+    <div class="modal-overlay" id="editEmpresasModal">
         <div class="modal-container">
             <div class="modal-header">
-                <h3>Editar Checador</h3>
-                <button class="modal-close" id="closeEditChecadoresModal">×</button>
+                <h3>Editar Empresa</h3>
+                <button class="modal-close" id="closeEditEmpresasModal">×</button>
             </div>
-            <form id="editChecadoresForm" action="actualizar/actu_checadoresSql.php" method="POST">
+            <form id="editEmpresasForm" action="actualizar/actu_empresasSql.php" method="POST">
                 <div class="modal-body">
                     <div>
                         <div class="modal-form-group">
-                            <label for="edit_rfc_checador">RFC de Checador</label>
-                            <input type="text" id="edit_rfc_checador" name="rfc_checador" required>
+                            <label for="edit_rfc_empresa">RFC de la empresa</label>
+                            <input type="text" id="edit_rfc_empresa" name="rfc_empresa" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="edit_rfc_empresa">RFC de Empresa</label>
-                            <select id="edit_rfc_empresa" name="rfc_empresa" required>
-                                <?php
-                                $conn = $conexion;
-                                $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
-                                }
-                                ?>
-                            </select>
+                            <label for="edit_nombre_empresa">Nombre de Empresa</label>
+                            <input type="text" id="edit_nombre_empresa" name="nombre_empresa" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="edit_nombre">Nombre</label>
-                            <input type="text" id="edit_nombre" name="nombre" required>
+                            <label for="edit_direccion_empresa">Direccion de Empresa</label>
+                            <input type="text" id="edit_direccion_empresa" name="direccion_empresa" required>
                         </div>
                     </div>
                     <div>
                         <div class="modal-form-group">
-                            <label for="edit_usuario">Usuario</label>
-                            <input type="text" id="edit_usuario" name="usuario" required>
+                            <label for="edit_telefono">Telefono</label>
+                            <input type="text" id="edit_telefono" name="telefono" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="edit_password">Contraseña</label>
-                            <input type="text" id="edit_password" name="password" required>
+                            <label for="edit_email_empresa">E-mail</label>
+                            <input type="text" id="edit_email_empresa" name="email_empresa" required>
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_activo">Activo</label>
@@ -308,7 +284,7 @@ require_once '../config/conexion_bd.php';
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelEditChecadoresModal">Cancelar</button>
+                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelEditEmpresasModal">Cancelar</button>
                     <button type="submit" class="modal-btn modal-btn-save">Guardar cambios</button>
                 </div>
             </form>
@@ -377,9 +353,9 @@ require_once '../config/conexion_bd.php';
         });
     </script>
 
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/notifications.js"></script>
-    <script src="../assets/js/pagination.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/notifications.js"></script>
+    <script src="../../assets/js/pagination.js"></script>
     
     <script>
         // Manejar cierre de modal de agregar
@@ -392,7 +368,7 @@ require_once '../config/conexion_bd.php';
         });
 
         // Manejo del formulario de inserción
-        handleInsertForm(document.getElementById('routeForm'), 'Checador agregado correctamente');
+        handleInsertForm(document.getElementById('routeForm'), 'Empresa agregada correctamente');
 
         // Cerrar modal al hacer clic fuera
         document.getElementById('addRouteModal').addEventListener('click', function(e) {
@@ -410,45 +386,45 @@ require_once '../config/conexion_bd.php';
                     const row = btn.closest('tr');
                     const cells = row.querySelectorAll('td');
                     
-                    document.getElementById('edit_rfc_checador').value = cells[0].textContent.trim();
-                    document.getElementById('edit_rfc_empresa').value = cells[1].textContent.trim();
-                    document.getElementById('edit_nombre').value = cells[2].textContent.trim();
-                    document.getElementById('edit_usuario').value = cells[3].textContent.trim();
-                    document.getElementById('edit_password').value = cells[4].textContent.trim();
+                    document.getElementById('edit_rfc_empresa').value = cells[0].textContent.trim();
+                    document.getElementById('edit_nombre_empresa').value = cells[1].textContent.trim();
+                    document.getElementById('edit_direccion_empresa').value = cells[2].textContent.trim();
+                    document.getElementById('edit_telefono').value = cells[3].textContent.trim();
+                    document.getElementById('edit_email_empresa').value = cells[4].textContent.trim();
                     
                     const statusText = cells[5].querySelector('span').textContent.trim();
                     document.getElementById('edit_activo').value = statusText === 'Sí' ? 1 : 0;
                     
-                    document.getElementById('editChecadoresModal').classList.add('active');
+                    document.getElementById('editEmpresasModal').classList.add('active');
                 }
             });
         }
 
         // Cerrar modal de edición
-        document.getElementById('closeEditChecadoresModal').addEventListener('click', () => {
-            document.getElementById('editChecadoresModal').classList.remove('active');
+        document.getElementById('closeEditEmpresasModal').addEventListener('click', () => {
+            document.getElementById('editEmpresasModal').classList.remove('active');
         });
 
-        document.getElementById('cancelEditChecadoresModal').addEventListener('click', () => {
-            document.getElementById('editChecadoresModal').classList.remove('active');
+        document.getElementById('cancelEditEmpresasModal').addEventListener('click', () => {
+            document.getElementById('editEmpresasModal').classList.remove('active');
         });
 
         // Cerrar modal al hacer clic fuera
-        document.getElementById('editChecadoresModal').addEventListener('click', function(e) {
+        document.getElementById('editEmpresasModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 this.classList.remove('active');
             }
         });
 
         // Manejo del formulario de edición
-        handleUpdateForm(document.getElementById('editChecadoresForm'), 'Checador actualizado correctamente');
+        handleUpdateForm(document.getElementById('editEmpresasForm'), 'Empresa actualizada correctamente');
 
         // Inicializar botones de eliminación
         initializeDeleteButtons(
             '.btn-delete',
-            '../controllers/delete/delete_checadores.php',
-            'rfc_checador',
-            '¿Estás seguro de que deseas eliminar este checador?'
+            '../controllers/delete/delete_empresas.php',
+            'rfc_empresa',
+            '¿Estás seguro de que deseas eliminar esta empresa?'
         );
     </script>
 </body>
