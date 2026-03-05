@@ -22,7 +22,7 @@ body {
 /* Menú Lateral */
 /* ==================== */
 .sidebar {
-    width: 250px;
+    width: 210px;
     background-color: #ecf5fc;
     color: #fff;
     padding: 20px;
@@ -76,8 +76,16 @@ body {
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-/* SOLO HOVER - Sin color permanente para página activa */
+/* Hover: gris claro */
 .sidebar nav ul li a:hover {
+    background-color: #dde8f5;
+    transform: translateX(5px);
+    font-weight: bold;
+    color: #1c1f24;
+}
+
+/* Página activa: azul */
+.sidebar nav ul li a.nav-active {
     background-color: #0660fe;
     transform: translateX(5px);
     font-weight: bold;
@@ -91,6 +99,10 @@ body {
 }
 
 .sidebar nav ul li a:hover .icon {
+    filter: none;
+}
+
+.sidebar nav ul li a.nav-active .icon {
     filter: brightness(0) invert(1);
 }
 

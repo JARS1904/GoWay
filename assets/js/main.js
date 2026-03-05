@@ -1,22 +1,30 @@
 // Mostrar modal al hacer clic en "Agregar nueva ruta"
-document.querySelector('.btn-add').addEventListener('click', function() {
-    document.getElementById('addRouteModal').classList.add('active');
-});
+if (document.querySelector('.btn-add')) {
+    document.querySelector('.btn-add').addEventListener('click', function() {
+        document.getElementById('addRouteModal').classList.add('active');
+    });
+}
 
 // Ocultar modal al hacer clic en la X, en Cancelar o fuera del modal
-document.getElementById('closeModal').addEventListener('click', function() {
-    document.getElementById('addRouteModal').classList.remove('active');
-});
-
-document.getElementById('cancelModal').addEventListener('click', function() {
-    document.getElementById('addRouteModal').classList.remove('active');
-});
-
-document.getElementById('addRouteModal').addEventListener('click', function(e) {
-    if (e.target === this) {
+if (document.getElementById('closeModal')) {
+    document.getElementById('closeModal').addEventListener('click', function() {
         document.getElementById('addRouteModal').classList.remove('active');
-    }
-});
+    });
+}
+
+if (document.getElementById('cancelModal')) {
+    document.getElementById('cancelModal').addEventListener('click', function() {
+        document.getElementById('addRouteModal').classList.remove('active');
+    });
+}
+
+if (document.getElementById('addRouteModal')) {
+    document.getElementById('addRouteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+}
 
 // Manejar envío del formulario de agregar con AJAX
 document.addEventListener('DOMContentLoaded', function() {
@@ -150,6 +158,17 @@ window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
         closeSidebar();
     }
+});
+
+// Marcar enlace activo según la página actual
+document.addEventListener('DOMContentLoaded', function () {
+    const currentFile = window.location.pathname.split('/').pop() || 'index.php';
+    document.querySelectorAll('.sidebar nav ul li a').forEach(link => {
+        const linkFile = link.getAttribute('href').split('/').pop();
+        if (linkFile === currentFile) {
+            link.classList.add('nav-active');
+        }
+    });
 });
 
 // ====================================================
