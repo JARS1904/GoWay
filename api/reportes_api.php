@@ -73,10 +73,79 @@ try {
     // GET ?action=get_assignment_data&placa=ABC123
     //  ó  ?action=get_assignment_data&id_asignacion=X
     // Devuelve: placa del vehículo, nombre del conductor y datos de ruta
+    //
+    // GET ?action=get_reports&id_usuario=X
+    // Devuelve los reportes creados por ese usuario (solo si rol = 2)
     // ─────────────────────────────────────────────────────────────
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if (!isset($_GET['action']) || $_GET['action'] !== 'get_assignment_data') {
-            sendResponse(400, ["error" => "Acción no válida. Use action=get_assignment_data"]);
+        $action = isset($_GET['action']) ? $_GET['action'] : '';
+
+        if (!in_array($action, ['get_assignment_data', 'get_reports'])) {
+            sendResponse(400, ["error" => "Acción no válida. Use action=get_assignment_data o action=get_reports"]);
+        }
+
+        // ── GET REPORTS ──────────────────────────────────────────
+        if ($action === 'get_reports') {
+            $id_usuario = isset($_GET['id_usuario']) ? intval($_GET['id_usuario']) : 0;
+
+            if ($id_usuario <= 0) {
+                sendResponse(400, ["error" => "id_usuario es requerido y debe ser un entero positivo"]);
+            }
+
+            // Verificar que el usuario existe y tiene rol = 2 (usuario normal)
+            $stmt_rol = $conn->prepare("SELECT id FROM usuarios WHERE id = ? AND rol = 2");
+            if (!$stmt_rol) {
+                sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+            }
+            $stmt_rol->bind_param("i", $id_usuario);
+            $stmt_rol->execute();
+            if ($stmt_rol->get_result()->num_rows === 0) {
+                sendResponse(403, ["error" => "Usuario no encontrado o no tiene permisos para consultar reportes"]);
+            }
+            $stmt_rol->close();
+
+            $sql_rep = "SELECT
+                            rep.tipo_incidente,
+                            rep.fecha_incidente,
+                            rep.descripcion,
+                            rep.gravedad,
+                            v.placa         AS vehiculo_placa,
+                            v.modelo        AS vehiculo_modelo,
+                            c.nombre        AS conductor_nombre,
+                            r.nombre        AS ruta_nombre,
+                            r.origen,
+                            r.destino
+                        FROM reportes rep
+                        JOIN vehiculos   v ON rep.id_vehiculo  = v.id_vehiculo
+                        JOIN conductores c ON rep.rfc_conductor = c.rfc_conductor
+                        JOIN rutas       r ON rep.id_ruta       = r.id_ruta
+                        WHERE rep.id_usuario = ?
+                        ORDER BY rep.fecha_incidente DESC";
+
+            $stmt_rep = $conn->prepare($sql_rep);
+            if (!$stmt_rep) {
+                sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+            }
+            $stmt_rep->bind_param("i", $id_usuario);
+            $stmt_rep->execute();
+            $result_rep = $stmt_rep->get_result();
+
+            $reportes = [];
+            while ($row = $result_rep->fetch_assoc()) {
+                $reportes[] = $row;
+            }
+            $stmt_rep->close();
+
+            sendResponse(200, [
+                "success"  => true,
+                "total"    => count($reportes),
+                "reportes" => $reportes
+            ]);
+        }
+
+        // ── GET ASSIGNMENT DATA ───────────────────────────────────
+        if ($action !== 'get_assignment_data') {
+            sendResponse(400, ["error" => "Acción no válida"]);
         }
 
         $placa         = isset($_GET['placa'])         ? strtoupper(trim($_GET['placa'])) : '';
