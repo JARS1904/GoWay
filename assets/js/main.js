@@ -151,3 +151,87 @@ window.addEventListener('resize', () => {
         closeSidebar();
     }
 });
+
+// ====================================================
+// Table Toolbar: search, sort, count
+// Injected automatically before every .data-table
+// ====================================================
+document.addEventListener('DOMContentLoaded', function () {
+    const table = document.querySelector('.data-table');
+    if (!table) return;
+
+    const content = table.closest('.content');
+    if (!content) return;
+
+    const sectionHeader = content.querySelector('.section-header');
+    if (!sectionHeader) return;
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'table-toolbar';
+    toolbar.innerHTML = `
+        <div class="toolbar-left">
+            <span class="toolbar-count" id="toolbarCount"></span>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn-toolbar" id="btnSortTable" title="Ordenar por primera columna">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+                    <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+                    <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+                Ordenar
+            </button>
+            <div class="toolbar-search">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" class="table-search-input" id="tableSearch" placeholder="Buscar...">
+            </div>
+        </div>
+    `;
+    sectionHeader.insertAdjacentElement('afterend', toolbar);
+
+    // Wire up search — pagination.js exposes window.paginationInstance
+    const searchInput = document.getElementById('tableSearch');
+    searchInput.addEventListener('input', function () {
+        if (window.paginationInstance) {
+            window.paginationInstance.filterRows(this.value);
+        } else {
+            // Fallback: simple row visibility (no pagination)
+            const q = this.value.toLowerCase().trim();
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(r => {
+                r.style.display = q && !r.textContent.toLowerCase().includes(q) ? 'none' : '';
+            });
+        }
+    });
+
+    // Wire up sort button - sorts by first data column (index 0)
+    const sortBtn = document.getElementById('btnSortTable');
+    let sortLabels = ['Ordenar', 'A → Z', 'Z → A'];
+    sortBtn.addEventListener('click', function () {
+        if (window.paginationInstance) {
+            const dir = window.paginationInstance.sortByColumn(0);
+            const idx = dir === 1 ? 1 : dir === -1 ? 2 : 0;
+            this.querySelector('span') && (this.querySelector('span').textContent = sortLabels[idx]);
+            this.classList.toggle('active', dir !== 0);
+            // Update label text node
+            const textNodes = [...this.childNodes].filter(n => n.nodeType === 3);
+            const labelNode = textNodes[textNodes.length - 1];
+            if (labelNode) labelNode.textContent = ' ' + sortLabels[idx];
+        }
+    });
+
+    // Initial count — wait for pagination.js to init first
+    setTimeout(() => {
+        if (window.paginationInstance) {
+            window.paginationInstance._updateCount();
+        } else {
+            const el = document.getElementById('toolbarCount');
+            if (el) {
+                const count = table.querySelectorAll('tbody tr').length;
+                el.textContent = `${count} registro${count !== 1 ? 's' : ''}`;
+            }
+        }
+    }, 50);
+});
