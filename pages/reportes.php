@@ -382,6 +382,24 @@ if ($conexion->error) {
                     </a>
                 </li>
                 <li>
+                    <a href="empresas.php">
+                        <img src="../assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
+                        <span>Empresas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="conductores.php">
+                        <img src="../assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
+                        <span>Conductores</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="vehiculos.php">
+                        <img src="../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
+                        <span>Vehículos</span>
+                    </a>
+                </li>
+                <li>
                     <a href="rutas.php">
                         <img src="../assets/images/icons/icon_rutas.png" alt="Rutas" class="icon">
                         <span>Rutas</span>
@@ -394,21 +412,9 @@ if ($conexion->error) {
                     </a>
                 </li>
                 <li>
-                    <a href="vehiculos.php">
-                        <img src="../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon">
-                        <span>Vehículos</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="conductores.php">
-                        <img src="../assets/images/icons/icon_conductores.png" alt="Conductores" class="icon">
-                        <span>Conductores</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="empresas.php">
-                        <img src="../assets/images/icons/icon_empresas.png" alt="Empresas" class="icon">
-                        <span>Empresas</span>
+                    <a href="paradas.php">
+                        <img src="../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
+                        <span>Asignaciones</span>
                     </a>
                 </li>
                 <li>
@@ -418,21 +424,15 @@ if ($conexion->error) {
                     </a>
                 </li>
                 <li>
-                    <a href="paradas.php">
-                        <img src="../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
-                        <span>Asignaciones</span>
+                    <a href="reportes.php">
+                        <img src="../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
+                        <span>Reportes</span>
                     </a>
                 </li>
                 <li>
                     <a href="usuarios.php">
                         <img src="../assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon">
                         <span>Usuarios</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="reportes.php">
-                        <img src="../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon">
-                        <span>Reportes</span>
                     </a>
                 </li>
             </ul>
