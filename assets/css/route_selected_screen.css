@@ -435,12 +435,12 @@ select:focus {
 }
 
 .route-origin i {
-    color: #D32F2F;
+    color: #1d4ed8;
     font-size: 14px;
 }
 
 .route-destination i {
-    color: #388E3C;
+    color: #D32F2F;
     font-size: 14px;
 }
 
@@ -734,7 +734,7 @@ select:focus {
     content: '•';
     position: absolute;
     left: 0;
-    color: var(--dark-gray);
+    color: #e67e00;
 }
 
 /* Separador dentro del schedule-card para driver/vehicle */

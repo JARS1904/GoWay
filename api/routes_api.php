@@ -10,6 +10,13 @@ function sendResponse($statusCode, $data) {
     exit;
 }
 
+// Suma N minutos a una cadena de tiempo "HH:MM:SS" → "HH:MM"
+function _addMinutes(string $timeStr, int $minutes): string {
+    $parts        = explode(':', $timeStr);
+    $totalMinutes = ((int)$parts[0]) * 60 + ((int)$parts[1]) + $minutes;
+    return sprintf('%02d:%02d', intdiv($totalMinutes, 60) % 24, $totalMinutes % 60);
+}
+
 require_once '../config/conexion_bd.php';
 
 try {
@@ -19,23 +26,56 @@ try {
         sendResponse(500, ["error" => "Error de conexión: " . $conn->connect_error]);
     }
 
-    // Manejar solicitud GET para obtener ubicaciones
-    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'locations') {
-        $sql = "SELECT DISTINCT origen AS location FROM rutas WHERE activa = 1 
-                UNION 
-                SELECT DISTINCT destino FROM rutas WHERE activa = 1";
-        $result = $conn->query($sql);
-        
-        if (!$result) {
-            sendResponse(500, ["error" => "Error en consulta: " . $conn->error]);
+    // Manejar solicitud GET
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
+
+        // ── Obtener lista de ubicaciones (orígenes, destinos y paradas registradas) ──
+        if ($_GET['action'] === 'locations') {
+            $sql = "SELECT DISTINCT ubicacion
+                    FROM (
+                        SELECT origen  AS ubicacion FROM rutas WHERE activa = 1
+                        UNION
+                        SELECT destino AS ubicacion FROM rutas WHERE activa = 1
+                        UNION
+                        SELECT pr.nombre
+                        FROM   paradas_ruta pr
+                        INNER JOIN rutas r ON pr.id_ruta = r.id_ruta
+                        WHERE  r.activa = 1
+                    ) AS todas
+                    ORDER BY ubicacion ASC";
+            $result = $conn->query($sql);
+
+            if (!$result) {
+                sendResponse(500, ["error" => "Error en consulta: " . $conn->error]);
+            }
+
+            $locations = [];
+            while ($row = $result->fetch_assoc()) {
+                $locations[] = $row["ubicacion"];
+            }
+
+            sendResponse(200, $locations);
         }
-        
-        $locations = [];
-        while($row = $result->fetch_assoc()) {
-            $locations[] = $row["location"];
+
+        // ── Obtener paradas de una ruta específica (para panel de admin) ──
+        if ($_GET['action'] === 'paradas' && isset($_GET['id_ruta'])) {
+            $id_ruta = (int)$_GET['id_ruta'];
+            $stmt = $conn->prepare(
+                "SELECT id_parada, id_ruta, nombre, orden, minutos_desde_origen
+                 FROM   paradas_ruta
+                 WHERE  id_ruta = ?
+                 ORDER  BY orden ASC"
+            );
+            $stmt->bind_param("i", $id_ruta);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $paradas = [];
+            while ($row = $result->fetch_assoc()) {
+                $paradas[] = $row;
+            }
+            sendResponse(200, $paradas);
         }
-        
-        sendResponse(200, $locations);
     }
 
     // Manejar solicitud POST para buscar rutas
@@ -55,60 +95,116 @@ try {
             if (empty($data['origin']) || empty($data['destination'])) {
                 sendResponse(400, ["error" => "Origen y destino son requeridos"]);
             }
-            
-            $origin = $conn->real_escape_string($data['origin']);
-            $destination = $conn->real_escape_string($data['destination']);
-            
-            $sql = "SELECT DISTINCT r.id_ruta, r.nombre, r.origen, r.destino, r.rfc_empresa, r.paradas,
-                   r.id_ruta_retorno,
-                   ret.nombre  AS ruta_retorno_nombre,
-                   ret.origen  AS ruta_retorno_origen,
-                   ret.destino AS ruta_retorno_destino,
-                   e.nombre AS empresa_nombre, e.telefono AS empresa_telefono,
-                   e.direccion AS empresa_direccion, e.email AS empresa_email
-                FROM rutas r
-                JOIN empresas e ON r.rfc_empresa = e.rfc_empresa
-                LEFT JOIN rutas ret ON r.id_ruta_retorno = ret.id_ruta
-                WHERE r.origen = ? AND r.destino = ? AND r.activa = 1";
-            
+
+            $origin      = trim($data['origin']);
+            $destination = trim($data['destination']);
+
+            // ── Búsqueda extendida ──────────────────────────────────────────────
+            // Caso A (ruta completa): el usuario busca el origen y destino exactos
+            //   de la ruta → devuelve la ruta sin ajuste de tiempo.
+            //
+            // Caso B (tramo): el origen o el destino coinciden con una parada
+            //   registrada en paradas_ruta.  Se devuelve la ruta con los minutos
+            //   desde el origen para embarque y bajada, y es_tramo = 1.
+            //
+            // Ambos casos se resuelven en UNA sola consulta con LEFT JOINs y
+            // una condición OR en el WHERE.
+            // ───────────────────────────────────────────────────────────────────
+            $sql = "SELECT DISTINCT
+                        r.id_ruta, r.nombre, r.origen, r.destino, r.rfc_empresa, r.paradas,
+                        r.id_ruta_retorno,
+                        COALESCE(bo.minutos_desde_origen, 0)  AS embarque_minutos,
+                        COALESCE(bd.minutos_desde_origen, 0)  AS bajada_minutos,
+                        bo.nombre                             AS parada_embarque,
+                        bd.nombre                             AS parada_bajada,
+                        ret.nombre  AS ruta_retorno_nombre,
+                        ret.origen  AS ruta_retorno_origen,
+                        ret.destino AS ruta_retorno_destino,
+                        e.nombre    AS empresa_nombre,
+                        e.telefono  AS empresa_telefono,
+                        e.direccion AS empresa_direccion,
+                        e.email     AS empresa_email
+                    FROM rutas r
+                    JOIN empresas e ON r.rfc_empresa = e.rfc_empresa
+                    LEFT JOIN rutas ret ON r.id_ruta_retorno = ret.id_ruta
+                    LEFT JOIN paradas_ruta bo ON bo.id_ruta = r.id_ruta AND bo.nombre = ?
+                    LEFT JOIN paradas_ruta bd ON bd.id_ruta = r.id_ruta AND bd.nombre = ?
+                    WHERE r.activa = 1
+                      AND (
+                            (r.origen = ? AND r.destino = ?)
+                         OR (bo.id_parada IS NOT NULL AND bd.id_parada IS NOT NULL AND bo.orden < bd.orden)
+                           )";
+
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ss", $origin, $destination);
+            $stmt->bind_param("ssss", $origin, $destination, $origin, $destination);
             $stmt->execute();
             $result = $stmt->get_result();
-            
-            $routes = [];
-            while($row = $result->fetch_assoc()) {
-                // Obtener horarios para cada ruta con información de conductor y vehículo
-                $sql_horarios = "SELECT h.*, 
-                                c.nombre AS conductor_nombre, 
-                                c.licencia AS conductor_licencia,
-                                v.placa AS vehiculo_placa, 
-                                v.modelo AS vehiculo_modelo, 
-                                v.capacidad AS vehiculo_capacidad
-                            FROM horarios h
-                            LEFT JOIN asignaciones a ON h.id_horario = a.id_horario AND h.id_ruta = a.id_ruta AND a.activa = 1
-                            LEFT JOIN conductores c ON a.rfc_conductor = c.rfc_conductor
-                            LEFT JOIN vehiculos v ON a.id_vehiculo = v.id_vehiculo
-                            WHERE h.id_ruta = ?";
 
-                $stmt_h = $conn->prepare($sql_horarios);
+            $routes = [];
+            while ($row = $result->fetch_assoc()) {
+                // Determinar si es un tramo parcial o la ruta completa
+                $row['es_tramo'] = ($row['origen'] === $origin && $row['destino'] === $destination) ? 0 : 1;
+
+                // Obtener horarios con información de conductor y vehículo
+                $sql_h = "SELECT h.*,
+                                 c.nombre   AS conductor_nombre,
+                                 c.licencia AS conductor_licencia,
+                                 v.placa    AS vehiculo_placa,
+                                 v.modelo   AS vehiculo_modelo,
+                                 v.capacidad AS vehiculo_capacidad
+                          FROM horarios h
+                          LEFT JOIN asignaciones a
+                                 ON h.id_horario = a.id_horario
+                                AND h.id_ruta    = a.id_ruta
+                                AND a.activa     = 1
+                          LEFT JOIN conductores c ON a.rfc_conductor = c.rfc_conductor
+                          LEFT JOIN vehiculos   v ON a.id_vehiculo   = v.id_vehiculo
+                          WHERE h.id_ruta = ?";
+
+                $stmt_h = $conn->prepare($sql_h);
                 $stmt_h->bind_param("i", $row['id_ruta']);
                 $stmt_h->execute();
                 $result_h = $stmt_h->get_result();
-                
+
                 $horarios = [];
-                while($horario = $result_h->fetch_assoc()) {
+                while ($horario = $result_h->fetch_assoc()) {
+                    // Para tramos parciales, calcular los tiempos ajustados
+                    if ($row['es_tramo'] && !empty($horario['hora_salida'])) {
+                        $horario['hora_abordaje'] = _addMinutes(
+                            $horario['hora_salida'],
+                            (int)$row['embarque_minutos']
+                        );
+                        $horario['hora_bajada'] = _addMinutes(
+                            $horario['hora_salida'],
+                            (int)$row['bajada_minutos']
+                        );
+                    }
                     $horarios[] = $horario;
                 }
-                
+
                 $row['horarios'] = $horarios;
-                
-                // Procesar paradas como array
-                $row['paradas'] = explode(', ', $row['paradas']);
-                
+
+                // Paradas de la ruta completa (texto legacy + estructurado)
+                $row['paradas_texto'] = $row['paradas'];
+                $row['paradas']       = array_filter(
+                    explode(', ', $row['paradas'] ?? ''),
+                    fn($p) => $p !== ''
+                );
+
+                // Paradas estructuradas (con orden y tiempos)
+                $stmt_p = $conn->prepare(
+                    "SELECT nombre, orden, minutos_desde_origen
+                     FROM   paradas_ruta
+                     WHERE  id_ruta = ?
+                     ORDER  BY orden ASC"
+                );
+                $stmt_p->bind_param("i", $row['id_ruta']);
+                $stmt_p->execute();
+                $row['paradas_ruta'] = $stmt_p->get_result()->fetch_all(MYSQLI_ASSOC);
+
                 $routes[] = $row;
             }
-            
+
             sendResponse(200, $routes);
         }
     }

@@ -89,6 +89,12 @@ require_once '../../config/sync_session_foto.php';
                         </a>
                     </li>
                     <li>
+                        <a href="paradas_ruta.php">
+                            <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas de Ruta" class="icon">
+                            <span>Paradas de Ruta</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="paradas.php">
                             <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
                             <span>Asignaciones</span>
@@ -147,7 +153,7 @@ require_once '../../config/sync_session_foto.php';
                             <th>Nombre</th>
                             <th>Origen</th>
                             <th>Destino</th>
-                            <th>Paradas</th>
+                            <th>Paradas registradas</th>
                             <th>Ruta de retorno</th>
                             <th>Activa</th>
                             <th>RFC de la Empresa</th>
@@ -160,8 +166,10 @@ require_once '../../config/sync_session_foto.php';
                         // Conexión a la base de datos
                         $conn = $conexion;
 
-                        // Consulta para obtener las rutas con su par de retorno
-                        $sql = "SELECT r.*, ret.nombre AS nombre_retorno
+                        // Consulta para obtener las rutas con su par de retorno y conteo de paradas
+                        $sql = "SELECT r.*,
+                                       ret.nombre AS nombre_retorno,
+                                       (SELECT COUNT(*) FROM paradas_ruta pr WHERE pr.id_ruta = r.id_ruta) AS total_paradas
                                 FROM rutas r
                                 LEFT JOIN rutas ret ON r.id_ruta_retorno = ret.id_ruta
                                 ORDER BY r.id_ruta";
@@ -183,7 +191,9 @@ require_once '../../config/sync_session_foto.php';
                                         <td data-label="Nombre" data-id="'.$row["id_ruta"].'">'.$row["nombre"].'</td>
                                         <td data-label="Origen">' . htmlspecialchars($row["origen"]) . '</td>
                                         <td data-label="Destino">' . htmlspecialchars($row["destino"]) . '</td>
-                                        <td data-label="Paradas">' . htmlspecialchars($row["paradas"]) . '</td>
+                                        <td data-label="Paradas">' . ($row['total_paradas'] > 0
+                                            ? '<a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">' . $row['total_paradas'] . ' paradas</a>'
+                                            : '<a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#fee2e2;color:#b91c1c;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">Sin paradas</a>') . '</td>
                                         <td data-label="Ruta de retorno">' . $retornoBadge . '</td>
                                         <td data-label="Activa"><span class="'.$statusClass.'">' . $statusText . '</span></td>
                                         <td data-label="RFC de la Empresa">' . $row["rfc_empresa"] . '</td>

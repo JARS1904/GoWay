@@ -413,6 +413,12 @@ if ($conexion->error) {
                     </a>
                 </li>
                 <li>
+                    <a href="paradas_ruta.php">
+                        <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas de Ruta" class="icon">
+                        <span>Paradas de Ruta</span>
+                    </a>
+                </li>
+                <li>
                     <a href="paradas.php">
                         <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
                         <span>Asignaciones</span>

@@ -89,6 +89,12 @@ require_once 'config/sync_session_foto.php';
                         </a>
                     </li>
                     <li>
+                        <a href="pages/admin/paradas_ruta.php">
+                            <img src="assets/images/icons/icon_paradas.png" alt="Paradas de Ruta" class="icon">
+                            <span>Paradas de Ruta</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="pages/admin/paradas.php">
                             <img src="assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
                             <span>Asignaciones</span>

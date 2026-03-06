@@ -1,7 +1,8 @@
 // Mostrar modal al hacer clic en "Agregar nueva ruta"
 if (document.querySelector('.btn-add')) {
     document.querySelector('.btn-add').addEventListener('click', function() {
-        document.getElementById('addRouteModal').classList.add('active');
+        const modal = document.getElementById('addRouteModal');
+        if (modal) modal.classList.add('active');
     });
 }
 

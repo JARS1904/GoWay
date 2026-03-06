@@ -589,15 +589,16 @@ $stmt->close();
                             <i class="${favoriteIcon}"></i>
                         </button>
                     </div>
+                    ${route.es_tramo ? `<div style="margin-bottom:6px;"><span style="background:#fef3c7;color:#92400e;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;">✂ Tramo parcial de: ${route.origen} → ${route.destino}</span></div>` : ''}
                     <div class="route-path">
                         <div class="route-origin">
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>${route.origen}</span>
+                            <span>${route.es_tramo ? (route.parada_embarque || route.origen) : route.origen}</span>
                         </div>
                         <i class="fas fa-arrow-right arrow"></i>
                         <div class="route-destination">
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>${route.destino}</span>
+                            <span>${route.es_tramo ? (route.parada_bajada || route.destino) : route.destino}</span>
                         </div>
                     </div>
                     <div class="route-card-divider"></div>
@@ -747,16 +748,42 @@ $stmt->close();
             const uniqueSchedules = getUniqueSchedules(route.horarios || []);
             const isFavorite = favorites.has(route.id_ruta);
             const favoriteIcon = isFavorite ? 'fas fa-heart' : 'far fa-heart';
+
+            // Para tramos parciales: helper para sumar minutos a "HH:MM[:SS]"
+            function addMinutes(timeStr, minutes) {
+                if (!timeStr || !minutes) return timeStr;
+                const parts = timeStr.split(':');
+                const totalMin = parseInt(parts[0]) * 60 + parseInt(parts[1]) + parseInt(minutes);
+                const h = String(Math.floor(totalMin / 60) % 24).padStart(2, '0');
+                const m = String(totalMin % 60).padStart(2, '0');
+                return `${h}:${m}`;
+            }
+
+            const isTramo      = route.es_tramo == 1;
+            const boardStop    = isTramo ? (route.parada_embarque || route.origen) : route.origen;
+            const alightStop   = isTramo ? (route.parada_bajada   || route.destino) : route.destino;
+            const embedMinutes = parseInt(route.embarque_minutos) || 0;
+            const alightMinutes= parseInt(route.bajada_minutos)   || 0;
+
+            // Paradas estructuradas (si existen)
+            const paradasRuta = Array.isArray(route.paradas_ruta) ? route.paradas_ruta : [];
+            const paradasFallback = Array.isArray(route.paradas) ? route.paradas : ['No especificadas'];
             
             // Construir contenido de detalles
             let contentHTML = `
                 <div class="route-details">
                     <div class="route-detail-header">
                         <div class="route-detail-title">${route.empresa_nombre || 'Ruta'}</div>
+                        ${isTramo ? `
+                        <div style="margin:4px 0 2px 0;">
+                            <span style="background:#fef3c7;color:#92400e;border-radius:12px;padding:3px 12px;font-size:12px;font-weight:600;">✂ Tramo parcial</span>
+                        </div>
+                        <div style="font-size:12px;color:#64748b;margin-bottom:4px;">Ruta completa: ${route.origen} → ${route.destino}</div>
+                        ` : ''}
                         <div class="route-full-path">
-                            <span>${route.origen}</span>
+                            <span>${boardStop}</span>
                             <i class="fas fa-arrow-right"></i>
-                            <span>${route.destino}</span>
+                            <span>${alightStop}</span>
                         </div>
                     </div>
 
@@ -765,7 +792,6 @@ $stmt->close();
                     <div class="detail-card">
                         <h4 class="info-title">Información de la empresa:</h4>
                         <div class="info-rows-grid">
-                        
                         <div class="info-row">
                             <i class="fas fa-building"></i>
                             <div class="info-text">
@@ -773,7 +799,6 @@ $stmt->close();
                                 <span class="info-value">${route.empresa_nombre || 'No especificado'}</span>
                             </div>
                         </div>
-                        
                         <div class="info-row">
                             <i class="fas fa-phone"></i>
                             <div class="info-text">
@@ -781,7 +806,6 @@ $stmt->close();
                                 <span class="info-value">${route.empresa_telefono || 'No especificado'}</span>
                             </div>
                         </div>
-                        
                         <div class="info-row">
                             <i class="fas fa-map-marker-alt"></i>
                             <div class="info-text">
@@ -789,7 +813,6 @@ $stmt->close();
                                 <span class="info-value">${route.empresa_direccion || 'No especificada'}</span>
                             </div>
                         </div>
-                        
                         <div class="info-row">
                             <i class="fas fa-envelope"></i>
                             <div class="info-text">
@@ -807,7 +830,32 @@ $stmt->close();
 
             // Agregar horarios
             uniqueSchedules.forEach(schedule => {
-                const paradas = Array.isArray(route.paradas) ? route.paradas : ['No especificadas'];
+                // Tiempos: si es tramo y el servidor ya calculó los ajustados, usarlos;
+                // si no, calcularlos en el cliente con los minutos del tramo.
+                const salida  = schedule.hora_abordaje
+                    || (isTramo ? addMinutes(schedule.hora_salida,  embedMinutes)  : schedule.hora_salida);
+                const llegada = schedule.hora_bajada
+                    || (isTramo ? addMinutes(schedule.hora_salida,  alightMinutes) : schedule.hora_llegada);
+
+                // Construir lista de paradas a mostrar en la tarjeta
+                let paradasHTML = '';
+                if (paradasRuta.length > 0) {
+                    // Paradas estructuradas: si es tramo, mostrar solo el segmento relevante
+                    let segmento = paradasRuta;
+                    if (isTramo) {
+                        const idxBoard  = paradasRuta.findIndex(p => p.nombre === boardStop);
+                        const idxAlight = paradasRuta.findIndex(p => p.nombre === alightStop);
+                        if (idxBoard !== -1 && idxAlight !== -1) {
+                            segmento = paradasRuta.slice(idxBoard, idxAlight + 1);
+                        }
+                    }
+                    paradasHTML = segmento.map(p =>
+                        `<li>${p.nombre} <span style="color:#64748b;font-size:11px;">(+${p.minutos_desde_origen} min)</span></li>`
+                    ).join('');
+                } else {
+                    paradasHTML = paradasFallback.map(p => `<li>${p}</li>`).join('');
+                }
+
                 contentHTML += `
                     <div class="schedule-card">
                         <div class="schedule-header">
@@ -819,24 +867,24 @@ $stmt->close();
                         </div>
 
                         <div class="schedule-route-path">
-                            <span>${route.origen}</span>
+                            <span>${boardStop}</span>
                             <i class="fas fa-arrow-right"></i>
-                            <span>${route.destino}</span>
+                            <span>${alightStop}</span>
                         </div>
 
                         <div class="schedule-times">
                             <div class="time-group departure">
                                 <i class="fas fa-map-marker-alt"></i>
                                 <div class="time-text">
-                                    <span class="time-label">Salida</span>
-                                    <span class="time-value">${schedule.hora_salida || '--:--'}</span>
+                                    <span class="time-label">Hora de salida</span>
+                                    <span class="time-value">${salida || '--:--'}</span>
                                 </div>
                             </div>
                             <div class="time-group arrival">
                                 <i class="fas fa-map-marker-alt"></i>
                                 <div class="time-text">
-                                    <span class="time-label">Llegada</span>
-                                    <span class="time-value">${schedule.hora_llegada || '--:--'}</span>
+                                    <span class="time-label">Tiempo de llegada</span>
+                                    <span class="time-value">${llegada || '--:--'}</span>
                                 </div>
                             </div>
                         </div>
@@ -848,11 +896,11 @@ $stmt->close();
                                     <span>Frecuencia: ${schedule.frecuencia || 'No especificada'}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <i class="fas fa-traffic-light" style="color:#7B1FA2;"></i>
-                                    <span>Paradas:</span>
+                                    <i class="fas fa-traffic-light" style="color:#e67e00;"></i>
+                                    <span>${isTramo ? 'Paradas del tramo:' : 'Paradas:'}</span>
                                 </div>
                                 <ul class="stops-list">
-                                    ${paradas.map(stop => `<li>${stop}</li>`).join('')}
+                                    ${paradasHTML}
                                 </ul>
                             </div>
 
