@@ -73,7 +73,7 @@ require_once 'config/sync_session_foto.php';
                     <li>
                         <a href="pages/admin/vehiculos.php">
                             <img src="assets/images/icons/icon_vehiculos.png" alt="Veh├¡culos" class="icon">
-                            <span>Veh├¡culos</span>
+                            <span>Vehículos</span>
                         </a>
                     </li>
                     <li>
@@ -139,7 +139,7 @@ require_once 'config/sync_session_foto.php';
                 <!-- Secci├│n de Bienvenida -->
                 <div class="dashboard-welcome">
                     <h1>Bienvenido, <?php echo $_SESSION['nombre']; ?></h1>
-                    <p>Aqu├¡ puedes ver un resumen del estado general de tu sistema de transporte</p>
+                    <p>Aquí puedes ver un resumen del estado general de tu sistema de transporte</p>
                 </div>
 
                 <!-- Grid de Estad├¡sticas -->
@@ -192,9 +192,9 @@ require_once 'config/sync_session_foto.php';
                             <img src="assets/images/icons/icons8-vehiculo-dashboard-resumen.png" alt="Veh├¡culos">
                         </div>
                         <div class="stat-card-content">
-                            <h3>Veh├¡culos</h3>
+                            <h3>Vehículos</h3>
                             <p class="stat-number"><?php echo $row['total_vehiculos']; ?></p>
-                            <span class="stat-label">En operaci├│n</span>
+                            <span class="stat-label">En operación</span>
                         </div>
                     </div>
 
@@ -237,7 +237,7 @@ require_once 'config/sync_session_foto.php';
 
                 <!-- Secci├│n de Acciones R├ípidas -->
                 <div class="quick-actions">
-                    <h2>Acciones R├ípidas</h2>
+                    <h2>Acciones Rápidas</h2>
                     <div class="actions-grid">
                         <a href="pages/admin/rutas.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-rutas-dashboard.png" alt="Rutas">
@@ -245,7 +245,7 @@ require_once 'config/sync_session_foto.php';
                         </a>
                         <a href="pages/admin/vehiculos.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-vehiculos-dashboard.png" alt="Veh├¡culos">
-                            <span>Gestionar Veh├¡culos</span>
+                            <span>Gestionar Vehículos</span>
                         </a>
                         <a href="pages/admin/conductores.php" class="action-btn">
                             <img class="action-icon" src="assets/images/icons/icons8-conditores-dashboard.png" alt="Conductores">

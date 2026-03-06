@@ -244,7 +244,12 @@ require_once '../../config/sync_session_foto.php';
                         </div>
                         <div class="modal-form-group">
                             <label>Foto de perfil</label>
-                            <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="input-foto">
+                            <label class="foto-upload-label">
+                                <span class="foto-upload-icon">📷</span>
+                                <span class="foto-upload-btn">Elegir imagen</span>
+                                <span class="foto-upload-name">Sin archivo</span>
+                                <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="input-foto">
+                            </label>
                             <small class="form-hint">Opcional · JPG, PNG o WebP · Máx. 2 MB</small>
                         </div>
                     </div>
@@ -295,7 +300,12 @@ require_once '../../config/sync_session_foto.php';
                         </div>
                         <div class="modal-form-group">
                             <label>Cambiar foto</label>
-                            <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="input-foto">
+                            <label class="foto-upload-label">
+                                <span class="foto-upload-icon">📷</span>
+                                <span class="foto-upload-btn">Elegir imagen</span>
+                                <span class="foto-upload-name">Sin archivo</span>
+                                <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="input-foto">
+                            </label>
                             <small class="form-hint">Dejar vacío para conservar la foto actual</small>
                         </div>
                     </div>
@@ -441,6 +451,13 @@ require_once '../../config/sync_session_foto.php';
             'id',
             '¿Estás seguro de que deseas eliminar este usuario?'
         );
+
+        document.querySelectorAll('.input-foto').forEach(function(input) {
+            input.addEventListener('change', function() {
+                var nameEl = this.closest('.foto-upload-label').querySelector('.foto-upload-name');
+                if (nameEl) nameEl.textContent = this.files.length > 0 ? this.files[0].name : 'Sin archivo';
+            });
+        });
     </script>
 </body>
 </html>

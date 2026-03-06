@@ -1828,20 +1828,60 @@ body {
 }
 
 /* Input de archivo en modales */
+/* Input de foto oculto — se activa con .foto-upload-label */
 .input-foto {
-    display: block;
-    width: 100%;
-    padding: 6px 0;
-    font-size: 13px;
-    color: #374151;
+    display: none;
+}
+
+.foto-upload-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px dashed #aab4c4;
+    border-radius: 15px;
+    background-color: #f8fafc;
     cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    user-select: none;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.foto-upload-label:hover {
+    border-color: #0660fe;
+    background-color: #eef3ff;
+}
+
+.foto-upload-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.foto-upload-btn {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0660fe;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.foto-upload-name {
+    font-size: 12px;
+    color: #9ca3af;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
 }
 
 .form-hint {
     display: block;
-    margin-top: 4px;
+    margin-top: 5px;
     font-size: 11px;
     color: #9ca3af;
+    padding-left: 4px;
 }
 
 .card-actions {
