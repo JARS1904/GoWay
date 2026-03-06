@@ -12,7 +12,7 @@ require_once '../../config/sync_session_foto.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paradas de Ruta - GoWay</title>
+    <title>Paradas - GoWay</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" href="../../assets/images/logo.png" type="image/png">
     <style>
@@ -51,7 +51,7 @@ require_once '../../config/sync_session_foto.php';
         <div class="mobile-topbar-content">
             <div class="mobile-topbar-left">
                 <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-                <h1 class="mobile-page-title">Paradas de Ruta</h1>
+                <h1 class="mobile-page-title">Paradas</h1>
             </div>
             <div class="mobile-topbar-right">
                 <div class="mobile-user-info">
@@ -79,8 +79,8 @@ require_once '../../config/sync_session_foto.php';
                 <li><a href="vehiculos.php"><img src="../../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon"><span>Vehículos</span></a></li>
                 <li><a href="rutas.php"><img src="../../assets/images/icons/icon_rutas.png" alt="Rutas" class="icon"><span>Rutas</span></a></li>
                 <li><a href="horarios.php"><img src="../../assets/images/icons/icon_horarios.png" alt="Horarios" class="icon"><span>Horarios</span></a></li>
-                <li><a href="paradas_ruta.php" class="active"><img src="../../assets/images/icons/icon_paradas.png" alt="Paradas de Ruta" class="icon"><span>Paradas de Ruta</span></a></li>
-                <li><a href="paradas.php"><img src="../../assets/images/icons/icon_paradas.png" alt="Asignaciones" class="icon"><span>Asignaciones</span></a></li>
+                <li><a href="paradas_ruta.php" class="active"><img src="../../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon"><span>Paradas</span></a></li>
+                <li><a href="asignaciones.php"><img src="../../assets/images/icons/icon_asignacion.png" alt="Asignaciones" class="icon"><span>Asignaciones</span></a></li>
                 <li><a href="checadores.php"><img src="../../assets/images/icons/icon_checadores.png" alt="Checadores" class="icon"><span>Checadores</span></a></li>
                 <li><a href="reportes.php"><img src="../../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon"><span>Reportes</span></a></li>
                 <li><a href="usuarios.php"><img src="../../assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon"><span>Usuarios</span></a></li>
@@ -97,7 +97,7 @@ require_once '../../config/sync_session_foto.php';
     <!-- Contenido Principal -->
     <main class="main-content" id="mainContent">
         <header class="header">
-            <h2>Paradas de Ruta</h2>
+            <h2>Paradas</h2>
             <div class="user-info">
                 <span><?php echo htmlspecialchars($_SESSION['nombre']); ?></span>
                 <?php echo !empty($_SESSION['foto'])
@@ -109,7 +109,7 @@ require_once '../../config/sync_session_foto.php';
         <section class="content">
 
             <div class="section-header">
-                <h3>Paradas de Ruta</h3>
+                <h3>Paradas</h3>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <select id="routeSelect" style="padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:14px; color:#374151; background:#fff; cursor:pointer;">
                         <option value="">— Selecciona una ruta —</option>

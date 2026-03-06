@@ -71,8 +71,24 @@ try {
             
             $row['horarios'] = $horarios;
             
-            // Procesar paradas como array
-            $row['paradas'] = explode(', ', $row['paradas']);
+            // Paradas texto legacy como array
+            $row['paradas_texto'] = $row['paradas'];
+            $row['paradas'] = array_filter(
+                explode(', ', $row['paradas'] ?? ''),
+                fn($p) => $p !== ''
+            );
+
+            // Paradas estructuradas (con orden y tiempos)
+            $stmt_p = $conn->prepare(
+                "SELECT nombre, orden, minutos_desde_origen
+                 FROM   paradas_ruta
+                 WHERE  id_ruta = ?
+                 ORDER  BY orden ASC"
+            );
+            $stmt_p->bind_param("i", $row['id_ruta']);
+            $stmt_p->execute();
+            $row['paradas_ruta'] = $stmt_p->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt_p->close();
             
             $favoritas[] = $row;
             $stmt_h->close();

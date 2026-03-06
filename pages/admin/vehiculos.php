@@ -90,13 +90,13 @@ require_once '../../config/sync_session_foto.php';
                     </li>
                     <li>
                         <a href="paradas_ruta.php">
-                            <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas de Ruta" class="icon">
-                            <span>Paradas de Ruta</span>
+                            <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
+                            <span>Paradas</span>
                         </a>
                     </li>
                     <li>
-                        <a href="paradas.php">
-                            <img src="../../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon">
+                        <a href="asignaciones.php">
+                            <img src="../../assets/images/icons/icon_asignacion.png" alt="Asignaciones" class="icon">
                             <span>Asignaciones</span>
                         </a>
                     </li>

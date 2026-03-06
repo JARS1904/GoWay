@@ -876,14 +876,14 @@ $stmt->close();
                             <div class="time-group departure">
                                 <i class="fas fa-map-marker-alt"></i>
                                 <div class="time-text">
-                                    <span class="time-label">Hora de salida</span>
+                                    <span class="time-label">${isTramo ? 'Abordaje' : 'Hora de salida'}</span>
                                     <span class="time-value">${salida || '--:--'}</span>
                                 </div>
                             </div>
                             <div class="time-group arrival">
                                 <i class="fas fa-map-marker-alt"></i>
                                 <div class="time-text">
-                                    <span class="time-label">Tiempo de llegada</span>
+                                    <span class="time-label">${isTramo ? 'Bajada' : 'Tiempo de llegada'}</span>
                                     <span class="time-value">${llegada || '--:--'}</span>
                                 </div>
                             </div>
