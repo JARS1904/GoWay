@@ -830,26 +830,31 @@ $stmt->close();
 
             // Agregar horarios
             uniqueSchedules.forEach(schedule => {
-                // Tiempos: si es tramo y el servidor ya calculó los ajustados, usarlos;
-                // si no, calcularlos en el cliente con los minutos del tramo.
-                const salida  = schedule.hora_abordaje
-                    || (isTramo ? addMinutes(schedule.hora_salida,  embedMinutes)  : schedule.hora_salida);
-                const llegada = schedule.hora_bajada
-                    || (isTramo ? addMinutes(schedule.hora_salida,  alightMinutes) : schedule.hora_llegada);
+                // La API ya precalcula hora_abordaje y hora_bajada usando minutos_desde_origen acumulados
+                const salida  = schedule.hora_abordaje || schedule.hora_salida;
+                const llegada = schedule.hora_bajada   || schedule.hora_llegada;
 
-                // Construir lista de paradas a mostrar en la tarjeta
+                // Construir lista de paradas usando paradas_con_hora precalculadas por la API
                 let paradasHTML = '';
-                if (paradasRuta.length > 0) {
-                    // Paradas estructuradas: si es tramo, mostrar solo el segmento relevante
-                    let segmento = paradasRuta;
+                const paradasConHora = Array.isArray(schedule.paradas_con_hora) ? schedule.paradas_con_hora : [];
+
+                if (paradasConHora.length > 0) {
+                    // Filtrar solo el segmento del tramo si aplica
+                    let segmento = paradasConHora;
                     if (isTramo) {
-                        const idxBoard  = paradasRuta.findIndex(p => p.nombre === boardStop);
-                        const idxAlight = paradasRuta.findIndex(p => p.nombre === alightStop);
+                        const idxBoard  = paradasConHora.findIndex(p => p.nombre === boardStop);
+                        const idxAlight = paradasConHora.findIndex(p => p.nombre === alightStop);
                         if (idxBoard !== -1 && idxAlight !== -1) {
-                            segmento = paradasRuta.slice(idxBoard, idxAlight + 1);
+                            segmento = paradasConHora.slice(idxBoard, idxAlight + 1);
                         }
                     }
-                    paradasHTML = segmento.map(p =>
+                    const boardMin = isTramo && segmento.length > 0 ? segmento[0].minutos_desde_origen : 0;
+                    paradasHTML = segmento.map(p => {
+                        const minRel = p.minutos_desde_origen - boardMin;
+                        return `<li>${p.nombre} <span style="color:#64748b;font-size:11px;">${p.hora_estimada} <em>(+${minRel} min)</em></span></li>`;
+                    }).join('');
+                } else if (paradasRuta.length > 0) {
+                    paradasHTML = paradasRuta.map(p =>
                         `<li>${p.nombre} <span style="color:#64748b;font-size:11px;">(+${p.minutos_desde_origen} min)</span></li>`
                     ).join('');
                 } else {

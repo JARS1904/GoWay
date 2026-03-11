@@ -166,32 +166,7 @@ try {
                 $stmt_h->execute();
                 $result_h = $stmt_h->get_result();
 
-                $horarios = [];
-                while ($horario = $result_h->fetch_assoc()) {
-                    // Para tramos parciales, calcular los tiempos ajustados
-                    if ($row['es_tramo'] && !empty($horario['hora_salida'])) {
-                        $horario['hora_abordaje'] = _addMinutes(
-                            $horario['hora_salida'],
-                            (int)$row['embarque_minutos']
-                        );
-                        $horario['hora_bajada'] = _addMinutes(
-                            $horario['hora_salida'],
-                            (int)$row['bajada_minutos']
-                        );
-                    }
-                    $horarios[] = $horario;
-                }
-
-                $row['horarios'] = $horarios;
-
-                // Paradas de la ruta completa (texto legacy + estructurado)
-                $row['paradas_texto'] = $row['paradas'];
-                $row['paradas']       = array_filter(
-                    explode(', ', $row['paradas'] ?? ''),
-                    fn($p) => $p !== ''
-                );
-
-                // Paradas estructuradas (con orden y tiempos)
+                // Paradas estructuradas (con orden y tiempos) — se obtienen UNA vez por ruta
                 $stmt_p = $conn->prepare(
                     "SELECT nombre, orden, minutos_desde_origen
                      FROM   paradas_ruta
@@ -200,7 +175,56 @@ try {
                 );
                 $stmt_p->bind_param("i", $row['id_ruta']);
                 $stmt_p->execute();
-                $row['paradas_ruta'] = $stmt_p->get_result()->fetch_all(MYSQLI_ASSOC);
+                $paradas_ruta = $stmt_p->get_result()->fetch_all(MYSQLI_ASSOC);
+                $row['paradas_ruta'] = $paradas_ruta;
+
+                // Encontrar índices de embarque y bajada (para tramos)
+                $idx_embarque = -1;
+                $idx_bajada   = -1;
+                if ($row['es_tramo']) {
+                    foreach ($paradas_ruta as $i => $p) {
+                        if ($p['nombre'] === $row['parada_embarque']) $idx_embarque = $i;
+                        if ($p['nombre'] === $row['parada_bajada'])   $idx_bajada   = $i;
+                    }
+                }
+
+                $horarios = [];
+                while ($horario = $result_h->fetch_assoc()) {
+                    if (!empty($horario['hora_salida'])) {
+                        if ($row['es_tramo'] && $idx_embarque !== -1 && $idx_bajada !== -1) {
+                            // Abordaje: hora_salida + minutos_acumulados de la parada de embarque
+                            $horario['hora_abordaje'] = _addMinutes(
+                                $horario['hora_salida'],
+                                (int)$paradas_ruta[$idx_embarque]['minutos_desde_origen']
+                            );
+                            // Bajada: hora_salida + minutos_acumulados de la parada de bajada
+                            $horario['hora_bajada'] = _addMinutes(
+                                $horario['hora_salida'],
+                                (int)$paradas_ruta[$idx_bajada]['minutos_desde_origen']
+                            );
+                        }
+
+                        // Hora estimada por parada para este horario (útil para web y app)
+                        $horario['paradas_con_hora'] = array_map(function($p) use ($horario) {
+                            return [
+                                'nombre'               => $p['nombre'],
+                                'orden'                => (int)$p['orden'],
+                                'minutos_desde_origen' => (int)$p['minutos_desde_origen'],
+                                'hora_estimada'        => _addMinutes($horario['hora_salida'], (int)$p['minutos_desde_origen']),
+                            ];
+                        }, $paradas_ruta);
+                    }
+                    $horarios[] = $horario;
+                }
+
+                $row['horarios'] = $horarios;
+
+                // Paradas legacy como array (compatibilidad)
+                $row['paradas_texto'] = $row['paradas'];
+                $row['paradas'] = array_filter(
+                    explode(', ', $row['paradas'] ?? ''),
+                    fn($p) => $p !== ''
+                );
 
                 $routes[] = $row;
             }
