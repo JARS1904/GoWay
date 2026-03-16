@@ -50,6 +50,18 @@ if (isset($_POST['btningresar'])) {
     exit();
 }
 
+// Lógica para invitado
+if (isset($_POST['btninvitado'])) {
+    session_start();
+    $_SESSION['id']     = 0;
+    $_SESSION['nombre'] = 'Invitado';
+    $_SESSION['email']  = '';
+    $_SESSION['rol']    = 3; // Rol de invitado
+
+    header("Location: ../pages/usuario/route_selected_screen.php");
+    exit();
+}
+
 // Lógica para login de administrador
 if (isset($_POST['btnadmin'])) {
     if (empty($_POST['email']) || empty($_POST['password'])) {

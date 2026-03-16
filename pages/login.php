@@ -296,7 +296,8 @@ body {
 
             <div class="lg-row"><a href="#">¿Olvidaste tu contraseña?</a></div>
 
-            <button name="btningresar" type="submit" class="lg-btn">Iniciar sesión</button>
+            <button name="btningresar" type="submit" class="lg-btn" style="margin-bottom: 12px;">Iniciar sesión</button>
+            <button name="btninvitado" type="submit" class="lg-btn" style="background: transparent; color: #2962FF; border: 1.5px solid #2962FF; box-shadow: none;">Continuar como invitado</button>
         </form>
 
         <p class="lg-footer">¿No tienes cuenta? <a href="registro.php">Regístrate</a></p>

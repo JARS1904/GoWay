@@ -1,19 +1,22 @@
 <?php
 session_start();
 
-// Verificar si el usuario está logueado y tiene rol=2
-if (!isset($_SESSION['id']) || $_SESSION['rol'] != 2) {
+// Verificar si el usuario está logueado y tiene rol=2 o rol=3 (invitado)
+if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], [2, 3])) {
     header("Location: ../login.php");
     exit();
 }
 
-// Consultar foto fresca de la BD (no depender de la sesión)
-require_once '../../config/conexion_bd.php';
-$stmt = $conexion->prepare("SELECT foto FROM usuarios WHERE id = ?");
-$stmt->bind_param("i", $_SESSION['id']);
-$stmt->execute();
-$_user_foto = $stmt->get_result()->fetch_assoc()['foto'] ?? null;
-$stmt->close();
+$_user_foto = null;
+if ($_SESSION['id'] > 0) {
+    // Consultar foto fresca de la BD solo si no es invitado
+    require_once '../../config/conexion_bd.php';
+    $stmt = $conexion->prepare("SELECT foto FROM usuarios WHERE id = ?");
+    $stmt->bind_param("i", $_SESSION['id']);
+    $stmt->execute();
+    $_user_foto = $stmt->get_result()->fetch_assoc()['foto'] ?? null;
+    $stmt->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -40,17 +43,23 @@ $stmt->close();
                 <a href="https://goway.netlify.app" target="_blank" class="download-btn">
                     <i class="fas fa-download"></i> Descargar App
                 </a>
-                <a href="../logout.php" class="logout">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-                </a>
-                <button class="profile-nav-btn" onclick="openProfilePanel()">
-                    <?php if (!empty($_user_foto)): ?>
-                        <img src="../../assets/images/profiles/<?php echo htmlspecialchars($_user_foto); ?>" class="profile-nav-mini-avatar profile-nav-mini-img" alt="foto">
-                    <?php else: ?>
-                        <span class="profile-nav-mini-avatar"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></span>
-                    <?php endif; ?>
-                    Mi Perfil
-                </button>
+                <?php if ($_SESSION['rol'] == 3): ?>
+                    <a href="../login.php" class="download-btn">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                    </a>
+                <?php else: ?>
+                    <a href="../logout.php" class="logout">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                    </a>
+                    <button class="profile-nav-btn" onclick="openProfilePanel()">
+                        <?php if (!empty($_user_foto)): ?>
+                            <img src="../../assets/images/profiles/<?php echo htmlspecialchars($_user_foto); ?>" class="profile-nav-mini-avatar profile-nav-mini-img" alt="foto">
+                        <?php else: ?>
+                            <span class="profile-nav-mini-avatar"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></span>
+                        <?php endif; ?>
+                        Mi Perfil
+                    </button>
+                <?php endif; ?>
             </nav>
 
             <!-- Menú desplegable solo para móvil -->
@@ -59,15 +68,21 @@ $stmt->close();
                     <i class="fas fa-user-circle"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="#" onclick="openProfilePanel(); return false;">
-                        <i class="fas fa-user-circle"></i> Mi Perfil
-                    </a>
                     <a href="https://goway.netlify.app" target="_blank">
                         <i class="fas fa-download"></i> Descargar App
                     </a>
-                    <a href="../logout.php">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-                    </a>
+                    <?php if ($_SESSION['rol'] == 3): ?>
+                        <a href="../login.php">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                        </a>
+                    <?php else: ?>
+                        <a href="#" onclick="openProfilePanel(); return false;">
+                            <i class="fas fa-user-circle"></i> Mi Perfil
+                        </a>
+                        <a href="../logout.php">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -103,6 +118,7 @@ $stmt->close();
             <section class="results-section">
                 <h2 class="section-title">Disponibles</h2>
                 
+                <?php if ($_SESSION['rol'] != 3): ?>
                 <div class="filter-section">
                     <button class="filter-btn active" id="filterAll" data-filter="all">
                         <i class="fas fa-list"></i> Todas
@@ -111,6 +127,7 @@ $stmt->close();
                         <i class="fas fa-heart"></i> Favoritas
                     </button>
                 </div>
+                <?php endif; ?>
                 
                 <div id="resultsContainer">
                     <div class="no-routes">
@@ -285,21 +302,27 @@ $stmt->close();
             destinationSelect.addEventListener('change', updateSearchButton);
             
             // Escuchadores de eventos de filtro
-            filterAllBtn.addEventListener('click', () => {
-                currentFilter = 'all';
-                updateFilterButtons();
-                filterAndDisplayRoutes();
-            });
+            if (filterAllBtn) {
+                filterAllBtn.addEventListener('click', () => {
+                    currentFilter = 'all';
+                    updateFilterButtons();
+                    filterAndDisplayRoutes();
+                });
+            }
             
-            filterFavoritesBtn.addEventListener('click', () => {
-                currentFilter = 'favorites';
-                updateFilterButtons();
-                loadFavoritesAndDisplay();
-            });
+            if (filterFavoritesBtn) {
+                filterFavoritesBtn.addEventListener('click', () => {
+                    currentFilter = 'favorites';
+                    updateFilterButtons();
+                    loadFavoritesAndDisplay();
+                });
+            }
         });
 
         // Cargar rutas favoritas del servidor
         async function loadFavorites() {
+            if (ID_USUARIO === 0) return; // Invitados no tienen favoritas
+
             try {
                 const response = await fetch(`${FAVORITES_URL}?action=get_favorites&id_usuario=${ID_USUARIO}`, {
                     method: 'GET',
@@ -330,8 +353,8 @@ $stmt->close();
 
         // Actualizar apariencia de botones de filtro
         function updateFilterButtons() {
-            filterAllBtn.classList.toggle('active', currentFilter === 'all');
-            filterFavoritesBtn.classList.toggle('active', currentFilter === 'favorites');
+            if (filterAllBtn) filterAllBtn.classList.toggle('active', currentFilter === 'all');
+            if (filterFavoritesBtn) filterFavoritesBtn.classList.toggle('active', currentFilter === 'favorites');
         }
 
         // Filtrar y mostrar rutas según el filtro actual
@@ -585,9 +608,11 @@ $stmt->close();
                             <i class="fas fa-building"></i>
                             <span class="route-company">${route.empresa_nombre || 'Transporte'}</span>
                         </div>
+                        ${ID_USUARIO !== 0 ? `
                         <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-route-id="${route.id_ruta}" title="${isFavorite ? 'Eliminar de favoritas' : 'Agregar a favoritas'}">
                             <i class="${favoriteIcon}"></i>
                         </button>
+                        ` : ''}
                     </div>
                     ${route.es_tramo ? `<div style="margin-bottom:6px;"><span style="background:#fef3c7;color:#92400e;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;">✂ Tramo parcial de: ${route.origen} → ${route.destino}</span></div>` : ''}
                     <div class="route-path">
@@ -633,10 +658,12 @@ $stmt->close();
 
                 // Agregar escucha de evento del botón de favorita
                 const favoriteBtn = routeCard.querySelector('.favorite-btn');
-                favoriteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toggleFavorite(route.id_ruta, favoriteBtn);
-                });
+                if (favoriteBtn) {
+                    favoriteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        toggleFavorite(route.id_ruta, favoriteBtn);
+                    });
+                }
                 
                 resultsContainer.appendChild(routeCard);
             });
