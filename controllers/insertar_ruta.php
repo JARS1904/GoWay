@@ -17,7 +17,7 @@ if ($conn->connect_error) {
 $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
 $origen = isset($_POST['origen']) ? trim($_POST['origen']) : '';
 $destino = isset($_POST['destino']) ? trim($_POST['destino']) : '';
-$paradas = isset($_POST['paradas']) ? trim($_POST['paradas']) : '';
+$id_ruta_retorno = isset($_POST['id_ruta_retorno']) && $_POST['id_ruta_retorno'] !== '' ? (int)$_POST['id_ruta_retorno'] : null;
 $rfc_empresa = isset($_POST['rfc_empresa']) ? trim($_POST['rfc_empresa']) : '';
 
 // Validar datos
@@ -27,8 +27,8 @@ if (empty($nombre) || empty($origen) || empty($destino) || empty($rfc_empresa)) 
     exit;
 }
 
-// Preparar la consulta SQL (añadiendo rfc_empresa)
-$sql = "INSERT INTO rutas (rfc_empresa, nombre, origen, destino, paradas)
+// Preparar la consulta SQL (añadiendo rfc_empresa e id_ruta_retorno)
+$sql = "INSERT INTO rutas (rfc_empresa, nombre, origen, destino, id_ruta_retorno)
         VALUES (?, ?, ?, ?, ?)";
 
 // Preparar statement
@@ -40,8 +40,8 @@ if ($stmt === false) {
     exit;
 }
 
-// Vincular parámetros
-$stmt->bind_param("sssss", $rfc_empresa, $nombre, $origen, $destino, $paradas);
+// Vincular parámetros (usando 'i' para el int nullable)
+$stmt->bind_param("ssssi", $rfc_empresa, $nombre, $origen, $destino, $id_ruta_retorno);
 
 // Ejecutar consulta
 if ($stmt->execute()) {

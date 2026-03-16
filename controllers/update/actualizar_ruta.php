@@ -18,7 +18,7 @@ $id_ruta = isset($_POST['id_ruta']) ? (int)$_POST['id_ruta'] : 0;
 $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
 $origen = isset($_POST['origen']) ? trim($_POST['origen']) : '';
 $destino = isset($_POST['destino']) ? trim($_POST['destino']) : '';
-$paradas = isset($_POST['paradas']) ? trim($_POST['paradas']) : '';
+$id_ruta_retorno = isset($_POST['id_ruta_retorno']) && $_POST['id_ruta_retorno'] !== '' ? (int)$_POST['id_ruta_retorno'] : null;
 $activa = isset($_POST['activa']) ? (int)$_POST['activa'] : 0;
 $rfc_empresa = isset($_POST['rfc_empresa']) ? trim($_POST['rfc_empresa']) : '';
 
@@ -35,7 +35,7 @@ $sql = "UPDATE rutas SET
         nombre = ?,
         origen = ?,
         destino = ?,
-        paradas = ?,
+        id_ruta_retorno = ?,
         activa = ?
         WHERE id_ruta = ?";
 
@@ -49,7 +49,7 @@ if ($stmt === false) {
 }
 
 // Vincular parámetros
-$stmt->bind_param("sssssii", $rfc_empresa, $nombre, $origen, $destino, $paradas, $activa, $id_ruta);
+$stmt->bind_param("ssssiii", $rfc_empresa, $nombre, $origen, $destino, $id_ruta_retorno, $activa, $id_ruta);
 
 // Ejecutar consulta
 if ($stmt->execute()) {

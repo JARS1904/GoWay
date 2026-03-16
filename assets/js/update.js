@@ -13,16 +13,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const nombre = row.querySelector('td:nth-child(1)').textContent;
             const origen = row.querySelector('td:nth-child(2)').textContent;
             const destino = row.querySelector('td:nth-child(3)').textContent;
-            const paradas = row.querySelector('td:nth-child(4)').textContent;
-            const activa = row.querySelector('td:nth-child(5)').textContent === 'Sí' ? '1' : '0';
-            const rfc_empresa = row.querySelector('td:nth-child(6)').textContent;
+            const ruta_retorno_id = row.querySelector('td:nth-child(5)').getAttribute('data-id-retorno') || '';
+            const activa = row.querySelector('td:nth-child(6)').textContent === 'Sí' ? '1' : '0';
+            const rfc_empresa = row.querySelector('td:nth-child(7)').textContent;
             
             // Llenar el formulario de edición
             document.getElementById('edit_id_ruta').value = id_ruta;
             document.getElementById('edit_nombre').value = nombre;
             document.getElementById('edit_origen').value = origen;
             document.getElementById('edit_destino').value = destino;
-            document.getElementById('edit_paradas').value = paradas;
+            document.getElementById('edit_id_ruta_retorno').value = ruta_retorno_id;
             document.getElementById('edit_activa').value = activa;
             document.getElementById('edit_rfc_empresa').value = rfc_empresa;
             

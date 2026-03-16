@@ -490,47 +490,19 @@ if ($conexion->error) {
                 <!-- Formulario para nuevo reporte -->
                 <div class="report-form-container">
                     <h3>Nuevo Reporte de Incidente</h3>
-                    <form id="incidentForm" method="POST" action="../../controllers/insert_reportes.php">
+                    <form id="incidentForm" method="POST" action="#">
                         <div class="form-group">
-                            <label for="vehiculo">Vehículo *</label>
-                            <select id="vehiculo" name="vehiculo" required>
-                                <option value="">Seleccionar vehículo</option>
-                                <?php
-                                if ($result_vehiculos && $result_vehiculos->num_rows > 0) {
-                                    while($row = $result_vehiculos->fetch_assoc()) {
-                                        echo "<option value='" . $row['id_vehiculo'] . "'>" . $row['placa'] . " - " . $row['modelo'] . "</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
+                            <label for="placa">Placa de la Unidad *</label>
+                            <input type="text" id="placa" name="placa" placeholder="Ingrese la placa" required style="text-transform: uppercase;">
+                            <small id="placaError" style="color: #ef4444; display: none; margin-top: 5px; font-weight: 500;">No se encontró asignación para esta placa.</small>
                         </div>
-
-                        <div class="form-group">
-                            <label for="conductor">Conductor *</label>
-                            <select id="conductor" name="conductor" required>
-                                <option value="">Seleccionar conductor</option>
-                                <?php
-                                if ($result_conductores && $result_conductores->num_rows > 0) {
-                                    while($row = $result_conductores->fetch_assoc()) {
-                                        echo "<option value='" . $row['rfc_conductor'] . "'>" . $row['nombre'] . "</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="ruta">Ruta *</label>
-                            <select id="ruta" name="ruta" required>
-                                <option value="">Seleccionar ruta</option>
-                                <?php
-                                if ($result_rutas && $result_rutas->num_rows > 0) {
-                                    while($row = $result_rutas->fetch_assoc()) {
-                                        echo "<option value='" . $row['id_ruta'] . "'>" . $row['nombre'] . "</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
+                        
+                        <!-- Contenedor para mostrar los datos obtenidos automáticamente -->
+                        <div id="datosAsignacion" style="display: none; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+                            <h4 style="margin-top: 0; margin-bottom: 10px; color: #3b82f6;">Asignación encontrada</h4>
+                            <p style="margin: 5px 0; font-size: 14px; color: #475569;"><strong>Vehículo:</strong> <span id="infoVehiculo"></span></p>
+                            <p style="margin: 5px 0; font-size: 14px; color: #475569;"><strong>Conductor:</strong> <span id="infoConductor"></span></p>
+                            <p style="margin: 5px 0; font-size: 14px; color: #475569;"><strong>Ruta:</strong> <span id="infoRuta"></span></p>
                         </div>
 
                         <div class="form-group">
@@ -790,9 +762,62 @@ if ($conexion->error) {
         loadReports(filteredReports);
     }
 
-    // Función para manejar el envío del formulario con AJAX
+    // Variables para almacenar datos temporales de la asignación
+    let currentAsignacionId = null;
+    const idUsuarioActual = <?php echo isset($_SESSION['id']) ? (int)$_SESSION['id'] : 0; ?>;
+
+    // Escuchar cambios en el input de placa
+    const inputPlaca = document.getElementById('placa');
+    if (inputPlaca) {
+        inputPlaca.addEventListener('blur', function() {
+            const placaVal = this.value.trim().toUpperCase();
+            this.value = placaVal;
+            const placaError = document.getElementById('placaError');
+            const dataContainer = document.getElementById('datosAsignacion');
+            
+            if (!placaVal) {
+                dataContainer.style.display = 'none';
+                placaError.style.display = 'none';
+                currentAsignacionId = null;
+                return;
+            }
+
+            fetch(`../../api/reportes_api.php?action=get_assignment_data&placa=${encodeURIComponent(placaVal)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        placaError.style.display = 'none';
+                        dataContainer.style.display = 'block';
+                        document.getElementById('infoVehiculo').textContent = `${data.data.vehiculo_placa} - ${data.data.vehiculo_modelo}`;
+                        document.getElementById('infoConductor').textContent = data.data.conductor_nombre;
+                        document.getElementById('infoRuta').textContent = `${data.data.ruta_nombre} (${data.data.origen} - ${data.data.destino})`;
+                        currentAsignacionId = data.data.id_asignacion;
+                    } else {
+                        placaError.style.display = 'block';
+                        placaError.textContent = data.error || 'No se encontró asignación para esta placa.';
+                        dataContainer.style.display = 'none';
+                        currentAsignacionId = null;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    placaError.style.display = 'block';
+                    placaError.textContent = 'Error de conexión al buscar placa.';
+                    dataContainer.style.display = 'none';
+                    currentAsignacionId = null;
+                });
+        });
+    }
+
+    // Función para manejar el envío del formulario con AJAX (Nuevo reporte)
     document.getElementById('incidentForm').addEventListener('submit', function(e) {
         e.preventDefault();
+
+        const placaVal = document.getElementById('placa').value.trim().toUpperCase();
+        if (!placaVal || !currentAsignacionId) {
+            showNotification('Por favor, ingrese una placa válida y verifique sus datos.', 'error');
+            return;
+        }
 
         const fechaIncidente = document.getElementById('fechaIncidente');
         if (!fechaIncidente.value) {
@@ -800,18 +825,33 @@ if ($conexion->error) {
             return;
         }
 
+        let fechaHr = fechaIncidente.value;
+        if (fechaHr.length === 16) { // YYYY-MM-DDTHH:MM
+            fechaHr += ':00';
+        }
+        fechaHr = fechaHr.replace('T', ' ');
+
         // Deshabilitar botón submit
         const submitBtn = this.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Guardando...';
 
-        // Enviar con AJAX
-        const formData = new FormData(this);
-        
-        fetch(this.action, {
+        const payload = {
+            id_usuario: idUsuarioActual,
+            placa: placaVal,
+            tipo_incidente: document.getElementById('tipoIncidente').value,
+            fecha_hora: fechaHr,
+            descripcion: document.getElementById('descripcion').value,
+            gravedad: document.getElementById('gravedad').value
+        };
+
+        fetch('../../api/reportes_api.php', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
         })
         .then(response => response.json())
         .then(data => {
@@ -819,18 +859,20 @@ if ($conexion->error) {
             submitBtn.textContent = originalText;
 
             if (data.success) {
-                // Limpiar formulario
+                // Limpiar formulario y ocultar contenedor
                 document.getElementById('incidentForm').reset();
+                document.getElementById('datosAsignacion').style.display = 'none';
+                currentAsignacionId = null;
                 
                 // Mostrar notificación
                 showNotification(data.message || 'Reporte guardado exitosamente', 'info');
 
-                // Recargar la página después de 2 segundos
+                // Recargar la página después de generar el reporte
                 setTimeout(() => {
                     location.reload();
                 }, 2000);
             } else {
-                showNotification(data.message || 'Error al guardar el reporte', 'error');
+                showNotification(data.error || data.message || 'Error al guardar el reporte', 'error');
             }
         })
         .catch(error => {
@@ -1015,12 +1057,7 @@ if ($conexion->error) {
         });
     }
 
-    // Función para mostrar notificaciones (opcional)
-    // Función para manejar el cambio de vehículo
-    document.getElementById('vehiculo').addEventListener('change', function() {
-        const vehiculoId = this.value;
-        // Aquí puedes agregar lógica adicional si necesitas hacer algo cuando se selecciona un vehículo
-    });
+    // Función para mostrar notificaciones (opcional) ya es parte del archivo utils
 
     // Funciones para el menú hamburguesa
     function toggleSidebar() {
@@ -1075,6 +1112,17 @@ if ($conexion->error) {
         if (window.innerWidth > 768) {
             closeSidebar();
         }
+    });
+
+    // Marcar enlace activo según la página actual
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentFile = window.location.pathname.split('/').pop() || 'index.php';
+        document.querySelectorAll('.sidebar nav ul li a').forEach(link => {
+            const linkFile = link.getAttribute('href').split('/').pop();
+            if (linkFile === currentFile) {
+                link.classList.add('nav-active');
+            }
+        });
     });
 
     // --- funciones para editar ---

@@ -182,7 +182,15 @@ require_once '../../config/sync_session_foto.php';
 
                                 // Badge de retorno
                                 if ($row['id_ruta_retorno']) {
-                                    $retornoBadge = '<span style="display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;white-space:nowrap;">⇄ ' . htmlspecialchars($row['nombre_retorno']) . '</span>';
+                                    $nombreRetorno = htmlspecialchars($row['nombre_retorno']);
+                                    // Cambiar formato: "A - B" a "A ⇄ B"
+                                    if (strpos($nombreRetorno, ' - ') !== false) {
+                                        $nombreRetornoFormatted = str_replace(' - ', ' ⇄ ', $nombreRetorno);
+                                        $retornoBadge = '<span style="display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;white-space:normal;line-height:1.2;">' . $nombreRetornoFormatted . '</span>';
+                                    } else {
+                                        // Si no tiene el guión, lo dejamos como ⇄ Nombre
+                                        $retornoBadge = '<span style="display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;white-space:normal;line-height:1.2;">⇄ ' . $nombreRetorno . '</span>';
+                                    }
                                 } else {
                                     $retornoBadge = '<span style="color:#94a3b8;font-size:12px;">— Sin par</span>';
                                 }
@@ -194,7 +202,7 @@ require_once '../../config/sync_session_foto.php';
                                         <td data-label="Paradas">' . ($row['total_paradas'] > 0
                                             ? '<a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">' . $row['total_paradas'] . ' paradas</a>'
                                             : '<a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#fee2e2;color:#b91c1c;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">Sin paradas</a>') . '</td>
-                                        <td data-label="Ruta de retorno">' . $retornoBadge . '</td>
+                                        <td data-label="Ruta de retorno" data-id-retorno="' . ($row['id_ruta_retorno'] ? $row['id_ruta_retorno'] : '') . '">' . $retornoBadge . '</td>
                                         <td data-label="Activa"><span class="'.$statusClass.'">' . $statusText . '</span></td>
                                         <td data-label="RFC de la Empresa">' . $row["rfc_empresa"] . '</td>
                                         <td>
@@ -263,8 +271,16 @@ require_once '../../config/sync_session_foto.php';
                             <input type="text" id="origen" name="origen" placeholder="Ej: Av. Principal" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="paradas">Paradas</label>
-                            <textarea id="paradas" name="paradas" placeholder="Descripción de paradas importantes"></textarea>
+                            <label for="id_ruta_retorno">Ruta de retorno (Opcional)</label>
+                            <select id="id_ruta_retorno" name="id_ruta_retorno">
+                                <option value="">-- Sin ruta de retorno --</option>
+                                <?php
+                                $result_rutas = $conexion->query("SELECT id_ruta, nombre FROM rutas ORDER BY nombre");
+                                while ($row_ruta = $result_rutas->fetch_assoc()) {
+                                    echo "<option value='{$row_ruta['id_ruta']}'>{$row_ruta['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -318,8 +334,16 @@ require_once '../../config/sync_session_foto.php';
                             <input type="text" id="edit_origen" name="origen" placeholder="Ej: Av. Principal" required>
                         </div>
                         <div class="modal-form-group">
-                            <label for="edit_paradas">Paradas</label>
-                            <textarea id="edit_paradas" name="paradas" placeholder="Descripción de paradas importantes"></textarea>
+                            <label for="edit_id_ruta_retorno">Ruta de retorno (Opcional)</label>
+                            <select id="edit_id_ruta_retorno" name="id_ruta_retorno">
+                                <option value="">-- Sin ruta de retorno --</option>
+                                <?php
+                                $result_rutas_edit = $conexion->query("SELECT id_ruta, nombre FROM rutas ORDER BY nombre");
+                                while ($row_ruta_edit = $result_rutas_edit->fetch_assoc()) {
+                                    echo "<option value='{$row_ruta_edit['id_ruta']}'>{$row_ruta_edit['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_activa">Activa</label>
