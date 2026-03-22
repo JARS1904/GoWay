@@ -56,6 +56,14 @@ if ($conexion->error) {
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-bottom: 30px;
+            height: calc(100vh - 140px);
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: 100%;
         }
 
         .report-form-container {
@@ -63,6 +71,9 @@ if ($conexion->error) {
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
         }
 
         .reports-list-container {
@@ -70,6 +81,11 @@ if ($conexion->error) {
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
 
         .form-group {
@@ -130,22 +146,22 @@ if ($conexion->error) {
         .reports-grid {
             display: grid;
             gap: 15px;
-            max-height: 700px; /*Antes era 500*/
+            flex: 1;
             overflow-y: auto;
+            min-height: 0;
+            align-content: start;
         }
 
         .report-card {
             background: #f8fafc;
-            border: 2px solid #e2e8f0;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 15px;
-            transition: all 0.3s ease;
+            transition: background-color 0.2s ease;
         }
 
         .report-card:hover {
-            border-color: #3b82f6;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #f1f5f9;
         }
 
         .report-header {
@@ -227,32 +243,49 @@ if ($conexion->error) {
             color: white;
         }
 
-        .stats-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        .compact-stats {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: space-between;
         }
 
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .compact-stat {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            flex: 1;
             text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+        
+        .compact-stat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
         }
 
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #3b82f6;
-            margin: 10px 0;
-        }
-
-        .stat-label {
+        .compact-label {
+            display: block;
+            font-size: 11px;
             color: #64748b;
-            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
         }
+
+        .compact-value {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .val-total  { color: #3b82f6; }
+        .val-orange { color: #f59e0b; }
+        .val-blue   { color: #0ea5e9; }
+        .val-green  { color: #10b981; }
 
         .filters {
             display: flex;
@@ -466,26 +499,6 @@ if ($conexion->error) {
         </header>
 
         <section class="content">
-            <!-- Estadísticas rápidas -->
-            <div class="stats-cards">
-                <div class="stat-card">
-                    <div class="stat-label">Total Reportes</div>
-                    <div class="stat-number" id="totalReports">12</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Pendientes</div>
-                    <div class="stat-number" id="pendingReports">5</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">En Proceso</div>
-                    <div class="stat-number" id="inProgressReports">3</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Resueltos</div>
-                    <div class="stat-number" id="resolvedReports">4</div>
-                </div>
-            </div>
-
             <div class="reports-container">
                 <!-- Formulario para nuevo reporte -->
                 <div class="report-form-container">
@@ -643,10 +656,12 @@ if ($conexion->error) {
                     </div>
                 </div>
 
-                <!-- Lista de reportes existentes -->
+                <!-- Columna derecha contenedora -->
+                <div class="right-column">
+                    <!-- Lista de reportes existentes -->
                 <div class="reports-list-container">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3>Reportes Recientes</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0;">Reportes Recientes</h3>
                         <div class="filters">
                             <div class="filter-group">
                                 <label>Filtrar por:</label>
@@ -660,10 +675,30 @@ if ($conexion->error) {
                         </div>
                     </div>
 
+                    <div class="compact-stats">
+                        <div class="compact-stat">
+                            <span class="compact-label">Total</span>
+                            <span class="compact-value val-total" id="totalReports">0</span>
+                        </div>
+                        <div class="compact-stat">
+                            <span class="compact-label">Pendientes</span>
+                            <span class="compact-value val-orange" id="pendingReports">0</span>
+                        </div>
+                        <div class="compact-stat">
+                            <span class="compact-label">Proceso</span>
+                            <span class="compact-value val-blue" id="inProgressReports">0</span>
+                        </div>
+                        <div class="compact-stat">
+                            <span class="compact-label">Resueltos</span>
+                            <span class="compact-value val-green" id="resolvedReports">0</span>
+                        </div>
+                    </div>
+
                     <div class="reports-grid" id="reportsList">
                         <!-- Los reportes se cargarán aquí dinámicamente -->
                     </div>
                 </div>
+                </div> <!-- Fin de right-column -->
             </div>
         </section>
     </main>
