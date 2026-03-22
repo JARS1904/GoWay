@@ -281,9 +281,9 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar horario</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT id_horario, dia_semana FROM horarios");
+                                $result = $conn->query("SELECT id_horario, tipo_dia, hora_salida FROM horarios");
                                 while ($row = $result->fetch_assoc()) {
-                                echo "<option value='{$row['id_horario']}'>{$row['dia_semana']}</option>";
+                                echo "<option value='{$row['id_horario']}'>{$row['tipo_dia']} - {$row['hora_salida']}</option>";
                                 }
                                 ?>
                             </select>

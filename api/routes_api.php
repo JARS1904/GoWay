@@ -99,6 +99,16 @@ try {
             $origin      = trim($data['origin']);
             $destination = trim($data['destination']);
 
+            // === Calcular el tipo de día actual basado en la fecha del servidor ===
+            $numeroDia = date('N'); // 1 = Lunes, 7 = Domingo
+            if ($numeroDia >= 1 && $numeroDia <= 5) {
+                $tipo_dia_actual = 'Lunes a Viernes';
+            } else if ($numeroDia == 6) {
+                $tipo_dia_actual = 'Sábado';
+            } else {
+                $tipo_dia_actual = 'Domingo';
+            }
+
             // ── Búsqueda extendida ──────────────────────────────────────────────
             // Caso A (ruta completa): el usuario busca el origen y destino exactos
             //   de la ruta → devuelve la ruta sin ajuste de tiempo.
@@ -157,12 +167,13 @@ try {
                                  ON h.id_horario = a.id_horario
                                 AND h.id_ruta    = a.id_ruta
                                 AND a.activa     = 1
+                                AND a.fecha      = CURDATE()
                           LEFT JOIN conductores c ON a.rfc_conductor = c.rfc_conductor
                           LEFT JOIN vehiculos   v ON a.id_vehiculo   = v.id_vehiculo
-                          WHERE h.id_ruta = ?";
+                          WHERE h.id_ruta = ? AND h.tipo_dia = ?";
 
                 $stmt_h = $conn->prepare($sql_h);
-                $stmt_h->bind_param("i", $row['id_ruta']);
+                $stmt_h->bind_param("is", $row['id_ruta'], $tipo_dia_actual);
                 $stmt_h->execute();
                 $result_h = $stmt_h->get_result();
 

@@ -148,7 +148,7 @@ require_once '../../config/sync_session_foto.php';
                     <thead>
                         <tr>
                             <th>Ruta</th>
-                            <th>Día</th>
+                            <th>Jornada (Día)</th>
                             <th>Hora salida</th>
                             <th>Hora llegada</th>
                             <th>Frecuencia</th>
@@ -163,7 +163,7 @@ require_once '../../config/sync_session_foto.php';
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 $ruta      = htmlspecialchars($row['nombre_ruta'] ?? 'Sin ruta');
-                                $dia       = htmlspecialchars($row['dia_semana']);
+                                $dia       = htmlspecialchars($row['tipo_dia']);
                                 $salida    = htmlspecialchars($row['hora_salida']);
                                 $llegada   = htmlspecialchars($row['hora_llegada']);
                                 $frecuencia = htmlspecialchars($row['frecuencia'] ?? '—');
@@ -229,8 +229,13 @@ require_once '../../config/sync_session_foto.php';
 
                     </div>
                     <div class="modal-form-group">
-                        <label >Día de la semana</label>
-                        <input type="text" id="" name="dia_semana" placeholder="Ej.Lunes, Martes, etc." required>
+                        <label >Tipo de Día (Jornada)</label>
+                        <select name="tipo_dia" required>
+                            <option value="Lunes a Viernes">Lunes a Viernes</option>
+                            <option value="Sábado">Sábado</option>
+                            <option value="Domingo">Domingo</option>
+                            <option value="Festivo">Festivo</option>
+                        </select>
                     </div>
                     <div class="modal-form-group">
                         <label >Hora de salida</label>
@@ -286,8 +291,13 @@ require_once '../../config/sync_session_foto.php';
             </select>
           </div>
           <div class="modal-form-group">
-            <label>Día de la semana</label>
-            <input type="text" name="dia_semana" id="edit_dia_semana" required>
+            <label>Tipo de Día (Jornada)</label>
+            <select name="tipo_dia" id="edit_tipo_dia" required>
+                <option value="Lunes a Viernes">Lunes a Viernes</option>
+                <option value="Sábado">Sábado</option>
+                <option value="Domingo">Domingo</option>
+                <option value="Festivo">Festivo</option>
+            </select>
           </div>
           <div class="modal-form-group">
             <label>Hora de salida</label>
@@ -347,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const row = this.closest('tr');
             document.getElementById('edit_id_horario').value  = row.dataset.id;
             document.getElementById('edit_id_ruta').value     = row.dataset.idRuta;
-            document.getElementById('edit_dia_semana').value  = row.dataset.dia;
+            document.getElementById('edit_tipo_dia').value  = row.dataset.tipoDia;
             document.getElementById('edit_hora_salida').value = row.dataset.salida;
             document.getElementById('edit_hora_llegada').value = row.dataset.llegada;
             document.getElementById('edit_frecuencia').value  = row.dataset.frecuencia;

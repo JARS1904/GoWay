@@ -15,20 +15,20 @@ if ($conn->connect_error) {
 
 // Obtener y validar datos
 $id_ruta = isset($_POST['id_ruta']) ? (int)$_POST['id_ruta'] : 0;
-$dia_semana = isset($_POST['dia_semana']) ? trim($_POST['dia_semana']) : '';
+$tipo_dia = isset($_POST['tipo_dia']) ? trim($_POST['tipo_dia']) : '';
 $hora_salida = isset($_POST['hora_salida']) ? trim($_POST['hora_salida']) : '';
 $hora_llegada = isset($_POST['hora_llegada']) ? trim($_POST['hora_llegada']) : '';
 $frecuencia = isset($_POST['frecuencia']) ? trim($_POST['frecuencia']) : '';
 
 // Validar campos requeridos
-if (empty($id_ruta) || empty($dia_semana) || empty($hora_salida) || empty($hora_llegada)) {
+if (empty($id_ruta) || empty($tipo_dia) || empty($hora_salida) || empty($hora_llegada)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Por favor completa todos los campos requeridos']);
     exit;
 }
 
 // Preparar y ejecutar consulta
-$stmt = $conn->prepare("INSERT INTO horarios (id_ruta, dia_semana, hora_salida, hora_llegada, frecuencia) VALUES (?, ?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO horarios (id_ruta, tipo_dia, hora_salida, hora_llegada, frecuencia) VALUES (?, ?, ?, ?, ?)");
 
 if ($stmt === false) {
     http_response_code(500);
@@ -36,7 +36,7 @@ if ($stmt === false) {
     exit;
 }
 
-$stmt->bind_param("issss", $id_ruta, $dia_semana, $hora_salida, $hora_llegada, $frecuencia);
+$stmt->bind_param("issss", $id_ruta, $tipo_dia, $hora_salida, $hora_llegada, $frecuencia);
 
 if ($stmt->execute()) {
     http_response_code(200);

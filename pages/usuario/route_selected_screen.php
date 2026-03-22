@@ -253,7 +253,7 @@ if ($_SESSION['id'] > 0) {
             empresa_direccion: "Calle Falsa 123",
             empresa_email: "contacto@ejemplo.com",
             horarios: [{
-                dia_semana: "Lunes a Viernes",
+                tipo_dia: "Lunes a Viernes",
                 hora_salida: "08:00",
                 hora_llegada: "09:30",
                 frecuencia: "Cada 30 minutos",
@@ -554,13 +554,13 @@ if ($_SESSION['id'] > 0) {
                     
                     // Agregar horarios existentes
                     uniqueRoutes[routeId].horarios.forEach(schedule => {
-                        const key = `${schedule.dia_semana}-${schedule.hora_salida}-${schedule.hora_llegada}`;
+                        const key = `${schedule.tipo_dia}-${schedule.hora_salida}-${schedule.hora_llegada}`;
                         scheduleMap[key] = schedule;
                     });
                     
                     // Agregar nuevos horarios
                     route.horarios.forEach(schedule => {
-                        const key = `${schedule.dia_semana}-${schedule.hora_salida}-${schedule.hora_llegada}`;
+                        const key = `${schedule.tipo_dia}-${schedule.hora_salida}-${schedule.hora_llegada}`;
                         scheduleMap[key] = schedule;
                     });
                     
@@ -738,7 +738,7 @@ if ($_SESSION['id'] > 0) {
             const scheduleMap = {};
             
             schedules.forEach(schedule => {
-                const key = `${schedule.dia_semana}-${schedule.hora_salida}-${schedule.hora_llegada}`;
+                const key = `${schedule.tipo_dia}-${schedule.hora_salida}-${schedule.hora_llegada}`;
                 scheduleMap[key] = schedule;
             });
             
@@ -894,7 +894,7 @@ if ($_SESSION['id'] > 0) {
                             <span class="schedule-company-name">${route.empresa_nombre || 'Transporte'}</span>
                             <div class="schedule-day">
                                 <i class="fas fa-calendar-alt"></i>
-                                ${schedule.dia_semana || 'No especificado'}
+                                ${schedule.tipo_dia || 'No especificado'}
                             </div>
                         </div>
 

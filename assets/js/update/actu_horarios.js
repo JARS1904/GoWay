@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Llenar los campos del formulario de edición
             document.getElementById('edit_id_horario').value = id_horario;
             document.getElementById('edit_id_ruta').value = id_ruta;
-            document.getElementById('edit_dia_semana').value = dia;
+            document.getElementById('edit_tipo_dia').value = dia;
             document.getElementById('edit_hora_salida').value = salida;
             document.getElementById('edit_hora_llegada').value = llegada;
             document.getElementById('edit_frecuencia').value = frecuencia;
