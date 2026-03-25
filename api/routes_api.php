@@ -156,6 +156,7 @@ try {
                 $row['es_tramo'] = ($row['origen'] === $origin && $row['destino'] === $destination) ? 0 : 1;
 
                 // Obtener horarios con información de conductor y vehículo
+                // Se obtiene la asignación más reciente y activa para cada horario
                 $sql_h = "SELECT h.*,
                                  c.nombre   AS conductor_nombre,
                                  c.licencia AS conductor_licencia,
@@ -167,7 +168,14 @@ try {
                                  ON h.id_horario = a.id_horario
                                 AND h.id_ruta    = a.id_ruta
                                 AND a.activa     = 1
-                                AND a.fecha      = CURDATE()
+                                AND a.id_asignacion = (
+                                    SELECT id_asignacion FROM asignaciones a2
+                                    WHERE a2.id_horario = h.id_horario 
+                                      AND a2.id_ruta = h.id_ruta
+                                      AND a2.activa = 1
+                                    ORDER BY a2.fecha DESC, a2.id_asignacion DESC
+                                    LIMIT 1
+                                )
                           LEFT JOIN conductores c ON a.rfc_conductor = c.rfc_conductor
                           LEFT JOIN vehiculos   v ON a.id_vehiculo   = v.id_vehiculo
                           WHERE h.id_ruta = ? AND h.tipo_dia = ?";
