@@ -18,6 +18,17 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
+    // Insertar notificación de sistema
+    $titulo_notif = "Horario Eliminado";
+    $mensaje_notif = "El administrador ha eliminado un horario. Por favor revisa las actualizaciones.";
+    $tipo_notif = "horario";
+    $sql_notif = "INSERT INTO notificaciones (id_usuario, titulo, mensaje, tipo) VALUES (NULL, ?, ?, ?)";
+    if ($stmt_notif = $conn->prepare($sql_notif)) {
+        $stmt_notif->bind_param("sss", $titulo_notif, $mensaje_notif, $tipo_notif);
+        $stmt_notif->execute();
+        $stmt_notif->close();
+    }
+
     header("Location: /GoWay/pages/admin/horarios.php?mensaje=Horario eliminado exitosamente");
     exit();
 } else {

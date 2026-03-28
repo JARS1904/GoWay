@@ -32,6 +32,17 @@ try {
     $stmt2->bind_param("i", $id);
     $stmt2->execute();
     
+    // Insertar notificación de sistema
+    $titulo_notif = "Unidad dada de baja";
+    $mensaje_notif = "El administrador ha dado de baja una unidad. Pueden existir cambios en las rutas.";
+    $tipo_notif = "unidad";
+    $sql_notif = "INSERT INTO notificaciones (id_usuario, titulo, mensaje, tipo) VALUES (NULL, ?, ?, ?)";
+    if ($stmt_notif = $conn->prepare($sql_notif)) {
+        $stmt_notif->bind_param("sss", $titulo_notif, $mensaje_notif, $tipo_notif);
+        $stmt_notif->execute();
+        $stmt_notif->close();
+    }
+
     // Confirmar transacción si todo salió bien
     $conn->commit();
 

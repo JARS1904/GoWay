@@ -261,9 +261,9 @@ require_once 'config/sync_session_foto.php';
                             <img class="action-icon" src="assets/images/icons/icons8-horario-dashboard.png" alt="Horarios">
                             <span>Gestionar Horarios</span>
                         </a>
-                        <a href="pages/admin/checadores.php" class="action-btn">
-                            <img class="action-icon" src="assets/images/icons/icons8-checadores-dashboard.png" alt="Checadores">
-                            <span>Gestionar Checadores</span>
+                        <a href="pages/admin/notificaciones.php" class="action-btn">
+                            <img class="action-icon" src="assets/images/icons/icon_reportes.png" alt="Notificaciones">
+                            <span>Gestionar Notificaciones</span>
                         </a>
                     </div>
                 </div>

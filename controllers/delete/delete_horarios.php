@@ -29,12 +29,28 @@ if ($stmt === false) {
 
 $stmt->bind_param("i", $id);
 
-if ($stmt->execute()) {
-    http_response_code(200);
-    echo json_encode(['success' => true, 'message' => 'Horario eliminado exitosamente']);
-} else {
+try {
+    if ($stmt->execute()) {
+        // Insertar notificación
+        $titulo_notif = "Horario Eliminado";
+        $mensaje_notif = "El administrador ha eliminado un horario. Por favor revisa las actualizaciones.";
+        $tipo_notif = "horario";
+        $sql_notif = "INSERT INTO notificaciones (id_usuario, titulo, mensaje, tipo) VALUES (NULL, ?, ?, ?)";
+        if ($stmt_notif = $conn->prepare($sql_notif)) {
+            $stmt_notif->bind_param("sss", $titulo_notif, $mensaje_notif, $tipo_notif);
+            $stmt_notif->execute();
+            $stmt_notif->close();
+        }
+
+        http_response_code(200);
+        echo json_encode(['success' => true, 'message' => 'Horario eliminado exitosamente']);
+    } else {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Error al eliminar: ' . $stmt->error]);
+    }
+} catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error al eliminar: ' . $stmt->error]);
+    echo json_encode(['success' => false, 'message' => 'Operación fallida. Revisa si la tabla notificaciones ya existe o si el horario está ocupado. Error: ' . $e->getMessage()]);
 }
 
 $stmt->close();
