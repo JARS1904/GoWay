@@ -2156,3 +2156,213 @@ body {
         font-size: 24px;
     }
 }
+
+/* ============================ */
+/* PANEL LATERAL NOTIFICACIONES */
+/* ============================ */
+
+/* Campana de Notificaciones */
+.notification-bell {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border: none;
+    position: relative;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.notification-bell .material-icons {
+    font-size: 24px;
+    color: #ffffff !important;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.notification-bell:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: scale(1.1);
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.4);
+}
+
+.mobile-user-info .notification-bell {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.mobile-user-info .notification-bell:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+/* Redirección/Panel Derecho */
+.notifications-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 380px;
+    height: 100vh;
+    background-color: #ffffff;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.notifications-panel.active {
+    right: 0;
+}
+
+.notifications-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.notifications-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Cabecera del Panel */
+.notifications-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.notifications-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.close-panel {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #64748b;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close-panel:hover {
+    color: #ef4444;
+}
+
+/* Acciones */
+.notifications-actions {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #ffffff;
+}
+
+/* Cuerpo del Panel (Lista) */
+.notifications-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    background-color: #f8fafc;
+}
+
+/* Cápsula de Notificación */
+.notification-capsule {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    border: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.notification-capsule:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-color: #e2e8f0;
+}
+
+.notif-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.notif-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-title {
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.notif-desc {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.notif-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.notif-target {
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.empty-notifs {
+    text-align: center;
+    padding: 40px 0;
+    color: #94a3b8;
+}
+
+/* Pantallas pequeñas (Móvil) */
+@media (max-width: 480px) {
+    .notifications-panel {
+        width: 100vw;
+        right: -100vw;
+    }
+}

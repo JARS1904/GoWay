@@ -18,6 +18,7 @@ require_once 'config/sync_session_foto.php';
     <title>Dashboard - Transporte P├║blico</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="icon" href="assets/images/logo.png" type="image/png">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
 <body>
@@ -34,6 +35,9 @@ require_once 'config/sync_session_foto.php';
                 </div>
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
+                        <button class="notification-bell" id="mobileNotifBtn" onclick="toggleNotifications()">
+                            <span class="material-icons">notifications_none</span>
+                        </button>
                         <span><?php echo $_SESSION['nombre']; ?></span>
                         <?php echo !empty($_SESSION['foto']) ? '<img src="assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="assets/images/icons/administrador.png" alt="Usuario">'; ?>
                     </div>
@@ -136,6 +140,9 @@ require_once 'config/sync_session_foto.php';
             <header class="header">
                 <h2>Dashboard</h2>
                 <div class="user-info">
+                    <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
+                        <span class="material-icons">notifications_none</span>
+                    </button>
                     <span><?php echo $_SESSION['nombre']; ?></span>
                     <?php echo !empty($_SESSION['foto']) ? '<img src="assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="assets/images/icons/administrador.png" alt="Usuario">'; ?>
                 </div>
@@ -261,14 +268,156 @@ require_once 'config/sync_session_foto.php';
                             <img class="action-icon" src="assets/images/icons/icons8-horario-dashboard.png" alt="Horarios">
                             <span>Gestionar Horarios</span>
                         </a>
-                        <a href="pages/admin/notificaciones.php" class="action-btn">
-                            <img class="action-icon" src="assets/images/icons/icon_reportes.png" alt="Notificaciones">
-                            <span>Gestionar Notificaciones</span>
+                        <a href="pages/admin/checadores.php" class="action-btn">
+                            <img class="action-icon" src="assets/images/icons/icons8-checadores-dashboard.png" alt="Checadores">
+                            <span>Gestionar Checadores</span>
                         </a>
                     </div>
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- Panel Lateral de Notificaciones -->
+    <div class="notifications-panel" id="notificationsPanel">
+        <div class="notifications-header">
+            <h3>Centro de Notificaciones</h3>
+            <button class="close-panel" onclick="toggleNotifications()">&times;</button>
+        </div>
+        <div class="notifications-actions">
+            <button class="btn-add full-width" id="openAddNotificationModal" style="margin: 0; width: 100%;">+ Mandar Notificación</button>
+        </div>
+        <div class="notifications-body">
+            <?php
+            $sql_notif  = "SELECT n.*, u.nombre AS usuario_nombre 
+                           FROM notificaciones n 
+                           LEFT JOIN usuarios u ON n.id_usuario = u.id 
+                           ORDER BY n.fecha_creacion DESC LIMIT 50";
+            $result_notif = $conn->query($sql_notif);
+            
+            if ($result_notif && $result_notif->num_rows > 0) {
+                while ($row_notif = $result_notif->fetch_assoc()) {
+                    $target = ($row_notif['id_usuario'] === null) ? 'Todos los usuarios' : htmlspecialchars($row_notif['usuario_nombre']);
+                    $titulo = htmlspecialchars($row_notif['titulo']);
+                    $tipo = htmlspecialchars($row_notif['tipo']);
+                    $fecha = date('d M Y, h:i a', strtotime($row_notif['fecha_creacion']));
+
+                    $icon_svg = '';
+                    $gradient = '';
+                    $tipo_text = '';
+
+                    switch ($tipo) {
+                        case 'Alerta':
+                            $gradient = 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)';
+                            $icon_svg = 'warning';
+                            $tipo_text = 'Alerta de Seguridad';
+                            break;
+                        case 'Promocion':
+                            $gradient = 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)';
+                            $icon_svg = 'local_offer';
+                            $tipo_text = 'Promoción Especial';
+                            break;
+                        case 'Cierre':
+                            $gradient = 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)';
+                            $icon_svg = 'block';
+                            $tipo_text = 'Cierre Vial';
+                            break;
+                        case 'General':
+                        default:
+                            $gradient = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+                            $icon_svg = 'notifications';
+                            $tipo_text = 'Aviso General';
+                            break;
+                    }
+                    ?>
+                    <div class="notification-capsule">
+                        <div class="notif-icon" style="background: <?php echo $gradient; ?>">
+                            <span class="material-icons"><?php echo $icon_svg; ?></span>
+                        </div>
+                        <div class="notif-content">
+                            <h4 class="notif-title"><?php echo $titulo; ?></h4>
+                            <p class="notif-desc"><?php echo htmlspecialchars($row_notif['mensaje']); ?></p>
+                            
+                            <div class="notif-details" style="font-size: 13px; color: #475569; margin-bottom: 8px;">
+                                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
+                                    <span class="material-icons" style="font-size:14px;">group</span>
+                                    <span><strong><?php echo $target; ?></strong></span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-icons" style="font-size:14px;">label</span>
+                                    <span><?php echo $tipo_text; ?></span>
+                                </div>
+                            </div>
+
+                            <div class="notif-meta" style="display: flex; justify-content: flex-end; width: 100%;">
+                                <span class="notif-time" style="font-size: 11px; color: #94a3b8;"><?php echo $fecha; ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                }
+            } else {
+                echo '<div class="empty-notifs">
+                        <span class="material-icons" style="font-size: 48px; color: #cbd5e1; margin-bottom: 10px;">notifications_off</span>
+                        <p>No hay notificaciones recientes</p>
+                      </div>';
+            }
+            ?>
+        </div>
+    </div>
+    <div class="notifications-overlay" id="notificationsOverlay" onclick="toggleNotifications()"></div>
+
+    <!-- Modal para agregar nueva notificación -->
+    <div class="modal-overlay" id="addNotificationModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Enviar Notificación</h3>
+                <button class="modal-close" id="closeAddNotifModal">&times;</button>
+            </div>
+            <form id="notificationForm" action="controllers/insert_notificacion.php" method="POST">
+                <div class="modal-body">
+                    <div>
+                        <div class="modal-form-group">
+                            <label>Destinatario (Usuario)</label>
+                            <select name="id_usuario" required>
+                                <option value="todos">Todos los usuarios (Global)</option>
+                                <?php
+                                $res_usuarios = $conn->query("SELECT id, nombre, email FROM usuarios ORDER BY nombre ASC");
+                                if ($res_usuarios) {
+                                    while ($u_row = $res_usuarios->fetch_assoc()) {
+                                        echo "<option value='{$u_row['id']}'>" . htmlspecialchars($u_row['nombre']) . " ({$u_row['email']})</option>";
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Tipo de Mensaje</label>
+                            <select name="tipo" required>
+                                <option value="Alerta">Alerta de Seguridad</option>
+                                <option value="Cierre">Cierre Vial/Tráfico</option>
+                                <option value="Promocion">Promoción Especial</option>
+                                <option value="General" selected>Aviso General</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="modal-form-group">
+                            <label>Título de la Notificación</label>
+                            <input type="text" name="titulo" placeholder="Ej. Accidente en el centro" required>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Mensaje / Detalles</label>
+                            <textarea name="mensaje" rows="4" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc" placeholder="Escribe aquí las instrucciones para los usuarios..." required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelAddNotifModal">Cancelar</button>
+                    <button type="submit" class="modal-btn modal-btn-save">Enviar Notificación ¡Ahora!</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Modal para agregar nueva Empresa -->
@@ -379,6 +528,43 @@ require_once 'config/sync_session_foto.php';
         });
     </script>
 
+    <script src="assets/js/notifications.js"></script>
     <script src="assets/js/main.js"></script>
+    <script>
+        // Lógica del Panel de Notificaciones
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationsPanel');
+            const overlay = document.getElementById('notificationsOverlay');
+            panel.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Ocultar main sidebar si está abierta en móvil
+            if (window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
+                closeSidebar();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Abrir Modal de Notificación
+            const btnOpenNotif = document.getElementById('openAddNotificationModal');
+            if (btnOpenNotif) {
+                btnOpenNotif.addEventListener('click', function() {
+                    toggleNotifications(); // cerrar panel
+                    document.getElementById('addNotificationModal').classList.add('active');
+                });
+            }
+
+            // Cerrar Modal
+            const closeModalNotifFn = () => document.getElementById('addNotificationModal').classList.remove('active');
+            document.getElementById('closeAddNotifModal')?.addEventListener('click', closeModalNotifFn);
+            document.getElementById('cancelAddNotifModal')?.addEventListener('click', closeModalNotifFn);
+
+            // Handler para el formulario usando notifications.js
+            const notifForm = document.getElementById('notificationForm');
+            if (notifForm && typeof handleInsertForm === 'function') {
+                handleInsertForm(notifForm, '¡Notificación enviada correctamente a los usuarios!');
+            }
+        });
+    </script>
 </body>
 </html>
