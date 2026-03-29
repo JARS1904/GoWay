@@ -284,10 +284,29 @@ require_once 'config/sync_session_foto.php';
             <h3>Centro de Notificaciones</h3>
             <button class="close-panel" onclick="toggleNotifications()">&times;</button>
         </div>
+        
+        <!-- Buscador -->
+        <div class="notif-search-container">
+            <div class="notif-search-box">
+                <span class="material-icons">search</span>
+                <input type="text" id="notifSearchInput" placeholder="Buscar por título..." onkeyup="filterNotifications()">
+            </div>
+        </div>
+
+        <!-- Filtros Categoría -->
+        <div class="notif-filters">
+            <button class="notif-chip active" onclick="filterByChip(this, 'all')">Todos</button>
+            <button class="notif-chip" onclick="filterByChip(this, 'alerta')">Alertas</button>
+            <button class="notif-chip" onclick="filterByChip(this, 'promocion')">Promociones</button>
+            <button class="notif-chip" onclick="filterByChip(this, 'cierre')">Cierres</button>
+            <button class="notif-chip" onclick="filterByChip(this, 'general')">General</button>
+        </div>
+
         <div class="notifications-actions">
             <button class="btn-add full-width" id="openAddNotificationModal" style="margin: 0; width: 100%;">+ Mandar Notificación</button>
         </div>
-        <div class="notifications-body">
+        
+        <div class="notifications-body" id="notifListBody">
             <?php
             $sql_notif  = "SELECT n.*, u.nombre AS usuario_nombre 
                            FROM notificaciones n 
@@ -296,62 +315,82 @@ require_once 'config/sync_session_foto.php';
             $result_notif = $conn->query($sql_notif);
             
             if ($result_notif && $result_notif->num_rows > 0) {
+                date_default_timezone_set('America/Mexico_City');
+                $current_date_group = '';
+                $hoy_str = date('Y-m-d');
+                $ayer_str = date('Y-m-d', strtotime('-1 day'));
+
                 while ($row_notif = $result_notif->fetch_assoc()) {
                     $target = ($row_notif['id_usuario'] === null) ? 'Todos los usuarios' : htmlspecialchars($row_notif['usuario_nombre']);
                     $titulo = htmlspecialchars($row_notif['titulo']);
                     $tipo = htmlspecialchars($row_notif['tipo']);
-                    $fecha = date('d M Y, h:i a', strtotime($row_notif['fecha_creacion']));
+                    
+                    // Lógica para separar por fechas (Hoy, Ayer, Antiguos)
+                    $fecha_db_str = date('Y-m-d', strtotime($row_notif['fecha_creacion']));
+                    if ($fecha_db_str == $hoy_str) {
+                        $date_label = 'Hoy';
+                    } elseif ($fecha_db_str == $ayer_str) {
+                        $date_label = 'Ayer';
+                    } else {
+                        // "24 Mar" por ejemplo
+                        $date_label = date('d M', strtotime($row_notif['fecha_creacion']));
+                    }
+
+                    if ($current_date_group !== $date_label) {
+                        echo '<div class="notif-date-header" data-dategroup="1">' . $date_label . '</div>';
+                        $current_date_group = $date_label;
+                    }
+
+                    // Hora y fecha completas en cada notificación
+                    $hora_str = date('d M Y, h:i a', strtotime($row_notif['fecha_creacion']));
 
                     $icon_svg = '';
-                    $gradient = '';
+                    $icon_bg_class = '';
                     $tipo_text = '';
 
                     switch ($tipo) {
                         case 'Alerta':
-                            $gradient = 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)';
+                            $icon_bg_class = 'bg-red';
                             $icon_svg = 'warning';
-                            $tipo_text = 'Alerta de Seguridad';
+                            $tipo_text = 'Alerta';
                             break;
                         case 'Promocion':
-                            $gradient = 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)';
+                            $icon_bg_class = 'bg-orange';
                             $icon_svg = 'local_offer';
-                            $tipo_text = 'Promoción Especial';
+                            $tipo_text = 'Promoción';
                             break;
                         case 'Cierre':
-                            $gradient = 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)';
+                            $icon_bg_class = 'bg-blue';
                             $icon_svg = 'block';
                             $tipo_text = 'Cierre Vial';
                             break;
                         case 'General':
                         default:
-                            $gradient = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
-                            $icon_svg = 'notifications';
+                            $icon_bg_class = '';
+                            $icon_svg = 'notifications_none';
                             $tipo_text = 'Aviso General';
                             break;
                     }
                     ?>
-                    <div class="notification-capsule">
-                        <div class="notif-icon" style="background: <?php echo $gradient; ?>">
-                            <span class="material-icons"><?php echo $icon_svg; ?></span>
+                    <div class="notif-item" data-type="<?php echo strtolower($tipo); ?>" data-title="<?php echo strtolower($titulo); ?>" onclick="this.classList.toggle('expanded')">
+                        <div class="notif-icon-col">
+                            <div class="notif-icon-circle <?php echo $icon_bg_class; ?>">
+                                <span class="material-icons"><?php echo $icon_svg; ?></span>
+                            </div>
                         </div>
-                        <div class="notif-content">
-                            <h4 class="notif-title"><?php echo $titulo; ?></h4>
+                        <div class="notif-item-content">
+                            <div class="notif-item-top">
+                                <span class="notif-time"><?php echo $hora_str . ' &bull; ' . $tipo_text; ?></span>
+                            </div>
+                            <div class="notif-title-row">
+                                <div class="notif-dot"></div>
+                                <h4 class="notif-title"><?php echo $titulo; ?></h4>
+                            </div>
                             <p class="notif-desc"><?php echo htmlspecialchars($row_notif['mensaje']); ?></p>
-                            
-                            <div class="notif-details" style="font-size: 13px; color: #475569; margin-bottom: 8px;">
-                                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-                                    <span class="material-icons" style="font-size:14px;">group</span>
-                                    <span><strong><?php echo $target; ?></strong></span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 4px;">
-                                    <span class="material-icons" style="font-size:14px;">label</span>
-                                    <span><?php echo $tipo_text; ?></span>
-                                </div>
-                            </div>
-
-                            <div class="notif-meta" style="display: flex; justify-content: flex-end; width: 100%;">
-                                <span class="notif-time" style="font-size: 11px; color: #94a3b8;"><?php echo $fecha; ?></span>
-                            </div>
+                            <p class="notif-desc" style="font-size:0.75rem; color:#9ca3af; margin:0;">Enviado a: <strong><?php echo $target; ?></strong></p>
+                        </div>
+                        <div class="notif-item-chevron">
+                            <span class="material-icons">chevron_right</span>
                         </div>
                     </div>
                     <?php
@@ -365,6 +404,45 @@ require_once 'config/sync_session_foto.php';
             ?>
         </div>
     </div>
+    
+    <script>
+    function filterNotifications() {
+        const searchVal = document.getElementById('notifSearchInput').value.toLowerCase();
+        const activeChip = document.querySelector('.notif-chip.active');
+        const onclickText = activeChip ? activeChip.getAttribute('onclick') : '';
+        let typeFilter = 'all';
+        if (onclickText.includes('alerta')) typeFilter = 'alerta';
+        else if (onclickText.includes('promocion')) typeFilter = 'promocion';
+        else if (onclickText.includes('cierre')) typeFilter = 'cierre';
+        else if (onclickText.includes('general')) typeFilter = 'general';
+        
+        applyFilters(searchVal, typeFilter);
+    }
+
+    function filterByChip(btnElem, type) {
+        document.querySelectorAll('.notif-chip').forEach(btn => btn.classList.remove('active'));
+        btnElem.classList.add('active');
+        const searchVal = document.getElementById('notifSearchInput').value.toLowerCase();
+        applyFilters(searchVal, type);
+    }
+
+    function applyFilters(search, type) {
+        const items = document.querySelectorAll('.notif-item');
+        items.forEach(item => {
+            const itemType = item.getAttribute('data-type') || '';
+            const itemTitle = item.getAttribute('data-title') || '';
+            
+            let matchesSearch = search === '' || itemTitle.includes(search);
+            let matchesType = (type === 'all') || (itemType.toLowerCase().includes(type));
+            
+            if (matchesSearch && matchesType) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+    </script>
     <div class="notifications-overlay" id="notificationsOverlay" onclick="toggleNotifications()"></div>
 
     <!-- Modal para agregar nueva notificación -->
