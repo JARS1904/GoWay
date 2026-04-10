@@ -15,7 +15,7 @@ require_once 'config/sync_session_foto.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Transporte P├║blico</title>
+    <title>Dashboard - Transporte Público</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="icon" href="assets/images/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -35,11 +35,11 @@ require_once 'config/sync_session_foto.php';
                 </div>
                 <div class="mobile-topbar-right">
                     <div class="mobile-user-info">
+                        <?php echo !empty($_SESSION['foto']) ? '<img src="assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="assets/images/icons/administrador.png" alt="Usuario">'; ?>
+                        <span><?php echo $_SESSION['nombre']; ?></span>
                         <button class="notification-bell" id="mobileNotifBtn" onclick="toggleNotifications()">
                             <span class="material-icons">notifications_none</span>
                         </button>
-                        <span><?php echo $_SESSION['nombre']; ?></span>
-                        <?php echo !empty($_SESSION['foto']) ? '<img src="assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="assets/images/icons/administrador.png" alt="Usuario">'; ?>
                     </div>
                 </div>
             </div>
@@ -140,11 +140,11 @@ require_once 'config/sync_session_foto.php';
             <header class="header">
                 <h2>Dashboard</h2>
                 <div class="user-info">
+                    <?php echo !empty($_SESSION['foto']) ? '<img src="assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="assets/images/icons/administrador.png" alt="Usuario">'; ?>
+                    <span><?php echo $_SESSION['nombre']; ?></span>
                     <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
                         <span class="material-icons">notifications_none</span>
                     </button>
-                    <span><?php echo $_SESSION['nombre']; ?></span>
-                    <?php echo !empty($_SESSION['foto']) ? '<img src="assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="assets/images/icons/administrador.png" alt="Usuario">'; ?>
                 </div>
             </header>
 

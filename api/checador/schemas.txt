@@ -1,0 +1,35 @@
+id_vehiculo	int(11)	NO	PRI	NULL	auto_increment
+rfc_empresa	varchar(13)	NO	MUL	NULL	
+placa	varchar(20)	NO		NULL	
+modelo	varchar(50)	YES		NULL	
+capacidad	int(11)	YES		NULL	
+activo	tinyint(1)	YES		1	
+created_at	timestamp	NO		current_timestamp()	
+---
+rfc_checador	varchar(13)	NO	PRI	NULL	
+rfc_empresa	varchar(13)	NO	MUL	NULL	
+nombre	varchar(100)	NO		NULL	
+usuario	varchar(50)	NO	UNI	NULL	
+contrasena	varchar(255)	NO		NULL	
+activo	tinyint(1)	YES		1	
+created_at	timestamp	NO		current_timestamp()	
+foto	varchar(255)	YES		NULL	
+---
+id	int(11)	NO	PRI	NULL	auto_increment
+id_vehiculo	int(11)	NO	MUL	NULL	
+rfc_conductor	varchar(13)	NO	MUL	NULL	
+id_ruta	int(11)	NO	MUL	NULL	
+tipo_incidente	varchar(50)	NO		NULL	
+fecha_incidente	datetime	NO		NULL	
+descripcion	text	NO		NULL	
+gravedad	varchar(20)	NO		NULL	
+estado	varchar(20)	YES		pendiente	
+id_usuario	int(11)	YES	MUL	NULL	
+created_at	timestamp	NO		current_timestamp()	
+---
+id	int(11)	NO	PRI	NULL	auto_increment
+nombre	varchar(50)	NO		NULL	
+email	varchar(50)	NO		NULL	
+password	varchar(255)	NO		NULL	
+rol	varchar(50)	NO		NULL	
+foto	varchar(255)	YES		NULL	

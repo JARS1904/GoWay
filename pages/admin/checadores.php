@@ -245,15 +245,7 @@ require_once '../../config/sync_session_foto.php';
                     <div>
                         <div class="modal-form-group">
                             <label>Usuario</label>
-                            <select name="usuario" id="">
-                                <?php
-                                $conn = $conexion;
-                                $result = $conn->query("SELECT email, nombre FROM usuarios");
-                                while ($row = $result->fetch_assoc()) {
-                                echo "<option value='{$row['email']}'>{$row['nombre']}</option>";
-                                }
-                                ?>
-                            </select>
+                            <input type="text" id="add_usuario" name="usuario" placeholder="Correo del usuario" required>
                         </div>
                         <div class="modal-form-group">
                             <label>Contraseña</label>

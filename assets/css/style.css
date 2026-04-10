@@ -186,7 +186,7 @@ body {
 .mobile-user-info {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 15px;
     color: white;
 }
 
@@ -305,10 +305,10 @@ body {
 .user-info {
     display: flex;
     align-items: center;
+    gap: 15px;
 }
 
 .user-info span {
-    margin-right: 10px;
     font-size: 16px;
     font-weight: 700;
     color: #1a1c23;
@@ -2215,7 +2215,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 15px;
     box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
 }
 

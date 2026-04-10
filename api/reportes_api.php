@@ -37,17 +37,22 @@ try {
                     a.id_vehiculo,
                     a.rfc_conductor,
                     a.id_ruta,
+                    r.id_ruta_retorno,
                     v.placa         AS vehiculo_placa,
                     v.modelo        AS vehiculo_modelo,
                     c.nombre        AS conductor_nombre,
                     c.rfc_conductor AS conductor_rfc,
                     r.nombre        AS ruta_nombre,
                     r.origen,
-                    r.destino
+                    r.destino,
+                    ret.nombre      AS ruta_retorno_nombre,
+                    ret.origen      AS ruta_retorno_origen,
+                    ret.destino     AS ruta_retorno_destino
                 FROM asignaciones a
                 JOIN vehiculos   v ON a.id_vehiculo  = v.id_vehiculo
                 JOIN conductores c ON a.rfc_conductor = c.rfc_conductor
-                JOIN rutas       r ON a.id_ruta       = r.id_ruta";
+                JOIN rutas       r ON a.id_ruta       = r.id_ruta
+                LEFT JOIN rutas  ret ON r.id_ruta_retorno = ret.id_ruta";
 
         if ($by === 'id') {
             $sql  = $base_sql . " WHERE a.id_asignacion = ?";
@@ -87,22 +92,45 @@ try {
         // ── GET REPORTS ──────────────────────────────────────────
         if ($action === 'get_reports') {
             $id_usuario = isset($_GET['id_usuario']) ? intval($_GET['id_usuario']) : 0;
+            $rfc_checador = isset($_GET['rfc_checador']) ? trim($_GET['rfc_checador']) : '';
 
-            if ($id_usuario <= 0) {
-                sendResponse(400, ["error" => "id_usuario es requerido y debe ser un entero positivo"]);
+            if ($id_usuario <= 0 && empty($rfc_checador)) {
+                sendResponse(400, ["error" => "id_usuario o rfc_checador es requerido"]);
             }
 
-            // Verificar que el usuario existe y tiene rol = 2 (usuario normal)
-            $stmt_rol = $conn->prepare("SELECT id FROM usuarios WHERE id = ? AND rol = 2");
-            if (!$stmt_rol) {
-                sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+            if ($id_usuario > 0) {
+                // Verificar que el usuario existe y tiene rol = 2 (usuario normal)
+                $stmt_rol = $conn->prepare("SELECT id FROM usuarios WHERE id = ? AND rol = 2");
+                if (!$stmt_rol) {
+                    sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+                }
+                $stmt_rol->bind_param("i", $id_usuario);
+                $stmt_rol->execute();
+                if ($stmt_rol->get_result()->num_rows === 0) {
+                    sendResponse(403, ["error" => "Usuario no encontrado o no tiene permisos para consultar reportes"]);
+                }
+                $stmt_rol->close();
+
+                $condicion = "rep.id_usuario = ?";
+                $param_type = "i";
+                $param_val = $id_usuario;
+            } else {
+                // Verificar que el checador existe
+                $stmt_checador = $conn->prepare("SELECT rfc_checador FROM checadores WHERE rfc_checador = ?");
+                if (!$stmt_checador) {
+                    sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+                }
+                $stmt_checador->bind_param("s", $rfc_checador);
+                $stmt_checador->execute();
+                if ($stmt_checador->get_result()->num_rows === 0) {
+                    sendResponse(403, ["error" => "Checador no encontrado"]);
+                }
+                $stmt_checador->close();
+
+                $condicion = "rep.rfc_checador = ?";
+                $param_type = "s";
+                $param_val = $rfc_checador;
             }
-            $stmt_rol->bind_param("i", $id_usuario);
-            $stmt_rol->execute();
-            if ($stmt_rol->get_result()->num_rows === 0) {
-                sendResponse(403, ["error" => "Usuario no encontrado o no tiene permisos para consultar reportes"]);
-            }
-            $stmt_rol->close();
 
             $sql_rep = "SELECT
                             rep.tipo_incidente,
@@ -119,14 +147,14 @@ try {
                         JOIN vehiculos   v ON rep.id_vehiculo  = v.id_vehiculo
                         JOIN conductores c ON rep.rfc_conductor = c.rfc_conductor
                         JOIN rutas       r ON rep.id_ruta       = r.id_ruta
-                        WHERE rep.id_usuario = ?
+                        WHERE $condicion
                         ORDER BY rep.fecha_incidente DESC";
 
             $stmt_rep = $conn->prepare($sql_rep);
             if (!$stmt_rep) {
                 sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
             }
-            $stmt_rep->bind_param("i", $id_usuario);
+            $stmt_rep->bind_param($param_type, $param_val);
             $stmt_rep->execute();
             $result_rep = $stmt_rep->get_result();
 
@@ -179,7 +207,8 @@ try {
     // Body JSON esperado (usa placa O id_asignacion, no ambos):
     //   placa          (string)  — placa del vehículo (recomendado para usuarios)
     //   id_asignacion  (int)     — alternativa directa si ya se conoce
-    //   id_usuario     (int)     — quién hace el reporte
+    //   id_usuario     (int)     — quién hace el reporte (opcional si se envía rfc_checador)
+    //   rfc_checador   (string)  — quién hace el reporte (opcional si se envía id_usuario)
     //   tipo_incidente (string)
     //   fecha_hora     (string)  — formato YYYY-MM-DD HH:MM:SS
     //   descripcion    (string)
@@ -199,7 +228,7 @@ try {
         }
 
         // Validar campos comunes siempre requeridos
-        $campos_requeridos = ['id_usuario', 'tipo_incidente', 'fecha_hora', 'descripcion', 'gravedad'];
+        $campos_requeridos = ['tipo_incidente', 'fecha_hora', 'descripcion', 'gravedad'];
         foreach ($campos_requeridos as $campo) {
             if (!isset($data[$campo]) || (is_string($data[$campo]) && trim($data[$campo]) === '')) {
                 sendResponse(400, ["error" => "El campo '$campo' es requerido"]);
@@ -213,14 +242,16 @@ try {
             sendResponse(400, ["error" => "Debes enviar 'placa' o 'id_asignacion'"]);
         }
 
-        $id_usuario     = intval($data['id_usuario']);
+        $id_usuario     = isset($data['id_usuario']) ? intval($data['id_usuario']) : 0;
+        $rfc_checador   = isset($data['rfc_checador']) ? trim($data['rfc_checador']) : '';
         $tipo_incidente = trim($data['tipo_incidente']);
         $fecha_hora     = trim($data['fecha_hora']);
         $descripcion    = trim($data['descripcion']);
         $gravedad       = strtolower(trim($data['gravedad']));
+        $es_retorno     = isset($data['es_retorno']) ? filter_var($data['es_retorno'], FILTER_VALIDATE_BOOLEAN) : false;
 
-        if ($id_usuario <= 0) {
-            sendResponse(400, ["error" => "id_usuario debe ser un entero positivo"]);
+        if ($id_usuario <= 0 && empty($rfc_checador)) {
+            sendResponse(400, ["error" => "id_usuario o rfc_checador es requerido"]);
         }
 
         // Validar nivel de gravedad
@@ -244,46 +275,56 @@ try {
 
         $id_vehiculo   = intval($asig['id_vehiculo']);
         $rfc_conductor = $asig['rfc_conductor'];
-        $id_ruta       = intval($asig['id_ruta']);
+        $id_ruta       = ($es_retorno && !empty($asig['id_ruta_retorno'])) ? intval($asig['id_ruta_retorno']) : intval($asig['id_ruta']);
 
-        // Verificar que el usuario existe
-        $stmt_usr = $conn->prepare("SELECT id FROM usuarios WHERE id = ?");
-        if (!$stmt_usr) {
-            sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+        if ($id_usuario > 0) {
+            // Verificar que el usuario existe
+            $stmt_usr = $conn->prepare("SELECT id FROM usuarios WHERE id = ?");
+            if (!$stmt_usr) {
+                sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+            }
+            $stmt_usr->bind_param("i", $id_usuario);
+            $stmt_usr->execute();
+            $result_usr = $stmt_usr->get_result();
+            if ($result_usr->num_rows === 0) {
+                sendResponse(404, ["error" => "Usuario no encontrado"]);
+            }
+            $stmt_usr->close();
+
+            // Insertar el reporte con id_usuario
+            $sql_insert = "INSERT INTO reportes
+                               (id_vehiculo, rfc_conductor, id_ruta, tipo_incidente,
+                                fecha_incidente, descripcion, gravedad, id_usuario)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt_insert = $conn->prepare($sql_insert);
+            if (!$stmt_insert) {
+                sendResponse(500, ["error" => "Error al preparar inserción: " . $conn->error]);
+            }
+            $stmt_insert->bind_param("isissssi", $id_vehiculo, $rfc_conductor, $id_ruta, $tipo_incidente, $fecha_hora, $descripcion, $gravedad, $id_usuario);
+        } else {
+            // Verificar que el checador existe
+            $stmt_checador = $conn->prepare("SELECT rfc_checador FROM checadores WHERE rfc_checador = ?");
+            if (!$stmt_checador) {
+                sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+            }
+            $stmt_checador->bind_param("s", $rfc_checador);
+            $stmt_checador->execute();
+            if ($stmt_checador->get_result()->num_rows === 0) {
+                sendResponse(404, ["error" => "Checador no encontrado"]);
+            }
+            $stmt_checador->close();
+
+            // Insertar el reporte con rfc_checador
+            $sql_insert = "INSERT INTO reportes
+                               (id_vehiculo, rfc_conductor, id_ruta, tipo_incidente,
+                                fecha_incidente, descripcion, gravedad, rfc_checador)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt_insert = $conn->prepare($sql_insert);
+            if (!$stmt_insert) {
+                sendResponse(500, ["error" => "Error al preparar inserción: " . $conn->error]);
+            }
+            $stmt_insert->bind_param("isisssss", $id_vehiculo, $rfc_conductor, $id_ruta, $tipo_incidente, $fecha_hora, $descripcion, $gravedad, $rfc_checador);
         }
-        $stmt_usr->bind_param("i", $id_usuario);
-        $stmt_usr->execute();
-        $result_usr = $stmt_usr->get_result();
-        if ($result_usr->num_rows === 0) {
-            sendResponse(404, ["error" => "Usuario no encontrado"]);
-        }
-        $stmt_usr->close();
-
-        // Insertar el reporte
-        $sql_insert = "INSERT INTO reportes
-                           (id_vehiculo, rfc_conductor, id_ruta, tipo_incidente,
-                            fecha_incidente, descripcion, gravedad, id_usuario)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt_insert = $conn->prepare($sql_insert);
-        if (!$stmt_insert) {
-            sendResponse(500, ["error" => "Error al preparar inserción: " . $conn->error]);
-        }
-
-        // i = int, s = string
-        // id_vehiculo(i), rfc_conductor(s), id_ruta(i), tipo_incidente(s),
-        // fecha_incidente(s), descripcion(s), gravedad(s), id_usuario(i)
-        $stmt_insert->bind_param(
-            "isissssi",
-            $id_vehiculo,
-            $rfc_conductor,
-            $id_ruta,
-            $tipo_incidente,
-            $fecha_hora,
-            $descripcion,
-            $gravedad,
-            $id_usuario
-        );
 
         if ($stmt_insert->execute()) {
             $id_reporte = $stmt_insert->insert_id;
