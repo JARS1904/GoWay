@@ -113,13 +113,13 @@ function toggleSidebar() {
     sidebar.classList.toggle('active');
     overlay.classList.toggle('active');
     
-    // Ocultar botón hamburguesa cuando el menú está abierto
+    // Ocultar botón hamburguesa cuando el menú está abierto, cambiando por X
     if (sidebar.classList.contains('active')) {
-        toggleBtn.style.opacity = '0';
-        toggleBtn.style.visibility = 'hidden';
+        toggleBtn.innerHTML = '&times;';
+        toggleBtn.style.fontSize = '36px';
     } else {
-        toggleBtn.style.opacity = '1';
-        toggleBtn.style.visibility = 'visible';
+        toggleBtn.innerHTML = '&#9776;';
+        toggleBtn.style.fontSize = '';
     }
     
     // Prevenir scroll del body cuando el menú está abierto

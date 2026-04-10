@@ -28,9 +28,12 @@ require_once '../../config/conexion_bd.php';
                     <h1 class="mobile-page-title">Centro de Notificaciones</h1>
                 </div>
                 <div class="mobile-topbar-right">
-                    <div class="mobile-user-info">
-                        <span><?php echo $_SESSION['nombre']; ?></span>
+                                        <div class="mobile-user-info">
                         <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
+                        <span><?php echo $_SESSION['nombre']; ?></span>
+                        <button class="notification-bell" id="mobileNotifBtn" onclick="toggleNotifications()">
+                            <span class="material-icons">notifications_none</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -71,9 +74,12 @@ require_once '../../config/conexion_bd.php';
         <main class="main-content" id="mainContent">
             <header class="header">
                 <h2>Centro de Notificaciones</h2>
-                <div class="user-info">
-                    <span><?php echo $_SESSION['nombre']; ?></span>
+                                <div class="user-info">
                     <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
+                    <span><?php echo $_SESSION['nombre']; ?></span>
+                    <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
+                        <span class="material-icons">notifications_none</span>
+                    </button>
                 </div>
             </header>
 
@@ -229,5 +235,7 @@ require_once '../../config/conexion_bd.php';
         handleInsertForm(document.getElementById('notificationForm'), '¡Notificación enviada correctamente a los usuarios!');
     });
     </script>
+    <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
+    <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>
 </body>
 </html>

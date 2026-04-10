@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../../assets/css/style.css">
     <title>Actualizar Vehículo</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     
@@ -12,9 +13,12 @@
         <main class="main-content">
             <header class="header">
                 <h2>Editar Vehículo</h2>
-                <div class="user-info">
-                    <span>Admin</span>
-                    <img src="../../../assets/images/icons/administrador.png" alt="Usuario">
+                                <div class="user-info">
+                    <?php echo !empty($_SESSION['foto']) ? '<img src="../../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
+                    <span><?php echo $_SESSION['nombre']; ?></span>
+                    <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
+                        <span class="material-icons">notifications_none</span>
+                    </button>
                 </div>
             </header>
 
@@ -109,5 +113,7 @@
         </main>
 
 
+    <?php require_once __DIR__ . '/../../../components/notifications_panel.php'; ?>
+    <?php require_once __DIR__ . '/../../../components/logout_modal.php'; ?>
 </body>
 </html>

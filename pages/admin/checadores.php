@@ -20,6 +20,7 @@ require_once '../../config/sync_session_foto.php';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
     <link rel="icon" href="../../assets/images/logo.png" type="image/png">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -34,9 +35,12 @@ require_once '../../config/sync_session_foto.php';
                     <h1 class="mobile-page-title">Gestión de Checadores</h1>
                 </div>
                 <div class="mobile-topbar-right">
-                    <div class="mobile-user-info">
-                        <span><?php echo $_SESSION['nombre']; ?></span>
+                                        <div class="mobile-user-info">
                         <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
+                        <span><?php echo $_SESSION['nombre']; ?></span>
+                        <button class="notification-bell" id="mobileNotifBtn" onclick="toggleNotifications()">
+                            <span class="material-icons">notifications_none</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -136,9 +140,12 @@ require_once '../../config/sync_session_foto.php';
             <!-- Header para escritorio -->
             <header class="header">
                 <h2>Gestión de Checadores</h2>
-                <div class="user-info">
-                    <span><?php echo $_SESSION['nombre']; ?></span>
+                                <div class="user-info">
                     <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
+                    <span><?php echo $_SESSION['nombre']; ?></span>
+                    <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
+                        <span class="material-icons">notifications_none</span>
+                    </button>
                 </div>
             </header>
 
@@ -482,5 +489,7 @@ require_once '../../config/sync_session_foto.php';
             });
         });
     </script>
+    <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
+    <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>
 </body>
 </html>

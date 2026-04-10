@@ -30,7 +30,7 @@ require_once 'config/sync_session_foto.php';
         <div class="mobile-topbar">
             <div class="mobile-topbar-content">
                 <div class="mobile-topbar-left">
-                    <button class="toggle-btn" onclick="toggleSidebar()">Ôÿ░</button>
+                    <button class="toggle-btn" onclick="toggleSidebar()">&#9776;</button>
                     <h1 class="mobile-page-title">Dashboard</h1>
                 </div>
                 <div class="mobile-topbar-right">
@@ -278,172 +278,8 @@ require_once 'config/sync_session_foto.php';
         </main>
     </div>
 
-    <!-- Panel Lateral de Notificaciones -->
-    <div class="notifications-panel" id="notificationsPanel">
-        <div class="notifications-header">
-            <h3>Centro de Notificaciones</h3>
-            <button class="close-panel" onclick="toggleNotifications()">&times;</button>
-        </div>
-        
-        <!-- Buscador -->
-        <div class="notif-search-container">
-            <div class="notif-search-box">
-                <span class="material-icons">search</span>
-                <input type="text" id="notifSearchInput" placeholder="Buscar por título..." onkeyup="filterNotifications()">
-            </div>
-        </div>
-
-        <!-- Filtros Categoría -->
-        <div class="notif-filters">
-            <button class="notif-chip active" onclick="filterByChip(this, 'all')">Todos</button>
-            <button class="notif-chip" onclick="filterByChip(this, 'alerta')">Alertas</button>
-            <button class="notif-chip" onclick="filterByChip(this, 'promocion')">Promociones</button>
-            <button class="notif-chip" onclick="filterByChip(this, 'cierre')">Cierres</button>
-            <button class="notif-chip" onclick="filterByChip(this, 'general')">General</button>
-        </div>
-
-        <div class="notifications-actions">
-            <button class="btn-add full-width" id="openAddNotificationModal" style="margin: 0; width: 100%;">+ Mandar Notificación</button>
-        </div>
-        
-        <div class="notifications-body" id="notifListBody">
-            <?php
-            $sql_notif  = "SELECT n.*, u.nombre AS usuario_nombre 
-                           FROM notificaciones n 
-                           LEFT JOIN usuarios u ON n.id_usuario = u.id 
-                           ORDER BY n.fecha_creacion DESC LIMIT 50";
-            $result_notif = $conn->query($sql_notif);
-            
-            if ($result_notif && $result_notif->num_rows > 0) {
-                date_default_timezone_set('America/Mexico_City');
-                $current_date_group = '';
-                $hoy_str = date('Y-m-d');
-                $ayer_str = date('Y-m-d', strtotime('-1 day'));
-
-                while ($row_notif = $result_notif->fetch_assoc()) {
-                    $target = ($row_notif['id_usuario'] === null) ? 'Todos los usuarios' : htmlspecialchars($row_notif['usuario_nombre']);
-                    $titulo = htmlspecialchars($row_notif['titulo']);
-                    $tipo = htmlspecialchars($row_notif['tipo']);
-                    
-                    // Lógica para separar por fechas (Hoy, Ayer, Antiguos)
-                    $fecha_db_str = date('Y-m-d', strtotime($row_notif['fecha_creacion']));
-                    if ($fecha_db_str == $hoy_str) {
-                        $date_label = 'Hoy';
-                    } elseif ($fecha_db_str == $ayer_str) {
-                        $date_label = 'Ayer';
-                    } else {
-                        // "24 Mar" por ejemplo
-                        $date_label = date('d M', strtotime($row_notif['fecha_creacion']));
-                    }
-
-                    if ($current_date_group !== $date_label) {
-                        echo '<div class="notif-date-header" data-dategroup="1">' . $date_label . '</div>';
-                        $current_date_group = $date_label;
-                    }
-
-                    // Hora y fecha completas en cada notificación
-                    $hora_str = date('d M Y, h:i a', strtotime($row_notif['fecha_creacion']));
-
-                    $icon_svg = '';
-                    $icon_bg_class = '';
-                    $tipo_text = '';
-
-                    switch ($tipo) {
-                        case 'Alerta':
-                            $icon_bg_class = 'bg-red';
-                            $icon_svg = 'warning';
-                            $tipo_text = 'Alerta';
-                            break;
-                        case 'Promocion':
-                            $icon_bg_class = 'bg-orange';
-                            $icon_svg = 'local_offer';
-                            $tipo_text = 'Promoción';
-                            break;
-                        case 'Cierre':
-                            $icon_bg_class = 'bg-blue';
-                            $icon_svg = 'block';
-                            $tipo_text = 'Cierre Vial';
-                            break;
-                        case 'General':
-                        default:
-                            $icon_bg_class = '';
-                            $icon_svg = 'notifications_none';
-                            $tipo_text = 'Aviso General';
-                            break;
-                    }
-                    ?>
-                    <div class="notif-item" data-type="<?php echo strtolower($tipo); ?>" data-title="<?php echo strtolower($titulo); ?>" onclick="this.classList.toggle('expanded')">
-                        <div class="notif-icon-col">
-                            <div class="notif-icon-circle <?php echo $icon_bg_class; ?>">
-                                <span class="material-icons"><?php echo $icon_svg; ?></span>
-                            </div>
-                        </div>
-                        <div class="notif-item-content">
-                            <div class="notif-item-top">
-                                <span class="notif-time"><?php echo $hora_str . ' &bull; ' . $tipo_text; ?></span>
-                            </div>
-                            <div class="notif-title-row">
-                                <div class="notif-dot"></div>
-                                <h4 class="notif-title"><?php echo $titulo; ?></h4>
-                            </div>
-                            <p class="notif-desc"><?php echo htmlspecialchars($row_notif['mensaje']); ?></p>
-                            <p class="notif-desc" style="font-size:0.75rem; color:#9ca3af; margin:0;">Enviado a: <strong><?php echo $target; ?></strong></p>
-                        </div>
-                        <div class="notif-item-chevron">
-                            <span class="material-icons">chevron_right</span>
-                        </div>
-                    </div>
-                    <?php
-                }
-            } else {
-                echo '<div class="empty-notifs">
-                        <span class="material-icons" style="font-size: 48px; color: #cbd5e1; margin-bottom: 10px;">notifications_off</span>
-                        <p>No hay notificaciones recientes</p>
-                      </div>';
-            }
-            ?>
-        </div>
-    </div>
-    
-    <script>
-    function filterNotifications() {
-        const searchVal = document.getElementById('notifSearchInput').value.toLowerCase();
-        const activeChip = document.querySelector('.notif-chip.active');
-        const onclickText = activeChip ? activeChip.getAttribute('onclick') : '';
-        let typeFilter = 'all';
-        if (onclickText.includes('alerta')) typeFilter = 'alerta';
-        else if (onclickText.includes('promocion')) typeFilter = 'promocion';
-        else if (onclickText.includes('cierre')) typeFilter = 'cierre';
-        else if (onclickText.includes('general')) typeFilter = 'general';
-        
-        applyFilters(searchVal, typeFilter);
-    }
-
-    function filterByChip(btnElem, type) {
-        document.querySelectorAll('.notif-chip').forEach(btn => btn.classList.remove('active'));
-        btnElem.classList.add('active');
-        const searchVal = document.getElementById('notifSearchInput').value.toLowerCase();
-        applyFilters(searchVal, type);
-    }
-
-    function applyFilters(search, type) {
-        const items = document.querySelectorAll('.notif-item');
-        items.forEach(item => {
-            const itemType = item.getAttribute('data-type') || '';
-            const itemTitle = item.getAttribute('data-title') || '';
-            
-            let matchesSearch = search === '' || itemTitle.includes(search);
-            let matchesType = (type === 'all') || (itemType.toLowerCase().includes(type));
-            
-            if (matchesSearch && matchesType) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    }
-    </script>
-    <div class="notifications-overlay" id="notificationsOverlay" onclick="toggleNotifications()"></div>
+    <!-- Integración del Panel Lateral de Notificaciones Compartido -->
+    <?php require_once __DIR__ . '/components/notifications_panel.php'; ?>
 
     <!-- Modal para agregar nueva notificación -->
     <div class="modal-overlay" id="addNotificationModal">
@@ -554,13 +390,13 @@ require_once 'config/sync_session_foto.php';
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
             
-            // Ocultar/mostrar bot├│n hamburguesa
+            // Ocultar/mostrar botón hamburguesa con la X
             if (sidebar.classList.contains('active')) {
-                toggleBtn.style.opacity = '0';
-                toggleBtn.style.visibility = 'hidden';
+                toggleBtn.innerHTML = '&times;';
+                toggleBtn.style.fontSize = '36px';
             } else {
-                toggleBtn.style.opacity = '1';
-                toggleBtn.style.visibility = 'visible';
+                toggleBtn.innerHTML = '&#9776;';
+                toggleBtn.style.fontSize = '';
             }
             
             // Prevenir scroll del body cuando el men├║ est├í abierto
@@ -608,41 +444,7 @@ require_once 'config/sync_session_foto.php';
 
     <script src="assets/js/notifications.js"></script>
     <script src="assets/js/main.js"></script>
-    <script>
-        // Lógica del Panel de Notificaciones
-        function toggleNotifications() {
-            const panel = document.getElementById('notificationsPanel');
-            const overlay = document.getElementById('notificationsOverlay');
-            panel.classList.toggle('active');
-            overlay.classList.toggle('active');
-            
-            // Ocultar main sidebar si está abierta en móvil
-            if (window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
-                closeSidebar();
-            }
-        }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Abrir Modal de Notificación
-            const btnOpenNotif = document.getElementById('openAddNotificationModal');
-            if (btnOpenNotif) {
-                btnOpenNotif.addEventListener('click', function() {
-                    toggleNotifications(); // cerrar panel
-                    document.getElementById('addNotificationModal').classList.add('active');
-                });
-            }
-
-            // Cerrar Modal
-            const closeModalNotifFn = () => document.getElementById('addNotificationModal').classList.remove('active');
-            document.getElementById('closeAddNotifModal')?.addEventListener('click', closeModalNotifFn);
-            document.getElementById('cancelAddNotifModal')?.addEventListener('click', closeModalNotifFn);
-
-            // Handler para el formulario usando notifications.js
-            const notifForm = document.getElementById('notificationForm');
-            if (notifForm && typeof handleInsertForm === 'function') {
-                handleInsertForm(notifForm, '¡Notificación enviada correctamente a los usuarios!');
-            }
-        });
-    </script>
+    <?php require_once __DIR__ . '/components/logout_modal.php'; ?>
 </body>
 </html>

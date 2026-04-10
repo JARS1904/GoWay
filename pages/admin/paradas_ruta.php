@@ -41,6 +41,7 @@ require_once '../../config/sync_session_foto.php';
         /* Ocultar toolbar de main.js hasta que la tabla sea visible */
         .table-toolbar { display: none; }
     </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
 <div class="container">
@@ -54,12 +55,13 @@ require_once '../../config/sync_session_foto.php';
                 <h1 class="mobile-page-title">Paradas</h1>
             </div>
             <div class="mobile-topbar-right">
-                <div class="mobile-user-info">
-                    <span><?php echo htmlspecialchars($_SESSION['nombre']); ?></span>
-                    <?php echo !empty($_SESSION['foto'])
-                        ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">'
-                        : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
-                </div>
+                                    <div class="mobile-user-info">
+                        <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
+                        <span><?php echo $_SESSION['nombre']; ?></span>
+                        <button class="notification-bell" id="mobileNotifBtn" onclick="toggleNotifications()">
+                            <span class="material-icons">notifications_none</span>
+                        </button>
+                    </div>
             </div>
         </div>
     </div>
@@ -98,12 +100,13 @@ require_once '../../config/sync_session_foto.php';
     <main class="main-content" id="mainContent">
         <header class="header">
             <h2>Paradas</h2>
-            <div class="user-info">
-                <span><?php echo htmlspecialchars($_SESSION['nombre']); ?></span>
-                <?php echo !empty($_SESSION['foto'])
-                    ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">'
-                    : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
-            </div>
+                            <div class="user-info">
+                    <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
+                    <span><?php echo $_SESSION['nombre']; ?></span>
+                    <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
+                        <span class="material-icons">notifications_none</span>
+                    </button>
+                </div>
         </header>
 
         <section class="content">
@@ -417,5 +420,7 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async () =
     }
 });
 </script>
+    <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
+    <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>
 </body>
 </html>
