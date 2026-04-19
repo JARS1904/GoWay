@@ -9,7 +9,7 @@ include("../controllers/controlador.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - GoWay</title>
-    <link rel="icon" href="../assets/images/logo.png" type="image/png">
+    <link rel="icon" href="../assets/images/logo_new.png" type="image/png">
 </head>
 <body>
 
@@ -257,7 +257,7 @@ body {
     <!-- ── Left brand panel ── -->
     <div class="lg-panel">
         <div class="lg-panel-brand">
-            <img src="../assets/images/logo.png" alt="GoWay logo">
+            <img src="../assets/images/logo_new.png" alt="GoWay logo">
             <span>GoWay</span>
         </div>
         <p class="lg-panel-tagline">Tu destino,<br>a un solo toque.</p>

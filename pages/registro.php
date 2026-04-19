@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - GoWay</title>
-    <link rel="icon" href="../assets/images/logo.png" type="image/png">
+    <link rel="icon" href="../assets/images/logo_new.png" type="image/png">
 </head>
 <body>
 
@@ -246,7 +246,7 @@ body {
     <!-- ── Left brand panel ── -->
     <div class="rg-panel">
         <div class="rg-panel-brand">
-            <img src="../assets/images/logo.png" alt="GoWay logo">
+            <img src="../assets/images/logo_new.png" alt="GoWay logo">
             <span>GoWay</span>
         </div>
         <p class="rg-panel-tagline">Únete a miles de<br>viajeros en GoWay.</p>

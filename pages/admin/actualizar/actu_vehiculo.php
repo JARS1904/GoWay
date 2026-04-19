@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,9 +13,7 @@
         <main class="main-content">
             <header class="header">
                 <h2>Editar Vehículo</h2>
-                                <div class="user-info">
-                    <?php echo !empty($_SESSION['foto']) ? '<img src="../../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
-                    <span><?php echo $_SESSION['nombre']; ?></span>
+                                <div class="header-notif-wrap">
                     <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
                         <span class="material-icons">notifications_none</span>
                     </button>

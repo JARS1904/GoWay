@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['id'])) {
     header('Location: ../login.php');
@@ -13,70 +13,23 @@ require_once '../../config/conexion_bd.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notificaciones - Administrador</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
+    <link rel="icon" href="../../assets/images/logo_new.png" type="image/png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
-        <!-- Barra Superior Móvil -->
-        <div class="mobile-topbar">
-            <div class="mobile-topbar-content">
-                <div class="mobile-topbar-left">
-                    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-                    <h1 class="mobile-page-title">Centro de Notificaciones</h1>
-                </div>
-                <div class="mobile-topbar-right">
-                                        <div class="mobile-user-info">
-                        <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
-                        <span><?php echo $_SESSION['nombre']; ?></span>
-                        <button class="notification-bell" id="mobileNotifBtn" onclick="toggleNotifications()">
-                            <span class="material-icons">notifications_none</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Menú Lateral -->
-        <aside class="sidebar" id="sidebar">
-            <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
-            <div class="logo">
-                <img src="../../assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
-                <h1>GoWay</h1>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="../../index.php"><img src="../../assets/images/icons/icon_dashboard.png" alt="Dashboard" class="icon"><span>Dashboard</span></a></li>
-                    <li><a href="empresas.php"><img src="../../assets/images/icons/icon_empresas.png" alt="Empresas" class="icon"><span>Empresas</span></a></li>
-                    <li><a href="conductores.php"><img src="../../assets/images/icons/icon_conductores.png" alt="Conductores" class="icon"><span>Conductores</span></a></li>
-                    <li><a href="vehiculos.php"><img src="../../assets/images/icons/icon_vehiculos.png" alt="Vehículos" class="icon"><span>Vehículos</span></a></li>
-                    <li><a href="rutas.php"><img src="../../assets/images/icons/icon_rutas.png" alt="Rutas" class="icon"><span>Rutas</span></a></li>
-                    <li><a href="horarios.php"><img src="../../assets/images/icons/icon_horarios.png" alt="Horarios" class="icon"><span>Horarios</span></a></li>
-                    <li><a href="paradas_ruta.php"><img src="../../assets/images/icons/icon_paradas.png" alt="Paradas" class="icon"><span>Paradas</span></a></li>
-                    <li><a href="asignaciones.php"><img src="../../assets/images/icons/icon_asignacion.png" alt="Asignaciones" class="icon"><span>Asignaciones</span></a></li>
-                    <li><a href="checadores.php"><img src="../../assets/images/icons/icon_checadores.png" alt="Checadores" class="icon"><span>Checadores</span></a></li>
-                    <li><a href="reportes.php"><img src="../../assets/images/icons/icon_reportes.png" alt="Reportes" class="icon"><span>Reportes</span></a></li>
-                    <li><a href="usuarios.php"><img src="../../assets/images/icons/icon_usuarios.png" alt="Usuarios" class="icon"><span>Usuarios</span></a></li>
-                </ul>
-            </nav>
-            <!-- Botón de Cerrar Sesión -->
-            <div class="logout-button">
-                <a href="../logout.php" id="logout">
-                    <img src="../../assets/images/icons/icon_cerrar_sesion.png" alt="Cerrar sesión" class="icon"> 
-                    <span>Cerrar sesión</span>
-                </a>
-            </div>
-        </aside>
+        <?php
+        $page_title  = 'Centro de Notificaciones';
+        $active_page = 'notificaciones';
+        $base_url    = '../../';
+        require_once __DIR__ . '/../../components/sidebar.php';
+        ?>
 
         <!-- Contenido Principal -->
         <main class="main-content" id="mainContent">
             <header class="header">
                 <h2>Centro de Notificaciones</h2>
-                                <div class="user-info">
-                    <?php echo !empty($_SESSION['foto']) ? '<img src="../../assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">' : '<img src="../../assets/images/icons/administrador.png" alt="Usuario">'; ?>
-                    <span><?php echo $_SESSION['nombre']; ?></span>
+                                <div class="header-notif-wrap">
                     <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
                         <span class="material-icons">notifications_none</span>
                     </button>

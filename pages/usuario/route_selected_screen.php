@@ -27,14 +27,14 @@ if ($_SESSION['id'] > 0) {
     <title>GoWay - Rutas de Transporte</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
+    <link rel="icon" href="../../assets/images/logo_new.png" type="image/png">
     <link rel="stylesheet" href="../../assets/css/route_selected_screen.css">
 </head>
 <body>
     <header>
         <div class="header-content">
             <div class="logo">
-                <img src="../../assets/images/logo.png" alt="GoWay Logo">
+                <img src="../../assets/images/logo_new.png" alt="GoWay Logo">
                 <h1>GoWay</h1>
             </div>
 
