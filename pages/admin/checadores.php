@@ -1,4 +1,4 @@
-﻿<!--Se agreo para el manejo de sesión-->
+<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -79,12 +79,13 @@ require_once '../../config/sync_session_foto.php';
                                     ? '<img src="../../assets/images/profiles/' . htmlspecialchars($row["foto"]) . '" class="avatar-img" alt="foto">'
                                     : '<div class="avatar-initials">' . $initial . '</div>';
                                 
+                                $password_display = !empty($row["contrasena"]) ? "●●●●●●●●" : "Sin contraseña";
                                 echo '<tr>
                                         <td data-label="RFC del Checador" data-id="'.$row["rfc_checador"].'">'.htmlspecialchars($row["rfc_checador"]).'</td>
                                         <td data-label="RFC de la Empresa">'.htmlspecialchars($row["rfc_empresa"]).'</td>
                                         <td data-label="Nombre" data-nombre="' . $nombre_esc . '"><div class="avatar-cell">' . $avatar . '<span>' . $nombre_esc . '</span></div></td>
                                         <td data-label="Usuario">'.htmlspecialchars($row["usuario"]).'</td>
-                                        <td data-label="Contraseña">'.htmlspecialchars($row["contrasena"]).'</td>
+                                        <td data-label="Contraseña" data-password="'.htmlspecialchars($row["contrasena"]).'">'.$password_display.'</td>
                                         <td data-label="Estado"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
                                             <button class="btn-action btn-edit">Editar</button>
@@ -150,7 +151,7 @@ require_once '../../config/sync_session_foto.php';
                         </div>
                         <div class="modal-form-group">
                             <label>Contraseña</label>
-                            <input type="text" id="" name="password" placeholder=""></input>
+                            <input type="password" id="" name="password" placeholder=""></input>
                         </div>
                         <div class="modal-form-group">
                             <label>Foto de perfil</label>

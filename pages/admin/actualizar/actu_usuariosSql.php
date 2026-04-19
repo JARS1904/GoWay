@@ -18,7 +18,7 @@ $email    = $_POST['email'];
 $password = $_POST['password'];
 $rol      = $_POST['rol'];
 
-if (!empty($password)) {
+if (!empty($password) && trim($password) !== '●●●●●●●●' && trim($password) !== 'Sin contraseña') {
     $password = password_hash($password, PASSWORD_DEFAULT);
 } else {
     // Keep existing password

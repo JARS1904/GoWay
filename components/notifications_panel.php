@@ -17,7 +17,7 @@ if (!isset($conn)) {
 <!-- Panel Lateral de Notificaciones -->
 <div class="notifications-panel" id="notificationsPanel">
     <div class="notifications-header">
-        <h3>Centro de Notificaciones</h3>
+        <h3>Centro de notificaciones</h3>
         <button class="close-panel" onclick="toggleNotifications()">&times;</button>
     </div>
     
@@ -39,7 +39,7 @@ if (!isset($conn)) {
     </div>
 
     <div class="notifications-actions">
-        <button class="btn-add full-width" id="openAddNotificationModal" style="margin: 0; width: 100%;">+ Mandar Notificación</button>
+        <button class="btn-add full-width" id="openAddNotificationModal" style="margin: 0; width: 100%;">+ Enviar notificación</button>
     </div>
     
     <div class="notifications-body" id="notifListBody">

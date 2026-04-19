@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['id'])) {
     header('Location: ../login.php');
@@ -38,8 +38,8 @@ require_once '../../config/conexion_bd.php';
 
             <section class="content">
                 <div class="section-header">
-                    <h3>Historial de Notificaciones Generadas</h3>
-                    <button class="btn-add" id="openAddModal">+ Mandar Notificación</button>
+                    <h3>Historial de notificaciones generadas</h3>
+                    <button class="btn-add" id="openAddModal">+ Enviar notificación</button>
                 </div>
                 <table class="data-table">
                     <thead>
@@ -56,7 +56,7 @@ require_once '../../config/conexion_bd.php';
                         $sql  = "SELECT n.*, u.nombre AS usuario_nombre 
                                  FROM notificaciones n 
                                  LEFT JOIN usuarios u ON n.id_usuario = u.id 
-                                 ORDER BY n.fecha_creacion DESC LIMIT 50";
+                                 ORDER BY n.fecha_creacion DESC";
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
@@ -114,6 +114,13 @@ require_once '../../config/conexion_bd.php';
                         ?>
                     </tbody>
                 </table>
+
+                <!-- Paginación -->
+                <div class="pagination">
+                    <button class="pagination-btn" id="prevPage" disabled>‹ Anterior</button>
+                    <div class="pagination-info" id="pageInfo">Página 1 de 1</div>
+                    <button class="pagination-btn" id="nextPage">Siguiente ›</button>
+                </div>
             </section>
         </main>
     </div>
@@ -157,14 +164,14 @@ require_once '../../config/conexion_bd.php';
                             <input type="text" name="titulo" placeholder="Ej. Accidente en el centro" required>
                         </div>
                         <div class="modal-form-group">
-                            <label>Mensaje / Detalles</label>
+                            <label>Mensaje</label>
                             <textarea name="mensaje" rows="4" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc" placeholder="Escribe aquí las instrucciones para los usuarios..." required></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="modal-btn modal-btn-cancel" id="cancelAddModal">Cancelar</button>
-                    <button type="submit" class="modal-btn modal-btn-save">Enviar Notificación ¡Ahora!</button>
+                    <button type="submit" class="modal-btn modal-btn-save">Enviar notificación</button>
                 </div>
             </form>
         </div>
@@ -172,6 +179,7 @@ require_once '../../config/conexion_bd.php';
 
     <script src="../../assets/js/notifications.js"></script>
     <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/pagination.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Abrir Modal

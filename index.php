@@ -1,4 +1,4 @@
-﻿<!--Se agreo para el manejo de sesi├│n-->
+<!--Se agreo para el manejo de sesi├│n-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -45,7 +45,7 @@ require_once 'config/sync_session_foto.php';
             <section class="content">
                 <!-- Secci├│n de Bienvenida -->
                 <div class="dashboard-welcome">
-                    <h1>Bienvenido, <?php echo $_SESSION['nombre']; ?></h1>
+                    <h1>Bienvenido, <?php echo $_SESSION['nombre']; ?> 👋</h1>
                     <p>Aquí puedes ver un resumen del estado general de tu sistema de transporte</p>
                 </div>
 

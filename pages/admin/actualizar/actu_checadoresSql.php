@@ -18,6 +18,17 @@ $usuario      = $_POST['usuario'];
 $contrasena   = $_POST['password'];
 $activo       = $_POST['activo'];
 
+if (trim($contrasena) === '●●●●●●●●' || trim($contrasena) === 'Sin contraseña') {
+    $stmt_pwd = $conn->prepare("SELECT contrasena FROM checadores WHERE rfc_checador = ?");
+    $stmt_pwd->bind_param("s", $rfc_checador);
+    $stmt_pwd->execute();
+    $res_pwd = $stmt_pwd->get_result();
+    if ($row_pwd = $res_pwd->fetch_assoc()) {
+        $contrasena = $row_pwd['contrasena'];
+    }
+    $stmt_pwd->close();
+}
+
 $nueva_foto = uploadFoto($_FILES['foto'] ?? [], 'checador');
 
 if ($nueva_foto !== null) {

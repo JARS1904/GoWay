@@ -15,19 +15,26 @@
 $admin_prefix = ($base_url === '') ? 'pages/admin/' : '';
 $logout_url   = $base_url . 'pages/logout.php';
 
-// Ítems de navegación: [slug => [label, icon_file, href]]
-$nav_items = [
-    'dashboard'   => ['label' => 'Dashboard',    'icon' => 'icon_dashboard.png',    'href' => $base_url . 'index.php'],
-    'empresas'    => ['label' => 'Empresas',      'icon' => 'icon_empresas.png',     'href' => $admin_prefix . 'empresas.php'],
-    'conductores' => ['label' => 'Conductores',   'icon' => 'icon_conductores.png',  'href' => $admin_prefix . 'conductores.php'],
-    'vehiculos'   => ['label' => 'Vehículos',     'icon' => 'icon_vehiculos.png',    'href' => $admin_prefix . 'vehiculos.php'],
-    'rutas'       => ['label' => 'Rutas',         'icon' => 'icon_rutas.png',        'href' => $admin_prefix . 'rutas.php'],
-    'horarios'    => ['label' => 'Horarios',      'icon' => 'icon_horarios.png',     'href' => $admin_prefix . 'horarios.php'],
-    'paradas'     => ['label' => 'Paradas',       'icon' => 'icon_paradas.png',      'href' => $admin_prefix . 'paradas_ruta.php'],
-    'asignaciones'=> ['label' => 'Asignaciones',  'icon' => 'icon_asignacion.png',   'href' => $admin_prefix . 'asignaciones.php'],
-    'checadores'  => ['label' => 'Checadores',    'icon' => 'icon_checadores.png',   'href' => $admin_prefix . 'checadores.php'],
-    'reportes'    => ['label' => 'Reportes',      'icon' => 'icon_reportes.png',     'href' => $admin_prefix . 'reportes.php'],
-    'usuarios'    => ['label' => 'Usuarios',      'icon' => 'icon_usuarios.png',     'href' => $admin_prefix . 'usuarios.php'],
+// Categorías de navegación: [Categoría => [slug => [label, icon_file, href]]]
+$nav_categories = [
+    'Principal' => [
+        'dashboard'   => ['label' => 'Dashboard',   'icon' => 'icon_dashboard.png',   'href' => $base_url . 'index.php'],
+        'empresas'    => ['label' => 'Empresa',     'icon' => 'icon_empresas.png',    'href' => $admin_prefix . 'empresas.php'],
+        'rutas'       => ['label' => 'Rutas',       'icon' => 'icon_rutas.png',       'href' => $admin_prefix . 'rutas.php'],
+        'horarios'    => ['label' => 'Horarios',    'icon' => 'icon_horarios.png',    'href' => $admin_prefix . 'horarios.php'],
+        'conductores' => ['label' => 'Conductores', 'icon' => 'icon_conductores.png', 'href' => $admin_prefix . 'conductores.php'],
+        'vehiculos'   => ['label' => 'Vehículos',   'icon' => 'icon_vehiculos.png',   'href' => $admin_prefix . 'vehiculos.php'],
+        'paradas'     => ['label' => 'Paradas',     'icon' => 'icon_paradas.png',     'href' => $admin_prefix . 'paradas_ruta.php'],
+        'asignaciones'=> ['label' => 'Asignaciones','icon' => 'icon_asignacion.png',  'href' => $admin_prefix . 'asignaciones.php'],
+    ],
+    'Usuarios' => [
+        'usuarios'    => ['label' => 'Usuarios',    'icon' => 'icon_usuarios.png',    'href' => $admin_prefix . 'usuarios.php'],
+        'checadores'  => ['label' => 'Checador',    'icon' => 'icon_checadores.png',  'href' => $admin_prefix . 'checadores.php'],
+    ],
+    'Gestión' => [
+        'reportes'    => ['label' => 'Reportes',    'icon' => 'icon_reportes.png',    'href' => $admin_prefix . 'reportes.php'],
+        'notificaciones'=>['label'=> 'Notificaciones','icon'=> 'icons_notifications.png', 'href' => $admin_prefix . 'notificaciones.php'],
+    ]
 ];
 ?>
 
@@ -43,10 +50,6 @@ $nav_items = [
         </div>
         <div class="mobile-topbar-right">
             <div class="mobile-user-info">
-                <?php echo !empty($_SESSION['foto'])
-                    ? '<img src="' . $base_url . 'assets/images/profiles/' . htmlspecialchars($_SESSION['foto']) . '" alt="Usuario" class="header-user-avatar">'
-                    : '<img src="' . $base_url . 'assets/images/icons/administrador.png" alt="Usuario">'; ?>
-                <span><?php echo $_SESSION['nombre']; ?></span>
                 <button class="notification-bell" id="mobileNotifBtn" onclick="toggleNotifications()">
                     <span class="material-icons">notifications_none</span>
                 </button>
@@ -63,18 +66,30 @@ $nav_items = [
     <div class="logo">
         <img src="<?php echo $base_url; ?>assets/images/logo_new.png" alt="Logo de GoWay" class="logo-img">
         <h1>GoWay</h1>
+        <button class="desktop-toggle-btn" onclick="toggleDesktopSidebar()">
+            <img src="<?php echo $base_url; ?>assets/images/icons/icons8_panel.png" alt="Colapsar" style="width: 24px; height: 24px; object-fit: contain;">
+        </button>
     </div>
     <nav>
+        <?php foreach ($nav_categories as $category_name => $items): ?>
+        <div class="sidebar-category">
+            <h4><?php echo $category_name; ?></h4>
+        </div>
         <ul>
-            <?php foreach ($nav_items as $slug => $item): ?>
+            <?php foreach ($items as $slug => $item): ?>
             <li>
-                <a href="<?php echo $item['href']; ?>"<?php echo ($active_page === $slug) ? ' class="active"' : ''; ?>>
-                    <img src="<?php echo $base_url; ?>assets/images/icons/<?php echo $item['icon']; ?>" alt="<?php echo $item['label']; ?>" class="icon">
+                <a href="<?php echo $item['href']; ?>" title="<?php echo $item['label']; ?>"<?php echo ($active_page === $slug) ? ' class="active"' : ''; ?>>
+                    <?php if (isset($item['is_material']) && $item['is_material']): ?>
+                        <span class="material-icons icon" style="font-size: 22px; line-height: 20px; text-align: center; display: block; margin-right: 10px; color: inherit;"><?php echo $item['icon']; ?></span>
+                    <?php else: ?>
+                        <img src="<?php echo $base_url; ?>assets/images/icons/<?php echo $item['icon']; ?>" alt="<?php echo $item['label']; ?>" class="icon">
+                    <?php endif; ?>
                     <span><?php echo $item['label']; ?></span>
                 </a>
             </li>
             <?php endforeach; ?>
         </ul>
+        <?php endforeach; ?>
     </nav>
 
     <!-- Perfil de usuario + Logout -->
@@ -136,6 +151,24 @@ $nav_items = [
 
         document.body.style.overflow = '';
     }
+
+    function toggleDesktopSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('collapsed');
+        
+        if (sidebar.classList.contains('collapsed')) {
+            localStorage.setItem('sidebarCollapsed', 'true');
+        } else {
+            localStorage.setItem('sidebarCollapsed', 'false');
+        }
+    }
+
+    // Persist sidebar state on load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.getItem('sidebarCollapsed') === 'true' && window.innerWidth > 768) {
+            document.getElementById('sidebar').classList.add('collapsed');
+        }
+    });
 
     // Cerrar sidebar al hacer clic en un enlace (en móvil)
     document.querySelectorAll('.sidebar nav a').forEach(link => {
