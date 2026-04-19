@@ -72,10 +72,15 @@ $nav_categories = [
     </div>
     <nav>
         <?php foreach ($nav_categories as $category_name => $items): ?>
-        <div class="sidebar-category">
+        <?php 
+            // Replace spaces and special chars for ID
+            $cat_id = 'cat_' . preg_replace('/[^a-zA-Z0-9]/', '', $category_name);
+        ?>
+        <div class="sidebar-category open" onclick="toggleCategory('<?php echo $cat_id; ?>', this)">
             <h4><?php echo $category_name; ?></h4>
+            <span class="material-icons category-chevron">expand_more</span>
         </div>
-        <ul>
+        <ul id="<?php echo $cat_id; ?>" class="category-list open">
             <?php foreach ($items as $slug => $item): ?>
             <li>
                 <a href="<?php echo $item['href']; ?>" title="<?php echo $item['label']; ?>"<?php echo ($active_page === $slug) ? ' class="active"' : ''; ?>>
@@ -115,6 +120,17 @@ $nav_categories = [
 
 
 <script>
+    // Funciones para categorías colapsables
+    function toggleCategory(categoryId, headerElement) {
+        const sidebar = document.getElementById('sidebar');
+        // Prevenir toggle si el sidebar general está colapsado (donde no se ven encabezados)
+        if (sidebar.classList.contains('collapsed')) return;
+
+        const ul = document.getElementById(categoryId);
+        ul.classList.toggle('open');
+        headerElement.classList.toggle('open');
+    }
+
     // Funciones para el menú hamburguesa
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
