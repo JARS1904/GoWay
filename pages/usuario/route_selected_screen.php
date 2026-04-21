@@ -27,6 +27,7 @@ if ($_SESSION['id'] > 0) {
     <title>GoWay - Rutas de Transporte</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" href="../../assets/images/logo_new.png" type="image/png">
     <link rel="stylesheet" href="../../assets/css/route_selected_screen.css">
 </head>
@@ -51,6 +52,9 @@ if ($_SESSION['id'] > 0) {
                     <a href="../logout.php" class="logout">
                         <i class="fas fa-sign-out-alt"></i> Cerrar sesión
                     </a>
+                    <button class="profile-nav-btn" onclick="toggleNotifications()" style="width: auto; padding: 5px; margin-right: 15px; color: var(--dark-gray); background: transparent; border: none; cursor: pointer; font-size: 20px;">
+                        <i class="far fa-bell"></i>
+                    </button>
                     <button class="profile-nav-btn" onclick="openProfilePanel()">
                         <?php if (!empty($_user_foto)): ?>
                             <img src="../../assets/images/profiles/<?php echo htmlspecialchars($_user_foto); ?>" class="profile-nav-mini-avatar profile-nav-mini-img" alt="foto">
@@ -78,6 +82,9 @@ if ($_SESSION['id'] > 0) {
                     <?php else: ?>
                         <a href="#" onclick="openProfilePanel(); return false;">
                             <i class="fas fa-user-circle"></i> Mi Perfil
+                        </a>
+                        <a href="#" onclick="toggleNotifications(); return false;">
+                            <i class="far fa-bell"></i> Notificaciones
                         </a>
                         <a href="../logout.php">
                             <i class="fas fa-sign-out-alt"></i> Cerrar sesión
@@ -1047,5 +1054,6 @@ if ($_SESSION['id'] > 0) {
             e.stopPropagation();
         });
     </script>
+    <?php require_once '../../components/notifications_panel.php'; ?>
 </body>
 </html>

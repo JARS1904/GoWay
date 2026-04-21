@@ -66,29 +66,29 @@ require_once '../../config/conexion_bd.php';
                                 $fecha = htmlspecialchars($row['fecha_creacion']);
 
                                 $icon_svg = '';
-                                $gradient = '';
+                                $icon_bg_class = '';
                                 $tipo_text = '';
 
                                 switch ($tipo) {
                                     case 'Alerta':
-                                        $gradient = 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)';
-                                        $icon_svg = '<span class="material-icons" style="color: white; font-size: 18px;">warning</span>';
-                                        $tipo_text = 'Aviso de Seguridad';
-                                        break;
-                                    case 'Promocion':
-                                        $gradient = 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)';
-                                        $icon_svg = '<span class="material-icons" style="color: white; font-size: 18px;">local_offer</span>';
-                                        $tipo_text = 'Promoción';
+                                        $icon_bg_class = 'bg-red';
+                                        $icon_svg = '<span class="material-icons" style="font-size: 18px;">warning</span>';
+                                        $tipo_text = 'Alerta de Seguridad';
                                         break;
                                     case 'Cierre':
-                                        $gradient = 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)';
-                                        $icon_svg = '<span class="material-icons" style="color: white; font-size: 18px;">notifications</span>';
+                                        $icon_bg_class = 'bg-blue';
+                                        $icon_svg = '<span class="material-icons" style="font-size: 18px;">block</span>';
                                         $tipo_text = 'Cierre Vial';
+                                        break;
+                                    case 'Trafico':
+                                        $icon_bg_class = 'bg-orange';
+                                        $icon_svg = '<span class="material-icons" style="font-size: 18px;">directions_car</span>';
+                                        $tipo_text = 'Tráfico Pesado';
                                         break;
                                     case 'General':
                                     default:
-                                        $gradient = 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)';
-                                        $icon_svg = '<span class="material-icons" style="color: white; font-size: 18px;">error</span>';
+                                        $icon_bg_class = ''; // default gray bg
+                                        $icon_svg = '<span class="material-icons" style="font-size: 18px;">notifications_none</span>';
                                         $tipo_text = 'Aviso General';
                                         break;
                                 }
@@ -97,7 +97,7 @@ require_once '../../config/conexion_bd.php';
                                 <tr>
                                     <td>
                                         <div style='display: flex; align-items: center; gap: 10px;'>
-                                            <div style='width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: {$gradient}; flex-shrink: 0;'>
+                                            <div class='notif-icon-circle {$icon_bg_class}' style='width: 32px; height: 32px;'>
                                                 {$icon_svg}
                                             </div>
                                             <span><strong>{$tipo_text}</strong></span>
@@ -125,57 +125,6 @@ require_once '../../config/conexion_bd.php';
         </main>
     </div>
 
-    <!-- Modal para agregar nueva notificación -->
-    <div class="modal-overlay" id="addNotificationModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3>Enviar Notificación</h3>
-                <button class="modal-close" id="closeAddModal">&times;</button>
-            </div>
-            <form id="notificationForm" action="../../controllers/insert_notificacion.php" method="POST">
-                <div class="modal-body">
-                    <div>
-                        <div class="modal-form-group">
-                            <label>Destinatario (Usuario)</label>
-                            <select name="id_usuario" required>
-                                <option value="todos">Todos los usuarios (Global)</option>
-                                <?php
-                                $conn = $conexion;
-                                $result = $conn->query("SELECT id, nombre, email FROM usuarios ORDER BY nombre ASC");
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<option value='{$row['id']}'>" . htmlspecialchars($row['nombre']) . " ({$row['email']})</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="modal-form-group">
-                            <label>Tipo de Mensaje</label>
-                            <select name="tipo" required>
-                                <option value="Alerta">Alerta de Seguridad</option>
-                                <option value="Cierre">Cierre Vial/Tráfico</option>
-                                <option value="Promocion">Promoción Especial</option>
-                                <option value="General" selected>Aviso General</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="modal-form-group">
-                            <label>Título de la Notificación</label>
-                            <input type="text" name="titulo" placeholder="Ej. Accidente en el centro" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label>Mensaje</label>
-                            <textarea name="mensaje" rows="4" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc" placeholder="Escribe aquí las instrucciones para los usuarios..." required></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelAddModal">Cancelar</button>
-                    <button type="submit" class="modal-btn modal-btn-save">Enviar notificación</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <script src="../../assets/js/notifications.js"></script>
     <script src="../../assets/js/main.js"></script>
@@ -192,8 +141,7 @@ require_once '../../config/conexion_bd.php';
         document.getElementById('closeAddModal').addEventListener('click', closeModalFn);
         document.getElementById('cancelAddModal').addEventListener('click', closeModalFn);
 
-        // Envío AJAX usando handleInsertForm de notifications.js
-        handleInsertForm(document.getElementById('notificationForm'), '¡Notificación enviada correctamente a los usuarios!');
+        // Envío AJAX manejado globalmente por notifications_panel.php
     });
     </script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>

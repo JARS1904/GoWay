@@ -13,7 +13,27 @@ if (!isset($conn)) {
         $conn = $conexion;
     }
 }
+
+$is_admin = (isset($_SESSION['rol']) && $_SESSION['rol'] == 1);
 ?>
+<style>
+/* Reset for buttons inside the panel to avoid global CSS collisions */
+.notifications-panel .close-panel {
+    width: auto !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.notif-filters button.notif-chip {
+    width: auto !important;
+    border: none !important;
+    padding: 8px 16px !important;
+}
+</style>
 <!-- Panel Lateral de Notificaciones -->
 <div class="notifications-panel" id="notificationsPanel">
     <div class="notifications-header">
@@ -32,23 +52,33 @@ if (!isset($conn)) {
     <!-- Filtros Categoría -->
     <div class="notif-filters">
         <button class="notif-chip active" onclick="filterByChip(this, 'all')">Todos</button>
-        <button class="notif-chip" onclick="filterByChip(this, 'alerta')">Alertas</button>
-        <button class="notif-chip" onclick="filterByChip(this, 'promocion')">Promociones</button>
-        <button class="notif-chip" onclick="filterByChip(this, 'cierre')">Cierres</button>
-        <button class="notif-chip" onclick="filterByChip(this, 'general')">General</button>
+        <button class="notif-chip" onclick="filterByChip(this, 'alerta')">Alertas de Seguridad</button>
+        <button class="notif-chip" onclick="filterByChip(this, 'cierre')">Cierre Vial</button>
+        <button class="notif-chip" onclick="filterByChip(this, 'trafico')">Tráfico Pesado</button>
+        <button class="notif-chip" onclick="filterByChip(this, 'general')">Aviso General</button>
     </div>
 
+    <?php if ($is_admin): ?>
     <div class="notifications-actions">
         <button class="btn-add full-width" id="openAddNotificationModal" style="margin: 0; width: 100%;">+ Enviar notificación</button>
     </div>
+    <?php endif; ?>
     
     <div class="notifications-body" id="notifListBody">
         <?php
         if (isset($conn) && $conn) {
             $sql_notif  = "SELECT n.*, u.nombre AS usuario_nombre 
                            FROM notificaciones n 
-                           LEFT JOIN usuarios u ON n.id_usuario = u.id 
-                           ORDER BY n.fecha_creacion DESC LIMIT 50";
+                           LEFT JOIN usuarios u ON n.id_usuario = u.id ";
+            if (!$is_admin) {
+                if (isset($_SESSION['id']) && $_SESSION['id'] > 0) {
+                    $user_id = (int)$_SESSION['id'];
+                    $sql_notif .= " WHERE n.id_usuario IS NULL OR n.id_usuario = $user_id ";
+                } else {
+                    $sql_notif .= " WHERE n.id_usuario IS NULL ";
+                }
+            }
+            $sql_notif .= " ORDER BY n.fecha_creacion DESC LIMIT 50";
             $result_notif = $conn->query($sql_notif);
             
             if ($result_notif && $result_notif->num_rows > 0) {
@@ -89,15 +119,15 @@ if (!isset($conn)) {
                             $icon_svg = 'warning';
                             $tipo_text = 'Alerta';
                             break;
-                        case 'Promocion':
-                            $icon_bg_class = 'bg-orange';
-                            $icon_svg = 'local_offer';
-                            $tipo_text = 'Promoción';
-                            break;
                         case 'Cierre':
                             $icon_bg_class = 'bg-blue';
                             $icon_svg = 'block';
                             $tipo_text = 'Cierre Vial';
+                            break;
+                        case 'Trafico':
+                            $icon_bg_class = 'bg-orange';
+                            $icon_svg = 'directions_car';
+                            $tipo_text = 'Tráfico Pesado';
                             break;
                         case 'General':
                         default:
@@ -122,7 +152,9 @@ if (!isset($conn)) {
                                 <h4 class="notif-title"><?php echo $titulo; ?></h4>
                             </div>
                             <p class="notif-desc"><?php echo htmlspecialchars($row_notif['mensaje']); ?></p>
+                            <?php if ($is_admin): ?>
                             <p class="notif-desc" style="font-size:0.75rem; color:#9ca3af; margin:0;">Enviado a: <strong><?php echo $target; ?></strong></p>
+                            <?php endif; ?>
                         </div>
                         <div class="notif-item-chevron">
                             <span class="material-icons">chevron_right</span>
@@ -148,8 +180,8 @@ function filterNotifications() {
     const onclickText = activeChip ? activeChip.getAttribute('onclick') : '';
     let typeFilter = 'all';
     if (onclickText.includes('alerta')) typeFilter = 'alerta';
-    else if (onclickText.includes('promocion')) typeFilter = 'promocion';
     else if (onclickText.includes('cierre')) typeFilter = 'cierre';
+    else if (onclickText.includes('trafico')) typeFilter = 'trafico';
     else if (onclickText.includes('general')) typeFilter = 'general';
     
     applyFilters(searchVal, typeFilter);
@@ -163,25 +195,44 @@ function filterByChip(btnElem, type) {
 }
 
 function applyFilters(search, type) {
-    const items = document.querySelectorAll('.notif-item');
-    items.forEach(item => {
-        const itemType = item.getAttribute('data-type') || '';
-        const itemTitle = item.getAttribute('data-title') || '';
-        
-        let matchesSearch = search === '' || itemTitle.includes(search);
-        let matchesType = (type === 'all') || (itemType.toLowerCase().includes(type));
-        
-        if (matchesSearch && matchesType) {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = 'none';
+    const listBody = document.getElementById('notifListBody');
+    if (!listBody) return;
+    
+    let pendingHeader = null;
+    let hasVisibleSinceHeader = false;
+    
+    Array.from(listBody.children).forEach(child => {
+        if (child.classList.contains('notif-date-header')) {
+            if (pendingHeader) {
+                pendingHeader.style.display = hasVisibleSinceHeader ? 'block' : 'none';
+            }
+            pendingHeader = child;
+            hasVisibleSinceHeader = false;
+        } else if (child.classList.contains('notif-item')) {
+            const itemType = child.getAttribute('data-type') || '';
+            const itemTitle = child.getAttribute('data-title') || '';
+            
+            let matchesSearch = search === '' || itemTitle.includes(search);
+            let matchesType = (type === 'all') || (itemType.toLowerCase().includes(type));
+            
+            if (matchesSearch && matchesType) {
+                child.style.display = 'flex';
+                hasVisibleSinceHeader = true;
+            } else {
+                child.style.display = 'none';
+            }
         }
     });
+    
+    if (pendingHeader) {
+        pendingHeader.style.display = hasVisibleSinceHeader ? 'block' : 'none';
+    }
 }
 </script>
 <div class="notifications-overlay" id="notificationsOverlay" onclick="toggleNotifications()"></div>
 
 <!-- Modal para agregar nueva notificación -->
+<?php if ($is_admin): ?>
 <div class="modal-overlay" id="addNotificationModal">
     <div class="modal-container">
         <div class="modal-header">
@@ -211,8 +262,8 @@ function applyFilters(search, type) {
                         <label>Tipo de Mensaje</label>
                         <select name="tipo" required>
                             <option value="Alerta">Alerta de Seguridad</option>
-                            <option value="Cierre">Cierre Vial/Tráfico</option>
-                            <option value="Promocion">Promoción Especial</option>
+                            <option value="Cierre">Cierre Vial</option>
+                            <option value="Trafico">Tráfico Pesado</option>
                             <option value="General" selected>Aviso General</option>
                         </select>
                     </div>
@@ -235,6 +286,7 @@ function applyFilters(search, type) {
         </form>
     </div>
 </div>
+<?php endif; ?>
 
 <script>
     // Lógica del Panel de Notificaciones

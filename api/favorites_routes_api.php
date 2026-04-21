@@ -64,7 +64,17 @@ try {
                             v.modelo AS vehiculo_modelo, 
                             v.capacidad AS vehiculo_capacidad
                         FROM horarios h
-                        LEFT JOIN asignaciones a ON h.id_horario = a.id_horario AND h.id_ruta = a.id_ruta AND a.activa = 1 AND a.fecha = CURDATE()
+                        LEFT JOIN (
+                            SELECT a1.*
+                            FROM asignaciones a1
+                            INNER JOIN (
+                                SELECT id_horario, id_ruta, MAX(fecha) AS max_fecha
+                                FROM asignaciones
+                                WHERE activa = 1
+                                GROUP BY id_horario, id_ruta
+                            ) a2 ON a1.id_horario = a2.id_horario AND a1.id_ruta = a2.id_ruta AND a1.fecha = a2.max_fecha
+                            WHERE a1.activa = 1
+                        ) a ON h.id_horario = a.id_horario AND h.id_ruta = a.id_ruta
                         LEFT JOIN conductores c ON a.rfc_conductor = c.rfc_conductor
                         LEFT JOIN vehiculos v ON a.id_vehiculo = v.id_vehiculo
                         WHERE h.id_ruta = ? AND h.tipo_dia = ?";

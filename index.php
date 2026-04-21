@@ -203,8 +203,8 @@ require_once 'config/sync_session_foto.php';
                             <label>Tipo de Mensaje</label>
                             <select name="tipo" required>
                                 <option value="Alerta">Alerta de Seguridad</option>
-                                <option value="Cierre">Cierre Vial/Tráfico</option>
-                                <option value="Promocion">Promoción Especial</option>
+                                <option value="Cierre">Cierre Vial</option>
+                                <option value="Trafico">Tráfico Pesado</option>
                                 <option value="General" selected>Aviso General</option>
                             </select>
                         </div>
