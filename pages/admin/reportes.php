@@ -1,4 +1,4 @@
-﻿<!--Se agreo para el manejo de sesión-->
+<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -405,7 +405,228 @@ if ($conexion->error) {
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
-        
+
+        /* ── Botón Generar resumen ── */
+        .btn-summary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            white-space: nowrap;
+        }
+        .btn-summary:hover {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            transform: translateY(-2px);
+        }
+        .btn-summary .material-icons { font-size: 17px; }
+
+        /* ── Modal de Resumen ── */
+        #summaryModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #summaryModal.active { display: flex; }
+
+        .summary-container {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 780px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: fadeSlideIn 0.3s ease;
+        }
+        @keyframes fadeSlideIn {
+            from { opacity:0; transform: translateY(-20px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .summary-header {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: #fff;
+            padding: 28px 32px 22px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .summary-header h2 { margin: 0 0 4px; font-size: 1.4rem; }
+        .summary-header .summary-meta { font-size: 12px; opacity: 0.82; margin: 3px 0; }
+        .summary-close-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            border-radius: 50%;
+            width: 32px; height: 32px;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.18s, color 0.18s;
+        }
+        .summary-close-btn:hover { background: rgba(255,255,255,0.35); }
+
+        .summary-body { padding: 28px 32px; overflow-y: auto; flex: 1; min-height: 0; }
+
+        /* KPI cards */
+        .summary-kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .kpi-card {
+            border-radius: 12px;
+            padding: 18px 14px;
+            text-align: center;
+        }
+        .kpi-card .kpi-val {
+            font-size: 2rem;
+            font-weight: 800;
+            display: block;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .kpi-card .kpi-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.75;
+        }
+        .kpi-total    { background:#eff6ff; color:#1e40af; }
+        .kpi-pending  { background:#fffbeb; color:#b45309; }
+        .kpi-process  { background:#f0f9ff; color:#0369a1; }
+        .kpi-resolved { background:#f0fdf4; color:#166534; }
+
+        /* Secciones */
+        .summary-section { margin-bottom: 26px; }
+        .summary-section:last-child { margin-bottom: 0; }
+        .summary-section h4 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #64748b;
+            margin: 0 0 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        /* Barras de gravedad */
+        .gravedad-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .gravedad-label {
+            width: 68px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .gravedad-bar-wrap { flex: 1; background: #f1f5f9; border-radius: 99px; height: 10px; overflow: hidden; }
+        .gravedad-bar { height: 10px; border-radius: 99px; transition: width 0.6s ease; }
+        .bar-baja     { background: #22c55e; }
+        .bar-media    { background: #f59e0b; }
+        .bar-alta     { background: #ef4444; }
+        .bar-critica  { background: #7c3aed; }
+        .gravedad-count { font-size: 13px; font-weight: 700; color: #334155; min-width: 24px; text-align: right; }
+
+        /* Tablas de resumen */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .summary-table th {
+            text-align: left;
+            padding: 8px 12px;
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .summary-table td {
+            padding: 9px 12px;
+            border-top: 1px solid #f1f5f9;
+            color: #334155;
+        }
+        .summary-table tr:hover td { background: #f8fafc; }
+        .badge-rank {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4338ca;
+            border-radius: 99px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Footer del modal */
+        .summary-footer {
+            border-top: 1px solid #e2e8f0;
+            padding: 18px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border-radius: 0 0 16px 16px;
+        }
+        .summary-footer small { color: #94a3b8; font-size: 12px; }
+        .btn-download-pdf {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #2962FF, #1a50e8);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: .95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(41,98,255,.32);
+        }
+        .btn-download-pdf:hover { opacity:.92; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(41,98,255,.38); }
+        .btn-download-pdf .material-icons { font-size: 17px; }
+
+        /* Loading state del resumen */
+        .summary-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+        .summary-loading .material-icons {
+            font-size: 48px;
+            animation: spin 1s linear infinite;
+            color: #6366f1;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        /* (print is handled via popup window — no @media print needed here) */
     </style>
     <script src="../../assets/js/notifications.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -424,7 +645,11 @@ if ($conexion->error) {
         <!-- Header para escritorio -->
         <header class="header">
             <h2>Reportes de Incidentes</h2>
-                            <div class="header-notif-wrap">
+                <div class="header-notif-wrap" style="gap:12px">
+                    <button class="btn-summary" id="btnGenerarResumen" onclick="openSummaryModal()">
+                        <span class="material-icons">summarize</span>
+                        Generar resumen
+                    </button>
                     <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
                         <span class="material-icons">notifications_none</span>
                     </button>
@@ -667,6 +892,17 @@ if ($conexion->error) {
     document.addEventListener('DOMContentLoaded', function() {
         loadReports(reportes);
         updateStats(reportes);
+
+        // Inyectar botón "Generar resumen" en el topbar móvil
+        const mobileRight = document.querySelector('.mobile-topbar-right');
+        if (mobileRight) {
+            const btn = document.createElement('button');
+            btn.className = 'notification-bell';
+            btn.innerHTML = '<span class="material-icons">summarize</span>';
+            btn.title = 'Generar resumen';
+            btn.onclick = openSummaryModal;
+            mobileRight.insertBefore(btn, mobileRight.firstChild);
+        }
     });
 
     // Función para cargar reportes en la lista
@@ -1170,8 +1406,290 @@ if ($conexion->error) {
     document.getElementById('editCancel').addEventListener('click', function(){
         closeEditModal();
     });
+
+    // ─────────────────────────────────────────────
+    // RESUMEN EJECUTIVO
+    // ─────────────────────────────────────────────
+    const TIPO_LABELS = {
+        accidente: 'Accidente',
+        averia:    'Avería Mecánica',
+        retraso:   'Retraso Significativo',
+        cliente:   'Incidente con Cliente',
+        otro:      'Otro'
+    };
+
+    function openSummaryModal() {
+        document.getElementById('summaryModal').classList.add('active');
+        // Resetear body a loading
+        document.getElementById('summaryBody').innerHTML = `
+            <div class="summary-loading">
+                <span class="material-icons">sync</span>
+                Generando resumen...
+            </div>`;
+        document.getElementById('summaryPeriodo').textContent  = 'Cargando período...';
+        document.getElementById('summaryGenerado').textContent = 'Generado el: —';
+
+        fetch('../../api/reportes_api.php?action=get_summary')
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) renderSummary(data);
+                else throw new Error(data.error || 'Error al obtener datos');
+            })
+            .catch(err => {
+                document.getElementById('summaryBody').innerHTML =
+                    `<p style="color:#ef4444;padding:20px;">Error: ${err.message}</p>`;
+            });
+    }
+
+    function closeSummaryModal() {
+        document.getElementById('summaryModal').classList.remove('active');
+    }
+
+    // Cerrar con ESC
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { closeSummaryModal(); closeEditModal(); }
+    });
+
+    function renderSummary(data) {
+        const t      = data.totales;
+        const total  = parseInt(t.total)      || 0;
+        const pend   = parseInt(t.pendientes) || 0;
+        const proc   = parseInt(t.en_proceso) || 0;
+        const resu   = parseInt(t.resueltos)  || 0;
+
+        // Período
+        const desde = data.rango_fechas?.desde ? new Date(data.rango_fechas.desde).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+        const hasta = data.rango_fechas?.hasta ? new Date(data.rango_fechas.hasta).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+        document.getElementById('summaryPeriodo').textContent  = `Período: ${desde} — ${hasta}`;
+
+        const genTs = new Date(data.generado_en);
+        document.getElementById('summaryGenerado').textContent =
+            `Generado el: ${genTs.toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'})} a las ${genTs.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}`;
+
+        // ── Barras de gravedad ──
+        const gravedadOrder = ['critica','alta','media','baja'];
+        const gMap = {};
+        (data.por_gravedad || []).forEach(g => gMap[g.gravedad] = parseInt(g.total));
+        const maxG = Math.max(...Object.values(gMap), 1);
+        const gravedadHTML = gravedadOrder.map(g => {
+            const cnt  = gMap[g] || 0;
+            const pct  = Math.round((cnt / maxG) * 100);
+            const label = g === 'critica' ? 'Crítica' : g.charAt(0).toUpperCase() + g.slice(1);
+            return `<div class="gravedad-row">
+                <span class="gravedad-label">${label}</span>
+                <div class="gravedad-bar-wrap">
+                    <div class="gravedad-bar bar-${g}" style="width:${pct}%"></div>
+                </div>
+                <span class="gravedad-count">${cnt}</span>
+            </div>`;
+        }).join('');
+
+        // ── Tabla tipos ──
+        const tipoRows = (data.por_tipo || []).map((row, i) => `
+            <tr>
+                <td><span class="badge-rank">#${i+1}</span></td>
+                <td>${TIPO_LABELS[row.tipo_incidente] || row.tipo_incidente}</td>
+                <td><strong>${row.total}</strong></td>
+                <td>${total > 0 ? Math.round((row.total/total)*100) : 0}%</td>
+            </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#94a3b8">Sin datos</td></tr>';
+
+        // ── Top conductores ──
+        const condRows = (data.top_conductores || []).map((row, i) => `
+            <tr>
+                <td><span class="badge-rank">#${i+1}</span></td>
+                <td>${row.nombre}</td>
+                <td><strong>${row.total}</strong></td>
+            </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:#94a3b8">Sin datos</td></tr>';
+
+        // ── Top rutas ──
+        const rutaRows = (data.top_rutas || []).map((row, i) => `
+            <tr>
+                <td><span class="badge-rank">#${i+1}</span></td>
+                <td>${row.nombre}</td>
+                <td><strong>${row.total}</strong></td>
+            </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:#94a3b8">Sin datos</td></tr>';
+
+        // ── Top vehículos ──
+        const vehicRows = (data.top_vehiculos || []).map((row, i) => `
+            <tr>
+                <td><span class="badge-rank">#${i+1}</span></td>
+                <td>${row.vehiculo}</td>
+                <td><strong>${row.total}</strong></td>
+            </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:#94a3b8">Sin datos</td></tr>';
+
+        // ── Días de la semana ──
+        const maxDia = Math.max(...(data.por_dia_semana || []).map(d => d.total), 1);
+        const diaColors = ['#6366f1','#3b82f6','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6'];
+        const diasHTML = (data.por_dia_semana || []).map((d, i) => {
+            const pct = Math.round((d.total / maxDia) * 100);
+            return `<div class="gravedad-row">
+                <span class="gravedad-label" style="width:36px;font-size:12px">${d.dia}</span>
+                <div class="gravedad-bar-wrap">
+                    <div class="gravedad-bar" style="width:${pct}%;background:${diaColors[i % diaColors.length]}"></div>
+                </div>
+                <span class="gravedad-count">${d.total}</span>
+            </div>`;
+        }).join('');
+
+        document.getElementById('summaryBody').innerHTML = `
+            <!-- KPIs -->
+            <div class="summary-kpis">
+                <div class="kpi-card kpi-total">
+                    <span class="kpi-val">${total}</span>
+                    <span class="kpi-label">Total</span>
+                </div>
+                <div class="kpi-card kpi-pending">
+                    <span class="kpi-val">${pend}</span>
+                    <span class="kpi-label">Pendientes</span>
+                </div>
+                <div class="kpi-card kpi-process">
+                    <span class="kpi-val">${proc}</span>
+                    <span class="kpi-label">En Proceso</span>
+                </div>
+                <div class="kpi-card kpi-resolved">
+                    <span class="kpi-val">${resu}</span>
+                    <span class="kpi-label">Resueltos</span>
+                </div>
+            </div>
+
+            <!-- Gravedad -->
+            <div class="summary-section">
+                <h4>Por Nivel de Gravedad</h4>
+                ${gravedadHTML}
+            </div>
+
+            <!-- Grid estructurado en filas para asegurar alineación horizontal -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px 24px; align-items:start;">
+                <!-- Fila 1 -->
+                <div class="summary-section" style="margin:0;">
+                    <h4>Por Tipo de Incidente</h4>
+                    <table class="summary-table">
+                        <thead><tr><th>#</th><th>Tipo</th><th>Total</th><th>%</th></tr></thead>
+                        <tbody>${tipoRows}</tbody>
+                    </table>
+                </div>
+                <div class="summary-section" style="margin:0;">
+                    <h4>Top Conductores</h4>
+                    <table class="summary-table">
+                        <thead><tr><th>#</th><th>Conductor</th><th>Reportes</th></tr></thead>
+                        <tbody>${condRows}</tbody>
+                    </table>
+                </div>
+
+                <!-- Fila 2 -->
+                <div class="summary-section" style="margin:0;">
+                    <h4>Top Vehículos</h4>
+                    <table class="summary-table">
+                        <thead><tr><th>#</th><th>Vehículo</th><th>Reportes</th></tr></thead>
+                        <tbody>${vehicRows}</tbody>
+                    </table>
+                </div>
+                <div class="summary-section" style="margin:0;">
+                    <h4>Top Rutas</h4>
+                    <table class="summary-table">
+                        <thead><tr><th>#</th><th>Ruta</th><th>Reportes</th></tr></thead>
+                        <tbody>${rutaRows}</tbody>
+                    </table>
+                </div>
+
+                <!-- Fila 3 -->
+                <div></div>
+                <div class="summary-section" style="margin:0;">
+                    <h4>Incidentes por Día</h4>
+                    ${diasHTML}
+                </div>
+            </div>`;
+    }
+
+    function downloadSummaryPDF() {
+        const generadoText = document.getElementById('summaryGenerado').textContent;
+        const bodyHTML     = document.getElementById('summaryBody').innerHTML;
+
+        const printCSS = `
+            body { font-family: 'Inter', Arial, sans-serif; margin: 0; padding: 0; background:#fff; color:#333; }
+            .print-header { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color:#fff; padding:28px 36px 22px; display:flex; align-items:center; gap:16px; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+            .print-header img { width:44px; height:44px; object-fit:contain; }
+            .print-header h2 { margin:0 0 4px; font-size:1.35rem; }
+            .print-header p { margin:3px 0; font-size:12px; opacity:.85; }
+            .print-body { padding:28px 36px; }
+            .summary-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
+            .kpi-card { border-radius:12px; padding:18px 14px; text-align:center; }
+            .kpi-card .kpi-val { font-size:2rem; font-weight:800; display:block; line-height:1; margin-bottom:6px; }
+            .kpi-card .kpi-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; opacity:.75; }
+            .kpi-total{background:#eff6ff;color:#1e40af;}.kpi-pending{background:#fffbeb;color:#b45309;}
+            .kpi-process{background:#f0f9ff;color:#0369a1;}.kpi-resolved{background:#f0fdf4;color:#166534;}
+            .summary-section { margin-bottom:24px; }
+            .summary-section h4 { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#64748b; margin:0 0 12px; padding-bottom:8px; border-bottom:2px solid #e2e8f0; }
+            .gravedad-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+            .gravedad-label { width:68px; font-size:13px; font-weight:600; text-transform:capitalize; }
+            .gravedad-bar-wrap { flex:1; background:#f1f5f9; border-radius:99px; height:10px; overflow:hidden; }
+            .gravedad-bar { height:10px; border-radius:99px; }
+            .bar-baja{background:#22c55e;}.bar-media{background:#f59e0b;}.bar-alta{background:#ef4444;}.bar-critica{background:#7c3aed;}
+            .gravedad-count { font-size:13px; font-weight:700; color:#334155; min-width:24px; text-align:right; }
+            .summary-table { width:100%; border-collapse:collapse; font-size:13px; }
+            .summary-table th { text-align:left; padding:8px 12px; background:#f8fafc; color:#64748b; font-weight:700; font-size:11px; text-transform:uppercase; }
+            .summary-table td { padding:9px 12px; border-top:1px solid #f1f5f9; color:#334155; }
+            .badge-rank { display:inline-block; background:#e0e7ff; color:#4338ca; border-radius:99px; padding:2px 8px; font-size:11px; font-weight:700; }
+            .print-footer { border-top:1px solid #e2e8f0; padding:14px 36px; background:#f8fafc; font-size:12px; color:#94a3b8; }
+            @media print { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        `;
+
+        const win = window.open('', '_blank', 'width=900,height=700');
+        win.document.write(`<!DOCTYPE html><html lang="es"><head>
+            <meta charset="UTF-8">
+            <title>Resumen ejecutivo de reportes - GoWay</title>
+            <style>${printCSS}</style>
+        </head><body>
+            <div class="print-header">
+                <img src="${window.location.origin}/GoWay/assets/images/logo_new.png" alt="GoWay">
+                <div>
+                    <h2>Resumen ejecutivo de reportes</h2>
+                    <p>${generadoText}</p>
+                </div>
+            </div>
+            <div class="print-body">${bodyHTML}</div>
+            <div class="print-footer">GoWay - Sistema de Transporte Público</div>
+        </body></html>`);
+        win.document.close();
+        win.onload = () => { win.focus(); win.print(); };
+    }
 </script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
     <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>
+
+    <!-- ── Modal Resumen Ejecutivo ── -->
+    <div id="summaryModal">
+        <div class="summary-container" id="summaryPrintArea">
+            <!-- Header -->
+            <div class="summary-header">
+                <div style="display:flex;align-items:center;gap:14px">
+                    <img src="../../assets/images/logo_new.png" alt="GoWay" style="width:42px;height:42px;object-fit:contain;flex-shrink:0;">
+                    <div>
+                        <h2 style="margin:0 0 4px;font-size:1.35rem;">Resumen ejecutivo de reportes</h2>
+                        <p class="summary-meta" id="summaryPeriodo" style="display:none"></p>
+                        <p class="summary-meta" id="summaryGenerado">Generado el: —</p>
+                    </div>
+                </div>
+                <button class="summary-close-btn" onclick="closeSummaryModal()">✕</button>
+            </div>
+
+            <!-- Body -->
+            <div class="summary-body" id="summaryBody">
+                <div class="summary-loading">
+                    <span class="material-icons">sync</span>
+                    Generando resumen...
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="summary-footer">
+                <small>GoWay - Sistema de Transporte Público</small>
+                <button class="btn-download-pdf" onclick="downloadSummaryPDF()">
+                    <span class="material-icons">download</span>
+                    Descargar PDF
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

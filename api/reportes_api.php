@@ -85,8 +85,85 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $action = isset($_GET['action']) ? $_GET['action'] : '';
 
-        if (!in_array($action, ['get_assignment_data', 'get_reports'])) {
-            sendResponse(400, ["error" => "Acción no válida. Use action=get_assignment_data o action=get_reports"]);
+        if (!in_array($action, ['get_assignment_data', 'get_reports', 'get_summary'])) {
+            sendResponse(400, ["error" => "Acción no válida."]);
+        }
+
+        // ── GET SUMMARY ──────────────────────────────────────────
+        if ($action === 'get_summary') {
+            // Totales generales
+            $r = $conn->query("SELECT COUNT(*) AS total,
+                SUM(estado='pendiente')  AS pendientes,
+                SUM(estado='en-proceso') AS en_proceso,
+                SUM(estado='resuelto')   AS resueltos
+                FROM reportes");
+            $totales = $r->fetch_assoc();
+
+            // Por gravedad
+            $r = $conn->query("SELECT gravedad, COUNT(*) AS total FROM reportes GROUP BY gravedad ORDER BY FIELD(gravedad,'critica','alta','media','baja')");
+            $por_gravedad = [];
+            while ($row = $r->fetch_assoc()) $por_gravedad[] = $row;
+
+            // Por tipo de incidente
+            $r = $conn->query("SELECT tipo_incidente, COUNT(*) AS total FROM reportes GROUP BY tipo_incidente ORDER BY total DESC");
+            $por_tipo = [];
+            while ($row = $r->fetch_assoc()) $por_tipo[] = $row;
+
+            // Top 5 conductores con más incidentes
+            $r = $conn->query("SELECT c.nombre, COUNT(*) AS total
+                FROM reportes rep JOIN conductores c ON rep.rfc_conductor = c.rfc_conductor
+                GROUP BY rep.rfc_conductor ORDER BY total DESC LIMIT 5");
+            $top_conductores = [];
+            while ($row = $r->fetch_assoc()) $top_conductores[] = $row;
+
+            // Top 5 rutas con más incidentes
+            $r = $conn->query("SELECT ru.nombre, COUNT(*) AS total
+                FROM reportes rep JOIN rutas ru ON rep.id_ruta = ru.id_ruta
+                GROUP BY rep.id_ruta ORDER BY total DESC LIMIT 5");
+            $top_rutas = [];
+            while ($row = $r->fetch_assoc()) $top_rutas[] = $row;
+
+            // Top 5 vehículos con más incidentes
+            $r = $conn->query("SELECT CONCAT(v.placa, ' - ', v.modelo) AS vehiculo, COUNT(*) AS total
+                FROM reportes rep JOIN vehiculos v ON rep.id_vehiculo = v.id_vehiculo
+                GROUP BY rep.id_vehiculo ORDER BY total DESC LIMIT 5");
+            $top_vehiculos = [];
+            while ($row = $r->fetch_assoc()) $top_vehiculos[] = $row;
+
+            // Incidentes por día de la semana (1=Dom…7=Sáb en MySQL)
+            $r = $conn->query("SELECT DAYOFWEEK(fecha_incidente) AS dia_num, COUNT(*) AS total
+                FROM reportes GROUP BY dia_num ORDER BY dia_num");
+            $por_dia_raw = [];
+            while ($row = $r->fetch_assoc()) $por_dia_raw[$row['dia_num']] = (int)$row['total'];
+            // Construir array lunes→domingo (2..7,1)
+            $dias_labels = [2=>'Lun',3=>'Mar',4=>'Mié',5=>'Jue',6=>'Vie',7=>'Sáb',1=>'Dom'];
+            $por_dia_semana = [];
+            foreach ($dias_labels as $num => $label) {
+                $por_dia_semana[] = ['dia' => $label, 'total' => $por_dia_raw[$num] ?? 0];
+            }
+
+            // Tiempo promedio de resolución (días) — solo reportes resueltos con updated_at
+            $tiempo_res = null;
+            $cols = $conn->query("SHOW COLUMNS FROM reportes LIKE 'updated_at'");
+            if ($cols && $cols->num_rows > 0) {
+                $r = $conn->query("SELECT ROUND(AVG(DATEDIFF(updated_at, created_at)), 1) AS promedio_dias
+                    FROM reportes WHERE estado = 'resuelto' AND updated_at IS NOT NULL AND updated_at != created_at");
+                if ($r) $tiempo_res = $r->fetch_assoc()['promedio_dias'];
+            }
+
+            sendResponse(200, [
+                "success"          => true,
+                "generado_en"      => date('Y-m-d H:i:s'),
+                "totales"          => $totales,
+                "por_gravedad"     => $por_gravedad,
+                "por_tipo"         => $por_tipo,
+                "top_conductores"  => $top_conductores,
+                "top_rutas"        => $top_rutas,
+                "top_vehiculos"    => $top_vehiculos,
+                "por_dia_semana"   => $por_dia_semana,
+                "tiempo_resolucion"=> $tiempo_res,
+                "rango_fechas"     => $rango
+            ]);
         }
 
         // ── GET REPORTS ──────────────────────────────────────────
