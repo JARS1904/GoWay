@@ -33,7 +33,7 @@ $sql_reportes = "SELECT r.*,
                  INNER JOIN conductores c ON r.rfc_conductor = c.rfc_conductor
                  INNER JOIN rutas ru ON r.id_ruta = ru.id_ruta
                  ORDER BY r.created_at DESC
-                 LIMIT 10";
+                 LIMIT 150";
 $result_reportes = $conexion->query($sql_reportes);
 
 // Si hay error en la conexión o en las consultas
@@ -831,10 +831,11 @@ if ($conexion->error) {
                             <div class="filter-group">
                                 <label>Filtrar por:</label>
                                 <select class="filter-select" id="filterStatus" onchange="filterReports()">
-                                    <option value="todos">Todos</option>
+                                    <option value="todos">Todos (Activos)</option>
                                     <option value="pendiente">Pendientes</option>
                                     <option value="en-proceso">En Proceso</option>
                                     <option value="resuelto">Resueltos</option>
+                                    <option value="archivados">Archivados</option>
                                 </select>
                             </div>
                         </div>
@@ -888,7 +889,8 @@ if ($conexion->error) {
                     fecha: \"" . addslashes($row['fecha_incidente']) . "\",
                     descripcion: \"" . addslashes($row['descripcion']) . "\",
                     gravedad: \"" . addslashes($row['gravedad']) . "\",
-                    status: \"" . addslashes($row['estado']) . "\"
+                    status: \"" . addslashes($row['estado']) . "\",
+                    archivado: " . (int)$row['archivado'] . "
                 },";
             }
         }
@@ -897,7 +899,7 @@ if ($conexion->error) {
 
     // Cargar reportes al iniciar
     document.addEventListener('DOMContentLoaded', function() {
-        loadReports(reportes);
+        filterReports();
         updateStats(reportes);
 
         // Inyectar botón "Generar resumen" en el topbar móvil
@@ -940,8 +942,10 @@ if ($conexion->error) {
                     </div>
                     <div class="report-description">${report.descripcion}</div>
                     <div class="report-actions">
-                        <!--<button class="btn-action-small btn-view" onclick="viewReport(${report.id})">Ver</button>-->
-                        <button class="btn-action-small btn-edit" onclick="editReport(${report.id})">Editar</button>
+                        <button class="btn-action-small btn-edit" onclick="editReport(${report.id})" ${report.archivado ? 'style="display:none"' : ''}>Editar</button>
+                        <button class="btn-action-small" style="background:#64748b;color:white;" onclick="toggleArchiveReport(${report.id}, ${report.archivado})">
+                            ${report.archivado ? 'Desarchivar' : 'Archivar'}
+                        </button>
                         <button class="btn-action-small btn-delete" onclick="deleteReport(${report.id})">Eliminar</button>
                     </div>
                 `;
@@ -955,19 +959,23 @@ if ($conexion->error) {
     // Resuelto
     function filterReports() {
         const filterValue = document.getElementById('filterStatus').value;
-
         let filteredReports;
 
-        if (filterValue === 'todos') {
-            filteredReports = reportes;
-        } else if (filterValue === 'pendiente') {
-            filteredReports = reportes.filter(report => report.status === 'pendiente');
-        } else if (filterValue === 'en-proceso') {
-            filteredReports = reportes.filter(report => report.status === 'en-proceso');
-        } else if (filterValue === 'resuelto') {
-            filteredReports = reportes.filter(report => report.status === 'resuelto');
+        if (filterValue === 'archivados') {
+            filteredReports = reportes.filter(report => report.archivado === 1);
         } else {
-            filteredReports = reportes;
+            const activeReports = reportes.filter(report => report.archivado === 0);
+            if (filterValue === 'todos') {
+                filteredReports = activeReports;
+            } else if (filterValue === 'pendiente') {
+                filteredReports = activeReports.filter(report => report.status === 'pendiente');
+            } else if (filterValue === 'en-proceso') {
+                filteredReports = activeReports.filter(report => report.status === 'en-proceso');
+            } else if (filterValue === 'resuelto') {
+                filteredReports = activeReports.filter(report => report.status === 'resuelto');
+            } else {
+                filteredReports = activeReports;
+            }
         }
 
         loadReports(filteredReports);
@@ -1133,11 +1141,14 @@ if ($conexion->error) {
     }
 
     function updateStats(reports) {
-        // Actualizar estadísticas con datos reales
-        document.getElementById('totalReports').textContent = reports.length;
-        document.getElementById('pendingReports').textContent = reports.filter(r => r.status === 'pendiente').length;
-        document.getElementById('inProgressReports').textContent = reports.filter(r => r.status === 'en-proceso').length;
-        document.getElementById('resolvedReports').textContent = reports.filter(r => r.status === 'resuelto').length;
+        // Solo contar los reportes según el filtro actual
+        const filterValue = document.getElementById('filterStatus').value;
+        const visibleReports = filterValue === 'archivados' ? reports.filter(r => r.archivado === 1) : reports.filter(r => r.archivado === 0);
+        
+        document.getElementById('totalReports').textContent = visibleReports.length;
+        document.getElementById('pendingReports').textContent = visibleReports.filter(r => r.status === 'pendiente').length;
+        document.getElementById('inProgressReports').textContent = visibleReports.filter(r => r.status === 'en-proceso').length;
+        document.getElementById('resolvedReports').textContent = visibleReports.filter(r => r.status === 'resuelto').length;
     }
 
     function viewReport(id) {
@@ -1265,6 +1276,41 @@ if ($conexion->error) {
             }
 
             showNotification('Error al eliminar el reporte: ' + error.message, 'error');
+        });
+    }
+
+    function toggleArchiveReport(id, currentArchivadoStatus) {
+        const flagTarget = currentArchivadoStatus ? 0 : 1;
+        const actionStr = currentArchivadoStatus ? 'desarchivar' : 'archivar';
+        const confirmAction = confirm(`¿Está seguro de que desea ${actionStr} este reporte?`);
+        
+        if (!confirmAction) return;
+
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('archivado', flagTarget);
+
+        fetch('../../controllers/update/archivar_reporte.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const reportIndex = reportes.findIndex(r => r.id == id);
+                if (reportIndex !== -1) {
+                    reportes[reportIndex].archivado = flagTarget;
+                    filterReports();
+                    updateStats(reportes);
+                    showNotification(data.message, 'info');
+                }
+            } else {
+                showNotification(data.message || `Error al ${actionStr}`, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification(`Error de conexión al ${actionStr}`, 'error');
         });
     }
 

@@ -60,6 +60,11 @@ $nav_categories = [
 
 <!-- Menú Lateral -->
 <aside id="sidebar" class="sidebar">
+    <script>
+        if (localStorage.getItem('sidebarCollapsed') === 'true' && window.innerWidth > 768) {
+            document.getElementById('sidebar').classList.add('collapsed');
+        }
+    </script>
     <!-- Botón de Cerrar para Móvil -->
     <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
 
@@ -178,13 +183,6 @@ $nav_categories = [
             localStorage.setItem('sidebarCollapsed', 'false');
         }
     }
-
-    // Persist sidebar state on load
-    document.addEventListener('DOMContentLoaded', function() {
-        if (localStorage.getItem('sidebarCollapsed') === 'true' && window.innerWidth > 768) {
-            document.getElementById('sidebar').classList.add('collapsed');
-        }
-    });
 
     // Cerrar sidebar al hacer clic en un enlace (en móvil)
     document.querySelectorAll('.sidebar nav a').forEach(link => {

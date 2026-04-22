@@ -96,22 +96,23 @@ try {
                 SUM(estado='pendiente')  AS pendientes,
                 SUM(estado='en-proceso') AS en_proceso,
                 SUM(estado='resuelto')   AS resueltos
-                FROM reportes");
+                FROM reportes WHERE archivado = 0");
             $totales = $r->fetch_assoc();
 
             // Por gravedad
-            $r = $conn->query("SELECT gravedad, COUNT(*) AS total FROM reportes GROUP BY gravedad ORDER BY FIELD(gravedad,'critica','alta','media','baja')");
+            $r = $conn->query("SELECT gravedad, COUNT(*) AS total FROM reportes WHERE archivado = 0 GROUP BY gravedad ORDER BY FIELD(gravedad,'critica','alta','media','baja')");
             $por_gravedad = [];
             while ($row = $r->fetch_assoc()) $por_gravedad[] = $row;
 
             // Por tipo de incidente
-            $r = $conn->query("SELECT tipo_incidente, COUNT(*) AS total FROM reportes GROUP BY tipo_incidente ORDER BY total DESC");
+            $r = $conn->query("SELECT tipo_incidente, COUNT(*) AS total FROM reportes WHERE archivado = 0 GROUP BY tipo_incidente ORDER BY total DESC");
             $por_tipo = [];
             while ($row = $r->fetch_assoc()) $por_tipo[] = $row;
 
             // Top 5 conductores con más incidentes
             $r = $conn->query("SELECT c.nombre, COUNT(*) AS total
                 FROM reportes rep JOIN conductores c ON rep.rfc_conductor = c.rfc_conductor
+                WHERE rep.archivado = 0
                 GROUP BY rep.rfc_conductor ORDER BY total DESC LIMIT 5");
             $top_conductores = [];
             while ($row = $r->fetch_assoc()) $top_conductores[] = $row;
@@ -119,6 +120,7 @@ try {
             // Top 5 rutas con más incidentes
             $r = $conn->query("SELECT ru.nombre, COUNT(*) AS total
                 FROM reportes rep JOIN rutas ru ON rep.id_ruta = ru.id_ruta
+                WHERE rep.archivado = 0
                 GROUP BY rep.id_ruta ORDER BY total DESC LIMIT 5");
             $top_rutas = [];
             while ($row = $r->fetch_assoc()) $top_rutas[] = $row;
@@ -126,13 +128,14 @@ try {
             // Top 5 vehículos con más incidentes
             $r = $conn->query("SELECT CONCAT(v.placa, ' - ', v.modelo) AS vehiculo, COUNT(*) AS total
                 FROM reportes rep JOIN vehiculos v ON rep.id_vehiculo = v.id_vehiculo
+                WHERE rep.archivado = 0
                 GROUP BY rep.id_vehiculo ORDER BY total DESC LIMIT 5");
             $top_vehiculos = [];
             while ($row = $r->fetch_assoc()) $top_vehiculos[] = $row;
 
             // Incidentes por día de la semana (1=Dom…7=Sáb en MySQL)
             $r = $conn->query("SELECT DAYOFWEEK(fecha_incidente) AS dia_num, COUNT(*) AS total
-                FROM reportes GROUP BY dia_num ORDER BY dia_num");
+                FROM reportes WHERE archivado = 0 GROUP BY dia_num ORDER BY dia_num");
             $por_dia_raw = [];
             while ($row = $r->fetch_assoc()) $por_dia_raw[$row['dia_num']] = (int)$row['total'];
             // Construir array lunes→domingo (2..7,1)
@@ -147,7 +150,7 @@ try {
             $cols = $conn->query("SHOW COLUMNS FROM reportes LIKE 'updated_at'");
             if ($cols && $cols->num_rows > 0) {
                 $r = $conn->query("SELECT ROUND(AVG(DATEDIFF(updated_at, created_at)), 1) AS promedio_dias
-                    FROM reportes WHERE estado = 'resuelto' AND updated_at IS NOT NULL AND updated_at != created_at");
+                    FROM reportes WHERE estado = 'resuelto' AND archivado = 0 AND updated_at IS NOT NULL AND updated_at != created_at");
                 if ($r) $tiempo_res = $r->fetch_assoc()['promedio_dias'];
             }
 
