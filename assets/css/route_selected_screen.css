@@ -1043,8 +1043,8 @@ select:focus {
 
 .profile-panel.open { right: 0; }
 
-@media (max-width: 400px) {
-    .profile-panel { width: 100%; right: -100%; }
+@media (max-width: 480px) {
+    .profile-panel { width: 100vw; right: -100vw; }
     .profile-panel.open { right: 0; }
 }
 
