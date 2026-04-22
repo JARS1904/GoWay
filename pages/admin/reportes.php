@@ -97,18 +97,21 @@ if ($conexion->error) {
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
+            font-size: 14px;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             font-size: 14px;
-            transition: border-color 0.3s ease;
+            font-family: inherit;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
             box-sizing: border-box;
+            background-color: #fff;
         }
 
         .form-group input:focus,
@@ -122,15 +125,14 @@ if ($conexion->error) {
         .form-group textarea {
             min-height: 100px;
             resize: vertical;
-            font-family: 'Arial', sans-serif;
         }
 
         .btn-submit {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 15px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
@@ -395,7 +397,7 @@ if ($conexion->error) {
         .modal-form-group textarea {
             min-height: 110px;
             resize: vertical;
-            font-family: 'Arial', sans-serif;
+            font-family: inherit;
         }
 
         .modal-form-group input:focus,
@@ -644,7 +646,7 @@ if ($conexion->error) {
     <main class="main-content" id="mainContent">
         <!-- Header para escritorio -->
         <header class="header">
-            <h2>Reportes de Incidentes</h2>
+            <h2>Reportes de Incidencias</h2>
                 <div class="header-notif-wrap" style="gap:12px">
                     <button class="btn-summary" id="btnGenerarResumen" onclick="openSummaryModal()">
                         <span class="material-icons">summarize</span>
@@ -660,7 +662,7 @@ if ($conexion->error) {
             <div class="reports-container">
                 <!-- Formulario para nuevo reporte -->
                 <div class="report-form-container">
-                    <h3>Nuevo Reporte de Incidente</h3>
+                    <h3>Nuevo reporte de Incidencias</h3>
                     <form id="incidentForm" method="POST" action="#">
                         <div class="form-group">
                             <label for="placa">Placa de la Unidad *</label>
@@ -669,11 +671,16 @@ if ($conexion->error) {
                         </div>
                         
                         <!-- Contenedor para mostrar los datos obtenidos automáticamente -->
-                        <div id="datosAsignacion" style="display: none; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-                            <h4 style="margin-top: 0; margin-bottom: 10px; color: #3b82f6;">Asignación encontrada</h4>
-                            <p style="margin: 5px 0; font-size: 14px; color: #475569;"><strong>Vehículo:</strong> <span id="infoVehiculo"></span></p>
-                            <p style="margin: 5px 0; font-size: 14px; color: #475569;"><strong>Conductor:</strong> <span id="infoConductor"></span></p>
-                            <p style="margin: 5px 0; font-size: 14px; color: #475569;"><strong>Ruta:</strong> <span id="infoRuta"></span></p>
+                        <div id="datosAsignacion" style="display: none; background: #eff6ff; padding: 18px; border-radius: 12px; margin-bottom: 22px; border: 1px solid #bfdbfe; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.05);">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                                <span class="material-icons" style="color: #2563eb; font-size: 20px;">info</span>
+                                <h4 style="margin: 0; color: #1d4ed8; font-size: 16px; font-weight: 700;">Asignación encontrada</h4>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <p style="margin: 0; font-size: 14.5px; color: #334155;"><strong style="color: #1e293b;">Vehículo:</strong> <span id="infoVehiculo"></span></p>
+                                <p style="margin: 0; font-size: 14.5px; color: #334155;"><strong style="color: #1e293b;">Conductor:</strong> <span id="infoConductor"></span></p>
+                                <p style="margin: 0; font-size: 14.5px; color: #334155;"><strong style="color: #1e293b;">Ruta:</strong> <span id="infoRuta"></span></p>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -708,7 +715,7 @@ if ($conexion->error) {
                             </select>
                         </div>
 
-                        <button type="submit" class="btn-submit">Generar Reporte</button>
+                        <button type="submit" class="btn-submit">Generar reporte</button>
                     </form>
 
                     <!-- Modal editar reporte -->
@@ -819,7 +826,7 @@ if ($conexion->error) {
                     <!-- Lista de reportes existentes -->
                 <div class="reports-list-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="margin: 0;">Reportes Recientes</h3>
+                        <h3 style="margin: 0;">Reportes recientes</h3>
                         <div class="filters">
                             <div class="filter-group">
                                 <label>Filtrar por:</label>
