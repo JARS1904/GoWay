@@ -15,10 +15,10 @@ $rfc_checador = $_POST['rfc_checador'];
 $rfc_empresa  = $_POST['rfc_empresa'];
 $nombre       = $_POST['nombre'];
 $usuario      = $_POST['usuario'];
-$contrasena   = $_POST['password'];
+$contrasena   = $_POST['password'] ?? '';
 $activo       = $_POST['activo'];
 
-if (trim($contrasena) === '●●●●●●●●' || trim($contrasena) === 'Sin contraseña') {
+if (empty(trim($contrasena)) || trim($contrasena) === '●●●●●●●●' || trim($contrasena) === 'Sin contraseña') {
     $stmt_pwd = $conn->prepare("SELECT contrasena FROM checadores WHERE rfc_checador = ?");
     $stmt_pwd->bind_param("s", $rfc_checador);
     $stmt_pwd->execute();
@@ -27,6 +27,8 @@ if (trim($contrasena) === '●●●●●●●●' || trim($contrasena) === 'S
         $contrasena = $row_pwd['contrasena'];
     }
     $stmt_pwd->close();
+} else {
+    $contrasena = password_hash($contrasena, PASSWORD_DEFAULT);
 }
 
 $nueva_foto = uploadFoto($_FILES['foto'] ?? [], 'checador');

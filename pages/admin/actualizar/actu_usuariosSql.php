@@ -15,10 +15,10 @@ if ($conn->connect_error) {
 $id       = $_POST['id_usuario'];
 $nombre   = $_POST['nombre'];
 $email    = $_POST['email'];
-$password = $_POST['password'];
+$password = $_POST['password'] ?? '';
 $rol      = $_POST['rol'];
 
-if (!empty($password) && trim($password) !== '●●●●●●●●' && trim($password) !== 'Sin contraseña') {
+if (!empty(trim($password)) && trim($password) !== '●●●●●●●●' && trim($password) !== 'Sin contraseña') {
     $password = password_hash($password, PASSWORD_DEFAULT);
 } else {
     // Keep existing password

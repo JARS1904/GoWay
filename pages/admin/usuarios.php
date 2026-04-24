@@ -55,7 +55,6 @@ require_once '../../config/sync_session_foto.php';
                             <!-- <th>ID usuario</th> -->
                             <th>Nombre</th>
                             <th>Email</th>
-                            <th>Password</th>
                             <th>Rol</th>
                             <th>Acción</th>
                         </tr>
@@ -77,7 +76,6 @@ require_once '../../config/sync_session_foto.php';
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
-                                $password_display = !empty($row["password"]) ? "●●●●●●●●" : "Sin contraseña";
                                 $rol_label = $rol_mapping[$row["rol"]] ?? "Desconocido";
                                 $nombre_esc = htmlspecialchars($row["nombre"]);
                                 $initial = htmlspecialchars(mb_strtoupper(mb_substr($row["nombre"], 0, 1)));
@@ -88,7 +86,6 @@ require_once '../../config/sync_session_foto.php';
                                 echo '<tr data-id="' . $row["id"] . '">
                                         <td data-label="Nombre" data-nombre="' . $nombre_esc . '"><div class="avatar-cell">' . $avatar . '<span>' . $nombre_esc . '</span></div></td>
                                         <td data-label="Email">' . htmlspecialchars($row["email"]) . '</td>
-                                        <td data-label="Password">' . $password_display . '</td>
                                         <td data-label="Rol" data-rol="' . $row["rol"] . '">' . $rol_label . '</td>
                                         <td>
                                             <button class="btn-action btn-edit">Editar</button>
@@ -97,7 +94,7 @@ require_once '../../config/sync_session_foto.php';
                                     </tr>';
                             }
                         } else {
-                            echo '<tr><td colspan="6">No hay usuarios registrados</td></tr>';
+                            echo '<tr><td colspan="4">No hay usuarios registrados</td></tr>';
                         }
 
                         ?>
@@ -139,7 +136,7 @@ require_once '../../config/sync_session_foto.php';
                     <div>
                         <div class="modal-form-group">
                             <label for="password">Contraseña</label>
-                            <input type="text" id="password" name="password" placeholder="Ingresa una contraseña" required>
+                            <input type="password" id="password" name="password" placeholder="Ingresa una contraseña" required>
                         </div>
                         <div class="modal-form-group">
                             <label for="rol">Rol</label>
@@ -196,7 +193,7 @@ require_once '../../config/sync_session_foto.php';
                     <div>
                         <div class="modal-form-group">
                             <label for="edit_password">Contraseña</label>
-                            <input type="text" id="edit_password" name="password" placeholder="Ingresa una contraseña">
+                            <input type="password" id="edit_password" name="password" placeholder="Deja vacío para conservar la contraseña actual">
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_rol">Rol</label>
@@ -267,8 +264,8 @@ require_once '../../config/sync_session_foto.php';
                     document.getElementById('edit_id_usuario').value = row.getAttribute('data-id');
                     document.getElementById('edit_nombre').value = cells[0].dataset.nombre;
                     document.getElementById('edit_email').value = cells[1].textContent.trim();
-                    document.getElementById('edit_password').value = cells[2].textContent.trim();
-                    document.getElementById('edit_rol').value = cells[3].getAttribute('data-rol');
+                    document.getElementById('edit_password').value = '';
+                    document.getElementById('edit_rol').value = cells[2].getAttribute('data-rol');
                     
                     document.getElementById('editUserModal').classList.add('active');
                 }
