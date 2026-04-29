@@ -1,4 +1,4 @@
-﻿<!--Se agreo para el manejo de sesión-->
+<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -81,8 +81,19 @@ require_once '../../config/sync_session_foto.php';
                                     <td data-label=\"Hora llegada\">{$llegada}</td>
                                     <td data-label=\"Frecuencia\">{$frecuencia}</td>
                                     <td>
-                                        <button class=\"btn-action btn-edit\" data-id=\"{$row['id_horario']}\">Editar</button>
-                                        <button class=\"btn-action btn-delete\" data-id=\"{$row['id_horario']}\">Eliminar</button>
+                                        <div class=\"kebab-menu\">
+                                            <button class=\"kebab-btn\" onclick=\"toggleKebabMenu(this, event)\">
+                                                <span class=\"material-icons\">more_vert</span>
+                                            </button>
+                                            <div class=\"dropdown-content\">
+                                                <button class=\"dropdown-item btn-edit\" data-id=\"{$row['id_horario']}\">
+                                                    <span class=\"material-icons\">edit</span> Editar
+                                                </button>
+                                                <button class=\"dropdown-item btn-delete\" data-id=\"{$row['id_horario']}\">
+                                                    <span class=\"material-icons\">delete</span> Eliminar
+                                                </button>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>";
                             }

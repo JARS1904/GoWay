@@ -13,8 +13,8 @@ if ($conn->connect_error) {
 }
 
 // Preparar y enlazar
-$stmt = $conn->prepare("INSERT INTO asignaciones (rfc_empresa, id_vehiculo, rfc_conductor, id_ruta, id_horario, fecha) VALUES (?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("sisiss", $rfc_empresa, $id_vehiculo, $rfc_conductor, $id_ruta, $id_horario, $fecha);
+$stmt = $conn->prepare("INSERT INTO asignaciones (rfc_empresa, id_vehiculo, rfc_conductor, id_ruta, id_horario, fecha, estado, asientos_disp) SELECT ?, ?, ?, ?, ?, ?, ?, capacidad FROM vehiculos WHERE id_vehiculo = ?");
+$stmt->bind_param("sisisssi", $rfc_empresa, $id_vehiculo, $rfc_conductor, $id_ruta, $id_horario, $fecha, $estado, $id_vehiculo);
 
 // Establecer parámetros y ejecutar
 $rfc_empresa = $_POST['rfc_empresa'];
@@ -23,6 +23,7 @@ $rfc_conductor = $_POST['rfc_conductor'];
 $id_ruta = $_POST['id_ruta'];
 $id_horario = $_POST['id_horario'];
 $fecha = $_POST['fecha'];
+$estado = $_POST['estado'] ?? 'programado'; // Default to programado just in case
 $stmt->execute();
 
 echo json_encode(["success" => true, "message" => "Asignación agregada correctamente"]);

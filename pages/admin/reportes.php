@@ -222,22 +222,45 @@ if ($conexion->error) {
         }
 
         .btn-action-small {
-            padding: 6px 12px;
+            padding: 8px 12px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             transition: all 0.3s ease;
         }
 
+        .btn-action-small .material-icons {
+            font-size: 16px;
+        }
+
         .btn-edit {
-            background: #3b82f6;
-            color: white;
+            background-color: #eff6ff;
+            color: #2563eb;
+        }
+        .btn-edit:hover {
+            background-color: #dbeafe;
         }
 
         .btn-delete {
-            background: #ef4444;
-            color: white;
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        .btn-delete:hover {
+            background-color: #fecaca;
+        }
+
+        .btn-archive {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+        .btn-archive:hover {
+            background-color: #e2e8f0;
         }
 
         .btn-view {
@@ -942,11 +965,15 @@ if ($conexion->error) {
                     </div>
                     <div class="report-description">${report.descripcion}</div>
                     <div class="report-actions">
-                        <button class="btn-action-small btn-edit" onclick="editReport(${report.id})" ${report.archivado ? 'style="display:none"' : ''}>Editar</button>
-                        <button class="btn-action-small" style="background:#64748b;color:white;" onclick="toggleArchiveReport(${report.id}, ${report.archivado})">
-                            ${report.archivado ? 'Desarchivar' : 'Archivar'}
+                        <button class="btn-action-small btn-edit" onclick="editReport(${report.id})" ${report.archivado ? 'style="display:none"' : ''}>
+                            <span class="material-icons">edit_square</span> Editar
                         </button>
-                        <button class="btn-action-small btn-delete" onclick="deleteReport(${report.id})">Eliminar</button>
+                        <button class="btn-action-small btn-archive" onclick="toggleArchiveReport(${report.id}, ${report.archivado})">
+                            <span class="material-icons">archive</span> ${report.archivado ? 'Desarchivar' : 'Archivar'}
+                        </button>
+                        <button class="btn-action-small btn-delete" onclick="deleteReport(${report.id})">
+                            <span class="material-icons">delete_outline</span> Eliminar
+                        </button>
                     </div>
                 `;
             reportsList.appendChild(reportCard);

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['id'])) {
     header('Location: ../login.php');
@@ -287,8 +287,19 @@ function renderStops(paradas) {
                 <span class="badge-minutos">${p.minutos_desde_origen} min</span>
             </td>
             <td>
-                <button class="btn-action btn-edit" onclick="openEditModal(${p.id_parada}, '${escAttr(p.nombre)}', ${p.orden}, ${p.minutos_desde_origen})">Editar</button>
-                <button class="btn-action btn-delete" onclick="openDeleteModal(${p.id_parada}, '${escAttr(p.nombre)}')">Eliminar</button>
+                <div class="kebab-menu">
+                    <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
+                        <span class="material-icons">more_vert</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <button class="dropdown-item btn-edit" onclick="openEditModal(${p.id_parada}, '${escAttr(p.nombre)}', ${p.orden}, ${p.minutos_desde_origen})">
+                            <span class="material-icons">edit_square</span> Editar
+                        </button>
+                        <button class="dropdown-item btn-delete" onclick="openDeleteModal(${p.id_parada}, '${escAttr(p.nombre)}')">
+                            <span class="material-icons">delete_outline</span> Eliminar
+                        </button>
+                    </div>
+                </div>
             </td>
         `;
         stopsBody.appendChild(tr);

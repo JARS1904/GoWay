@@ -242,6 +242,47 @@ if ($_SESSION['id'] > 0) {
     </div><!-- /profilePanel -->
 
     <script>
+        // ── renderSeatBadge ──────────────────────────────────────────
+        // Genera el HTML del componente de disponibilidad de asientos.
+        // disponibles: número de asientos libres
+        // capacidad:   capacidad total del vehículo
+        function renderSeatBadge(disponibles, capacidad) {
+            if (disponibles === null || disponibles === undefined || !capacidad) {
+                return `
+                    <div class="seats-availability-block">
+                        <div class="seats-bar-wrap"><div class="seats-bar" style="width:0%"></div></div>
+                        <span class="seats-label">Sin datos de disponibilidad</span>
+                        <span class="seats-status status-agotado">Sin asignar</span>
+                    </div>`;
+            }
+            const disp = parseInt(disponibles);
+            const cap  = parseInt(capacidad);
+            const pct  = cap > 0 ? Math.round((disp / cap) * 100) : 0;
+
+            // Color de la barra
+            let barColor;
+            if (disp === 0)      barColor = '#9e9e9e';  // gris cuando agotado
+            else if (pct < 15)   barColor = '#E64A19';  // rojo
+            else if (pct < 50)   barColor = '#FBC02D';  // amarillo/naranja
+            else                 barColor = '#689F38';  // verde
+
+            // Estado del badge
+            let statusText, statusClass;
+            if (disp === 0)      { statusText = 'Agotado';       statusClass = 'status-agotado'; }
+            else if (pct < 15)   { statusText = 'Casi agotado';  statusClass = 'status-casi-agotado'; }
+            else if (pct < 50)   { statusText = 'Pocos lugares'; statusClass = 'status-pocos'; }
+            else                 { statusText = 'Disponible';    statusClass = 'status-disponible'; }
+
+            return `
+                <div class="seats-availability-block">
+                    <div class="seats-bar-wrap">
+                        <div class="seats-bar" style="width:${pct}%;background:${barColor};"></div>
+                    </div>
+                    <span class="seats-label"><strong>${disp}</strong> de ${cap} lugares disponibles</span>
+                    <span class="seats-status ${statusClass}">${statusText}</span>
+                </div>`;
+        }
+
         // Configuración de API
         const API_BASE_URL = window.location.origin; // Obtiene http://localhost
         const API_URL = `${API_BASE_URL}/GoWay/api/routes_api.php`;
@@ -956,10 +997,7 @@ if ($_SESSION['id'] > 0) {
                                     <i class="fas fa-ticket-alt" style="color:#E65100;"></i>
                                     <span><strong>Placa: ${schedule.vehiculo_placa || 'N/A'}</strong></span>
                                 </div>
-                                <div class="driver-vehicle-row">
-                                    <i class="fas fa-users" style="color:#6A1B9A;"></i>
-                                    <span><strong>Capacidad: ${schedule.vehiculo_capacidad || 'N/A'} pasajeros</strong></span>
-                                </div>
+                                ${renderSeatBadge(schedule.asientos_disponibles, schedule.vehiculo_capacidad)}
                             </div>
                         </div>
                     </div>

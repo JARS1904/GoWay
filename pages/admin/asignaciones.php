@@ -1,4 +1,4 @@
-﻿<!--Se agreo para el manejo de sesión-->
+<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -48,6 +48,7 @@ require_once '../../config/sync_session_foto.php';
                     <h3>Lista de Asignaciones</h3>
                     <button class="btn-add">+ Agregar nueva asignación</button>
                 </div>
+                <div class="table-responsive" style="overflow-x: auto; width: 100%;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -57,6 +58,8 @@ require_once '../../config/sync_session_foto.php';
                             <th>Ruta</th>
                             <th>Horario</th>
                             <th>Fecha de creación</th>
+                            <th>Asientos disp.</th>
+                            <th>Estado</th>
                             <th>Activa</th>
                             <th>Acciones</th>
                         </tr>
@@ -86,18 +89,33 @@ require_once '../../config/sync_session_foto.php';
                                         <td data-label="Ruta">'.$row["nombre_ruta"].'</td>
                                         <td data-label="Horario">'.$row["id_horario"].'</td>
                                         <td data-label="Fecha de creación">'.$row["fecha"].'</td>
+                                        <td data-label="Asientos disp.">'.$row["asientos_disp"].'</td>
+                                        <td data-label="Estado">'.ucfirst(str_replace("_", " ", $row["estado"])).'</td>
                                         <td data-label="Activa"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
-                                            <button class="btn-action btn-delete">Eliminar</button>
+                                            <div class="kebab-menu">
+                                                <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
+                                                    <span class="material-icons">more_vert</span>
+                                                </button>
+                                                <div class="dropdown-content">
+                                                    <button class="dropdown-item btn-edit" data-id="'.$row["id_asignacion"].'" data-empresa="'.$row["rfc_empresa"].'" data-ruta="'.$row["id_ruta"].'" data-horario="'.$row["id_horario"].'" data-conductor="'.$row["rfc_conductor"].'" data-vehiculo="'.$row["id_vehiculo"].'" data-fecha="'.$row["fecha"].'" data-estado="'.$row["estado"].'" data-asientos="'.$row["asientos_disp"].'">
+                                                        <span class="material-icons">edit_square</span> Editar
+                                                    </button>
+                                                    <button class="dropdown-item btn-delete" data-id="'.$row["id_asignacion"].'">
+                                                        <span class="material-icons">delete_outline</span> Eliminar
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>';
                             }
                         } else {
-                            echo '<tr><td colspan="8">No hay asignaciones registradas</td></tr>';
+                            echo '<tr><td colspan="10">No hay asignaciones registradas</td></tr>';
                         }
                         ?>
                     </tbody>
                 </table>
+                </div>
 
                 <!-- Paginación -->
                 <div class="pagination">
@@ -139,9 +157,9 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar vehículo</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT id_vehiculo, placa FROM vehiculos");
+                                $result = $conn->query("SELECT id_vehiculo, placa, modelo FROM vehiculos");
                                 while ($row = $result->fetch_assoc()) {
-                                echo "<option value='{$row['id_vehiculo']}'>{$row['placa']}</option>";
+                                echo "<option value='{$row['id_vehiculo']}'>{$row['placa']} - {$row['modelo']}</option>";
                                 }
                                 ?>
                             </select>
@@ -157,6 +175,16 @@ require_once '../../config/sync_session_foto.php';
                                 echo "<option value='{$row['rfc_conductor']}'>{$row['nombre']}</option>";
                                 }
                                 ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Estado</label>
+                            <select name="estado" required>
+                                <option value="programado" selected>Programado</option>
+                                <option value="en_ruta">En Ruta</option>
+                                <option value="completado">Completado</option>
+                                <option value="cancelado">Cancelado</option>
+                                <option value="retrasado">Retrasado</option>
                             </select>
                         </div>
                     </div>
@@ -204,8 +232,114 @@ require_once '../../config/sync_session_foto.php';
         </div>
     </div>
 
+    <div class="modal-overlay" id="editAssignModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Editar Asignación</h3>
+                <button class="modal-close" id="closeEditModal">&times;</button>
+            </div>
+            <form id="editAssignForm" action="../../controllers/update_asignacion.php" method="POST">
+                <input type="hidden" name="id_asignacion" id="edit_id_asignacion">
+                <div class="modal-body">
+                    <!-- Columna izquierda -->
+                    <div>
+                        <div class="modal-form-group">
+                            <label>RFC de la Empresa</label>
+                            <select name="rfc_empresa" id="edit_rfc_empresa" required>
+                                <option value="" disabled selected>Seleccionar empresa</option>
+                                <?php
+                                $conn = $conexion;
+                                $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['rfc_empresa']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Vehículo</label>
+                            <select name="id_vehiculo" id="edit_id_vehiculo" required>
+                                <option value="" disabled selected>Seleccionar vehículo</option>
+                                <?php
+                                $conn = $conexion;
+                                $result = $conn->query("SELECT id_vehiculo, placa, modelo FROM vehiculos");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['id_vehiculo']}'>{$row['placa']} - {$row['modelo']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>RFC Conductor</label>
+                            <select name="rfc_conductor" id="edit_rfc_conductor" required>
+                                <option value="" disabled selected>Seleccionar conductor</option>
+                                <?php
+                                $conn = $conexion;
+                                $result = $conn->query("SELECT rfc_conductor, nombre FROM conductores");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['rfc_conductor']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Estado</label>
+                            <select name="estado" id="edit_estado" required>
+                                <option value="programado">Programado</option>
+                                <option value="en_ruta">En Ruta</option>
+                                <option value="completado">Completado</option>
+                                <option value="cancelado">Cancelado</option>
+                                <option value="retrasado">Retrasado</option>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Asientos disponibles</label>
+                            <input type="number" name="asientos_disp" id="edit_asientos_disp" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Columna derecha -->
+                    <div>
+                        <div class="modal-form-group">
+                            <label>Ruta</label>
+                            <select name="id_ruta" id="edit_id_ruta" required>
+                                <option value="" disabled selected>Seleccionar ruta</option>
+                                <?php
+                                $conn = $conexion;
+                                $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Horario</label>
+                            <select name="id_horario" id="edit_id_horario" required>
+                                <option value="" disabled selected>Seleccionar horario</option>
+                                <?php
+                                $conn = $conexion;
+                                $result = $conn->query("SELECT id_horario, tipo_dia, hora_salida FROM horarios");
+                                while ($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['id_horario']}'>{$row['tipo_dia']} - {$row['hora_salida']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Fecha de creación</label>
+                            <input type="date" name="fecha" id="edit_fecha" required>
+                        </div>
+                    </div>
+                </div>
 
-
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelEditModal">Cancelar</button>
+                    <button type="submit" class="modal-btn modal-btn-save">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/notifications.js"></script>
@@ -238,6 +372,39 @@ require_once '../../config/sync_session_foto.php';
             'id_asignacion',
             '¿Estás seguro de que deseas eliminar esta asignación?'
         );
+
+        // Edit Modal Logic
+        document.querySelectorAll('.btn-edit').forEach(button => {
+            button.addEventListener('click', () => {
+                document.getElementById('edit_id_asignacion').value = button.dataset.id;
+                document.getElementById('edit_rfc_empresa').value = button.dataset.empresa;
+                document.getElementById('edit_id_ruta').value = button.dataset.ruta;
+                document.getElementById('edit_id_horario').value = button.dataset.horario;
+                document.getElementById('edit_rfc_conductor').value = button.dataset.conductor;
+                document.getElementById('edit_id_vehiculo').value = button.dataset.vehiculo;
+                document.getElementById('edit_fecha').value = button.dataset.fecha;
+                document.getElementById('edit_estado').value = button.dataset.estado;
+                document.getElementById('edit_asientos_disp').value = button.dataset.asientos;
+                document.getElementById('editAssignModal').classList.add('active');
+            });
+        });
+
+        document.getElementById('closeEditModal').addEventListener('click', () => {
+            document.getElementById('editAssignModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelEditModal').addEventListener('click', () => {
+            document.getElementById('editAssignModal').classList.remove('active');
+        });
+
+        document.getElementById('editAssignModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Use the existing handleInsertForm or generic form handler for updates
+        handleInsertForm(document.getElementById('editAssignForm'), 'Asignación actualizada correctamente');
     </script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
     <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>

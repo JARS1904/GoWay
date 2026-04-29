@@ -259,3 +259,79 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }, 50);
 });
+
+// ====================================================
+// Kebab Menu Logic
+// ====================================================
+function toggleKebabMenu(btn, event) {
+    event.stopPropagation(); // Prevent document click from immediately closing it
+    
+    // Close all other open dropdowns first
+    document.querySelectorAll('.dropdown-content.show').forEach(dropdown => {
+        if (dropdown !== btn.nextElementSibling) {
+            dropdown.classList.remove('show');
+            dropdown.style.position = '';
+            dropdown.style.top = '';
+            dropdown.style.right = '';
+            dropdown.style.bottom = '';
+        }
+    });
+
+    // Toggle this dropdown
+    const dropdown = btn.nextElementSibling;
+    if (dropdown) {
+        const isShowing = dropdown.classList.toggle('show');
+        
+        if (isShowing) {
+            // Position fixed to escape overflow hidden/auto wrappers
+            dropdown.style.position = 'fixed';
+            const rect = btn.getBoundingClientRect();
+            
+            // Align right edge of dropdown with right edge of button
+            dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+            dropdown.style.left = 'auto';
+            dropdown.style.bottom = 'auto';
+            
+            // Initial top position
+            dropdown.style.top = rect.bottom + 'px';
+            
+            // Smart positioning: check if it goes off bottom of screen
+            requestAnimationFrame(() => {
+                const dropRect = dropdown.getBoundingClientRect();
+                if (dropRect.bottom > window.innerHeight) {
+                    // Show above the button
+                    dropdown.style.top = (rect.top - dropRect.height) + 'px';
+                }
+            });
+        } else {
+            dropdown.style.position = '';
+            dropdown.style.top = '';
+            dropdown.style.right = '';
+            dropdown.style.bottom = '';
+        }
+    }
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.kebab-menu')) {
+        document.querySelectorAll('.dropdown-content.show').forEach(dropdown => {
+            dropdown.classList.remove('show');
+            dropdown.style.position = '';
+            dropdown.style.top = '';
+            dropdown.style.right = '';
+            dropdown.style.bottom = '';
+        });
+    }
+});
+
+// Close dropdowns on scroll to prevent detached menus
+window.addEventListener('scroll', function() {
+    document.querySelectorAll('.dropdown-content.show').forEach(dropdown => {
+        dropdown.classList.remove('show');
+        dropdown.style.position = '';
+        dropdown.style.top = '';
+        dropdown.style.right = '';
+        dropdown.style.bottom = '';
+    });
+}, true); // use capture phase to catch all scrolling elements

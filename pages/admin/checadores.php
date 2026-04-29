@@ -85,8 +85,19 @@ require_once '../../config/sync_session_foto.php';
                                         <td data-label="Usuario">'.htmlspecialchars($row["usuario"]).'</td>
                                         <td data-label="Estado"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
-                                            <button class="btn-action btn-edit">Editar</button>
-                                            <button class="btn-action btn-delete">Eliminar</button>
+                                            <div class="kebab-menu">
+                                                <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
+                                                    <span class="material-icons">more_vert</span>
+                                                </button>
+                                                <div class="dropdown-content">
+                                                    <button class="dropdown-item btn-edit">
+                                                        <span class="material-icons">edit_square</span> Editar
+                                                    </button>
+                                                    <button class="dropdown-item btn-delete">
+                                                        <span class="material-icons">delete_outline</span> Eliminar
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>';
                             }

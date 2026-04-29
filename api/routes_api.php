@@ -100,6 +100,7 @@ try {
             $destination = trim($data['destination']);
 
             // === Calcular el tipo de día actual basado en la fecha del servidor ===
+            date_default_timezone_set('America/Mexico_City');
             $numeroDia = date('N'); // 1 = Lunes, 7 = Domingo
             if ($numeroDia >= 1 && $numeroDia <= 5) {
                 $tipo_dia_actual = 'Lunes a Viernes';
@@ -162,7 +163,9 @@ try {
                                  c.licencia AS conductor_licencia,
                                  v.placa    AS vehiculo_placa,
                                  v.modelo   AS vehiculo_modelo,
-                                 v.capacidad AS vehiculo_capacidad
+                                 v.capacidad AS vehiculo_capacidad,
+                                 a.id_asignacion,
+                                 a.asientos_disp AS asientos_disponibles
                           FROM horarios h
                           LEFT JOIN asignaciones a
                                  ON h.id_horario = a.id_horario

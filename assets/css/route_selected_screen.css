@@ -1598,10 +1598,80 @@ select:focus {
     color: #94a3b8;
 }
 
-/* Pantallas pequeÃ±as (MÃ³vil) */
+/* Pantallas pequeñas (Móvil) */
 @media (max-width: 480px) {
     .notifications-panel {
         width: 100vw;
         right: -100vw;
     }
+}
+
+/* ── Seats Availability Block ───────────────────────────────── */
+.seats-availability-block {
+    margin-top: 14px;
+    padding: 14px 0 4px 0;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.seats-bar-wrap {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+    .seats-bar-wrap { background: #334155; }
+}
+
+.seats-bar {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.5s ease, background-color 0.4s ease;
+}
+
+.seats-label {
+    font-size: 14px;
+    font-weight: 400;
+    color: #374151;
+}
+
+.seats-label strong {
+    font-weight: 700;
+}
+
+/* Status pill */
+.seats-status {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    align-self: flex-start;
+    letter-spacing: 0.2px;
+    border: none;
+}
+
+.seats-status.status-disponible {
+    background: #dcedc8;
+    color: #33691e;
+}
+
+.seats-status.status-pocos {
+    background: #fff9c4;
+    color: #e65100;
+}
+
+.seats-status.status-casi-agotado {
+    background: #fce4ec;
+    color: #b71c1c;
+}
+
+.seats-status.status-agotado {
+    background: #f1f5f9;
+    color: #64748b;
 }
