@@ -43,65 +43,36 @@ try {
     $userData = null;
     $hashedPassword = null;
 
-    // 1. Primero intentar como USUARIO NORMAL
-    $stmt_usr = $conn->prepare("SELECT id, nombre, email, password as contrasena, foto FROM usuarios WHERE email = ?");
-    $stmt_usr->bind_param("s", $email);
-    $stmt_usr->execute();
-    $result_usr = $stmt_usr->get_result();
+    // Buscar como CHECADOR
+    $stmt_checador = $conn->prepare("SELECT rfc_checador, nombre, usuario, contrasena, activo, foto FROM checadores WHERE usuario = ? AND activo = 1");
+    $stmt_checador->bind_param("s", $email);
+    $stmt_checador->execute();
+    $result_checador = $stmt_checador->get_result();
 
-    if ($result_usr->num_rows > 0) {
-        $row_usr = $result_usr->fetch_assoc();
-        $userType = "usuario";
+    if ($result_checador->num_rows > 0) {
+        $row_checador = $result_checador->fetch_assoc();
+        $userType = "checador";
         
+        // Cargar URL de la foto de la carpeta donde realmente existen
         $fotoUrl = null;
-        if (!empty($row_usr['foto'])) {
-            $fotoUrl = "assets/images/profiles/" . $row_usr['foto'];
+        if (!empty($row_checador['foto'])) {
+            $fotoUrl = "assets/images/profiles/" . $row_checador['foto'];
         }
-
+        
         $userData = [
-            "id" => $row_usr['id'],
-            "name" => $row_usr['nombre'],
-            "rol" => "estandar", // O administrador si tuvieras la columna rol
+            "id" => $row_checador['rfc_checador'],
+            "name" => $row_checador['nombre'],
+            "rol" => "checador",
             "foto_url" => $fotoUrl,
-            "telefono" => "",
-            "fecha_registro" => ""
+            "telefono" => '',
+            "fecha_registro" => ''
         ];
-        $hashedPassword = $row_usr['contrasena'];
+        $hashedPassword = $row_checador['contrasena'];
     }
-    $stmt_usr->close();
-
-    // 2. Si no es usuario, buscar como CHECADOR
-    if ($userType === null) {
-        $stmt_checador = $conn->prepare("SELECT rfc_checador, nombre, usuario, contrasena, activo, foto FROM checadores WHERE usuario = ? AND activo = 1");
-        $stmt_checador->bind_param("s", $email);
-        $stmt_checador->execute();
-        $result_checador = $stmt_checador->get_result();
-
-        if ($result_checador->num_rows > 0) {
-            $row_checador = $result_checador->fetch_assoc();
-            $userType = "checador";
-            
-            // Cargar URL de la foto de la carpeta donde realmente existen
-            $fotoUrl = null;
-            if (!empty($row_checador['foto'])) {
-                $fotoUrl = "assets/images/profiles/" . $row_checador['foto'];
-            }
-            
-            $userData = [
-                "id" => $row_checador['rfc_checador'],
-                "name" => $row_checador['nombre'],
-                "rol" => "checador",
-                "foto_url" => $fotoUrl,
-                "telefono" => '',
-                "fecha_registro" => ''
-            ];
-            $hashedPassword = $row_checador['contrasena'];
-        }
-        $stmt_checador->close();
-    }
+    $stmt_checador->close();
 
     if ($userType === null) {
-        sendResponse(404, ["error" => "Usuario o checador no encontrado"]);
+        sendResponse(404, ["error" => "Checador no encontrado o inactivo"]);
     }
 
     // Verificar contraseña
