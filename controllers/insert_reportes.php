@@ -6,6 +6,7 @@ if (!isset($_SESSION['id'])) {
 }
 
 require_once '../config/conexion_bd.php';
+require_once '../config/opciones_reportes.php';
 
 // Procesar el formulario cuando se envía
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -21,6 +22,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $fecha_incidente = $conexion->real_escape_string($_POST['fechaIncidente'] ?? '');
         $descripcion = $conexion->real_escape_string($_POST['descripcion'] ?? '');
         $gravedad = $conexion->real_escape_string($_POST['gravedad'] ?? 'media');
+
+        global $TIPOS_INCIDENCIA, $NIVELES_GRAVEDAD;
+        if (!array_key_exists($tipo_incidente, $TIPOS_INCIDENCIA)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Tipo de incidente inválido']);
+            exit;
+        }
+
+        if (!array_key_exists($gravedad, $NIVELES_GRAVEDAD)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Nivel de gravedad inválido']);
+            exit;
+        }
 
         // Validar datos requeridos
         if (empty($id_vehiculo) || empty($rfc_conductor) || empty($id_ruta) || empty($tipo_incidente) || empty($fecha_incidente) || empty($descripcion)) {

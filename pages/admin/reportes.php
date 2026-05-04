@@ -10,6 +10,7 @@ if (!isset($_SESSION['id'])) {
 <?php
 require_once '../../config/conexion_bd.php';
 require_once '../../config/sync_session_foto.php';
+require_once '../../config/opciones_reportes.php';
 
 // Obtener lista de vehículos con placa y modelo
 $sql_vehiculos = "SELECT id_vehiculo, placa, modelo FROM vehiculos ORDER BY placa";
@@ -710,11 +711,9 @@ if ($conexion->error) {
                             <label for="tipoIncidente">Tipo de Incidente *</label>
                             <select id="tipoIncidente" name="tipoIncidente" required>
                                 <option value="">Seleccionar tipo</option>
-                                <option value="accidente">Accidente</option>
-                                <option value="averia">Avería Mecánica</option>
-                                <option value="retraso">Retraso Significativo</option>
-                                <option value="cliente">Incidente con Cliente</option>
-                                <option value="otro">Otro</option>
+                                <?php foreach($TIPOS_INCIDENCIA as $key => $val): ?>
+                                    <option value="<?php echo htmlspecialchars($key); ?>"><?php echo htmlspecialchars($val); ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 
@@ -731,10 +730,9 @@ if ($conexion->error) {
                         <div class="form-group">
                             <label for="gravedad">Nivel de Gravedad</label>
                             <select id="gravedad" name="gravedad">
-                                <option value="baja">Baja</option>
-                                <option value="media" selected>Media</option>
-                                <option value="alta">Alta</option>
-                                <option value="critica">Crítica</option>
+                                <?php foreach($NIVELES_GRAVEDAD as $key => $val): ?>
+                                    <option value="<?php echo htmlspecialchars($key); ?>" <?php echo $key === 'media' ? 'selected' : ''; ?>><?php echo htmlspecialchars($val); ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 
@@ -795,11 +793,9 @@ if ($conexion->error) {
                                             <label for="edit_tipoIncidente">Tipo de Incidente *</label>
                                             <select id="edit_tipoIncidente" name="tipoIncidente" required>
                                                 <option value="">Seleccionar tipo</option>
-                                                <option value="accidente">Accidente</option>
-                                                <option value="averia">Avería Mecánica</option>
-                                                <option value="retraso">Retraso Significativo</option>
-                                                <option value="cliente">Incidente con Cliente</option>
-                                                <option value="otro">Otro</option>
+                                                <?php foreach($TIPOS_INCIDENCIA as $key => $val): ?>
+                                                    <option value="<?php echo htmlspecialchars($key); ?>"><?php echo htmlspecialchars($val); ?></option>
+                                                <?php endforeach; ?>
                                             </select>
                                         </div>
                                     </div>
@@ -818,10 +814,9 @@ if ($conexion->error) {
                                         <div class="modal-form-group">
                                             <label for="edit_gravedad">Gravedad</label>
                                             <select id="edit_gravedad" name="gravedad">
-                                                <option value="baja">Baja</option>
-                                                <option value="media">Media</option>
-                                                <option value="alta">Alta</option>
-                                                <option value="critica">Crítica</option>
+                                                <?php foreach($NIVELES_GRAVEDAD as $key => $val): ?>
+                                                    <option value="<?php echo htmlspecialchars($key); ?>"><?php echo htmlspecialchars($val); ?></option>
+                                                <?php endforeach; ?>
                                             </select>
                                         </div>
                                         <div class="modal-form-group">

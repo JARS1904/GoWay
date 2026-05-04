@@ -243,30 +243,29 @@ if ($_SESSION['id'] > 0) {
 
     <script>
         // ── renderSeatBadge ──────────────────────────────────────────
-        // Genera el HTML del componente de disponibilidad de asientos.
-        // disponibles: número de asientos libres
-        // capacidad:   capacidad total del vehículo
         function renderSeatBadge(disponibles, capacidad) {
             if (disponibles === null || disponibles === undefined || !capacidad) {
                 return `
-                    <div class="seats-availability-block">
-                        <div class="seats-bar-wrap"><div class="seats-bar" style="width:0%"></div></div>
-                        <span class="seats-label">Sin datos de disponibilidad</span>
-                        <span class="seats-status status-agotado">Sin asignar</span>
+                    <div class="driver-vehicle-row">
+                        <i class="fas fa-users" style="color:#FFA000;"></i>
+                        <div class="driver-vehicle-row-text">
+                            <span class="driver-vehicle-label">Disponibilidad de asientos</span>
+                            <div class="seats-bar-wrap" style="margin-top:6px;"><div class="seats-bar" style="width:0%"></div></div>
+                            <span class="driver-vehicle-value" style="font-size:13px;font-weight:400;color:#64748b;">Sin datos de disponibilidad</span>
+                            <span class="seats-status status-agotado" style="margin-top:4px;">Sin asignar</span>
+                        </div>
                     </div>`;
             }
             const disp = parseInt(disponibles);
             const cap  = parseInt(capacidad);
             const pct  = cap > 0 ? Math.round((disp / cap) * 100) : 0;
 
-            // Color de la barra
             let barColor;
-            if (disp === 0)      barColor = '#9e9e9e';  // gris cuando agotado
-            else if (pct < 15)   barColor = '#E64A19';  // rojo
-            else if (pct < 50)   barColor = '#FBC02D';  // amarillo/naranja
-            else                 barColor = '#689F38';  // verde
+            if (disp === 0)      barColor = '#9e9e9e';
+            else if (pct < 15)   barColor = '#E64A19';
+            else if (pct < 50)   barColor = '#FBC02D';
+            else                 barColor = '#689F38';
 
-            // Estado del badge
             let statusText, statusClass;
             if (disp === 0)      { statusText = 'Agotado';       statusClass = 'status-agotado'; }
             else if (pct < 15)   { statusText = 'Casi agotado';  statusClass = 'status-casi-agotado'; }
@@ -274,22 +273,25 @@ if ($_SESSION['id'] > 0) {
             else                 { statusText = 'Disponible';    statusClass = 'status-disponible'; }
 
             return `
-                <div class="seats-availability-block">
-                    <div class="seats-bar-wrap">
-                        <div class="seats-bar" style="width:${pct}%;background:${barColor};"></div>
+                <div class="driver-vehicle-row" style="align-items:flex-start;">
+                    <i class="fas fa-users" style="color:#FFA000;margin-top:2px;"></i>
+                    <div class="driver-vehicle-row-text" style="width:100%;">
+                        <span class="driver-vehicle-label">Disponibilidad de asientos</span>
+                        <div class="seats-bar-wrap" style="margin-top:8px;">
+                            <div class="seats-bar" style="width:${pct}%;background:${barColor};"></div>
+                        </div>
+                        <span class="driver-vehicle-value" style="font-size:13px;font-weight:500;margin-top:4px;"><strong>${disp}</strong> de ${cap} lugares disponibles</span>
+                        <span class="seats-status ${statusClass}" style="margin-top:6px;">${statusText}</span>
                     </div>
-                    <span class="seats-label"><strong>${disp}</strong> de ${cap} lugares disponibles</span>
-                    <span class="seats-status ${statusClass}">${statusText}</span>
                 </div>`;
         }
 
         // Configuración de API
-        const API_BASE_URL = window.location.origin; // Obtiene http://localhost
+        const API_BASE_URL = window.location.origin;
         const API_URL = `${API_BASE_URL}/GoWay/api/routes_api.php`;
         const FAVORITES_URL = `${API_BASE_URL}/GoWay/api/favorites_routes_api.php`;
         const ID_USUARIO = <?php echo isset($_SESSION['id']) ? $_SESSION['id'] : 0; ?>;
         
-        // Datos mock para cuando falle la API
         const MOCK_LOCATIONS = ["Centro", "Norte", "Sur", "Este", "Oeste"];
         const MOCK_ROUTES = [{
             id_ruta: 1,
@@ -314,7 +316,6 @@ if ($_SESSION['id'] > 0) {
             paradas: ["Parada A", "Parada B", "Parada C"]
         }];
 
-        // Elementos del DOM
         const originSelect = document.getElementById('origin');
         const destinationSelect = document.getElementById('destination');
         const searchForm = document.getElementById('searchForm');
@@ -324,32 +325,23 @@ if ($_SESSION['id'] > 0) {
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toastMessage');
         
-        // Elementos de filtro
         const filterAllBtn = document.getElementById('filterAll');
         const filterFavoritesBtn = document.getElementById('filterFavorites');
         
-        // Estado
         let routes = [];
         let selectedRouteId = null;
         let favorites = new Set();
         let currentFilter = 'all';
         let locations = [];
 
-        // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Iniciando aplicación...');
-            console.log('URL base:', API_BASE_URL);
-            console.log('URL API:', API_URL);
-            
             fetchLocations();
             loadFavorites();
             
-            // Escuchadores de eventos del formulario
             searchForm.addEventListener('submit', handleSearch);
             originSelect.addEventListener('change', updateSearchButton);
             destinationSelect.addEventListener('change', updateSearchButton);
             
-            // Escuchadores de eventos de filtro
             if (filterAllBtn) {
                 filterAllBtn.addEventListener('click', () => {
                     currentFilter = 'all';
@@ -367,49 +359,32 @@ if ($_SESSION['id'] > 0) {
             }
         });
 
-        // Cargar rutas favoritas del servidor
         async function loadFavorites() {
-            if (ID_USUARIO === 0) return; // Invitados no tienen favoritas
-
+            if (ID_USUARIO === 0) return;
             try {
                 const response = await fetch(`${FAVORITES_URL}?action=get_favorites&id_usuario=${ID_USUARIO}`, {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
-                
-                console.log('Response favoritas:', response.status);
-                
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Datos favoritas recibidos:', data);
-                    
                     if (Array.isArray(data)) {
-                        data.forEach(fav => {
-                            favorites.add(fav.id_ruta);
-                        });
-                        console.log('Favoritas cargadas:', favorites);
+                        data.forEach(fav => favorites.add(fav.id_ruta));
                     }
-                } else {
-                    console.error('Error en respuesta favoritas:', response.status);
                 }
             } catch (error) {
                 console.error('Error al cargar favoritas:', error);
             }
         }
 
-        // Actualizar apariencia de botones de filtro
         function updateFilterButtons() {
             if (filterAllBtn) filterAllBtn.classList.toggle('active', currentFilter === 'all');
             if (filterFavoritesBtn) filterFavoritesBtn.classList.toggle('active', currentFilter === 'favorites');
         }
 
-        // Filtrar y mostrar rutas según el filtro actual
         function filterAndDisplayRoutes() {
             if (currentFilter === 'favorites') {
                 if (routes.length === 0) {
-                    // Si no hay búsqueda realizada, traer favoritas desde BD
                     loadFavoritesAndDisplay();
                 } else {
                     const favoriteRoutes = routes.filter(route => favorites.has(route.id_ruta));
@@ -427,18 +402,12 @@ if ($_SESSION['id'] > 0) {
         async function loadFavoritesAndDisplay() {
             try {
                 showLoading(true, resultsContainer);
-                
                 const response = await fetch(`${FAVORITES_URL}?action=get_favorites&id_usuario=${ID_USUARIO}`, {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
-                
                 if (response.ok) {
                     const favoritesData = await response.json();
-                    console.log('Favoritas cargadas:', favoritesData);
-                    
                     if (Array.isArray(favoritesData) && favoritesData.length > 0) {
                         displayRoutes(favoritesData);
                     } else {
@@ -455,34 +424,21 @@ if ($_SESSION['id'] > 0) {
             }
         }
 
-        // Obtener ubicaciones disponibles de la API
         async function fetchLocations() {
             try {
                 showLoading(true);
-                console.log('Consultando API en:', `${API_URL}?action=locations`);
-                
                 const response = await fetch(`${API_URL}?action=locations`, {
-                    headers: {
-                        'Accept': 'application/json'
-                    },
+                    headers: { 'Accept': 'application/json' },
                     cache: 'no-cache'
                 });
-                
-                console.log('Respuesta recibida. Status:', response.status);
-                
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('Error en respuesta:', errorText);
                     throw new Error(`Error HTTP ${response.status}: ${errorText}`);
                 }
-                
                 const data = await response.json();
-                console.log('Datos recibidos:', data);
-                
                 if (Array.isArray(data)) {
                     locations = data;
                 } else {
-                    console.warn('La API devolvió un array vacío o formato inválido');
                     throw new Error('Datos de ubicaciones no válidos');
                 }
             } catch (error) {
@@ -495,15 +451,10 @@ if ($_SESSION['id'] > 0) {
             }
         }
 
-        // Llenar selects de origen y destino con ubicaciones
         function populateLocationSelects() {
-            console.log('Llenando selects con:', locations);
-            
-            // Limpiar opciones existentes (manteniendo la primera opción vacía)
             while (originSelect.options.length > 1) originSelect.remove(1);
             while (destinationSelect.options.length > 1) destinationSelect.remove(1);
             
-            // Agregar nuevas opciones
             locations.forEach(location => {
                 const option1 = document.createElement('option');
                 option1.value = location;
@@ -519,13 +470,11 @@ if ($_SESSION['id'] > 0) {
             updateSearchButton();
         }
 
-        // Actualizar estado del botón de búsqueda según selecciones
         function updateSearchButton() {
             const hasSelection = originSelect.value && destinationSelect.value;
             searchBtn.disabled = !hasSelection;
         }
 
-        // Manejar envío de formulario de búsqueda
         async function handleSearch(e) {
             e.preventDefault();
             
@@ -539,8 +488,6 @@ if ($_SESSION['id'] > 0) {
             
             try {
                 showLoading(true, resultsContainer);
-                console.log(`Buscando rutas de ${origin} a ${destination}`);
-                
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -554,15 +501,12 @@ if ($_SESSION['id'] > 0) {
                     })
                 });
                 
-                console.log('Respuesta de búsqueda. Status:', response.status);
-                
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`Error HTTP ${response.status}: ${errorText}`);
                 }
                 
                 const data = await response.json();
-                console.log('Rutas encontradas:', data);
                 
                 if (Array.isArray(data)) {
                     routes = processRoutes(data);
@@ -574,22 +518,15 @@ if ($_SESSION['id'] > 0) {
             } catch (error) {
                 console.error('Error buscando rutas:', error);
                 showToast(error.message || 'Error al buscar rutas. Mostrando datos de prueba.');
-                routes = [{
-                    ...MOCK_ROUTES[0],
-                    origen: origin,
-                    destino: destination
-                }];
+                routes = [{ ...MOCK_ROUTES[0], origen: origin, destino: destination }];
             } finally {
                 displayRoutes(routes);
                 showLoading(false, resultsContainer);
-                
-                // Reset selección
                 selectedRouteId = null;
                 showNoSelection();
             }
         }
 
-        // Procesar rutas para combinar duplicados con diferentes horarios
         function processRoutes(rawRoutes) {
             const uniqueRoutes = {};
             
@@ -597,28 +534,18 @@ if ($_SESSION['id'] > 0) {
                 const routeId = route.id_ruta;
                 
                 if (uniqueRoutes[routeId]) {
-                    // Combinar horarios
                     const scheduleMap = {};
-                    
-                    // Agregar horarios existentes
                     uniqueRoutes[routeId].horarios.forEach(schedule => {
                         const key = `${schedule.tipo_dia}-${schedule.hora_salida}-${schedule.hora_llegada}`;
                         scheduleMap[key] = schedule;
                     });
-                    
-                    // Agregar nuevos horarios
                     route.horarios.forEach(schedule => {
                         const key = `${schedule.tipo_dia}-${schedule.hora_salida}-${schedule.hora_llegada}`;
                         scheduleMap[key] = schedule;
                     });
-                    
-                    // Actualizar horarios
                     uniqueRoutes[routeId].horarios = Object.values(scheduleMap);
                 } else {
-                    // Agregar nueva ruta
                     uniqueRoutes[routeId] = {...route};
-                    
-                    // Asegurar que paradas es un array
                     if (typeof uniqueRoutes[routeId].paradas === 'string') {
                         uniqueRoutes[routeId].paradas = uniqueRoutes[routeId].paradas.split(', ');
                     }
@@ -628,7 +555,7 @@ if ($_SESSION['id'] > 0) {
             return Object.values(uniqueRoutes);
         }
 
-        // Mostrar rutas en el contenedor de resultados
+        // ── displayRoutes — tarjetas con nuevo diseño (corazón abajo) ──
         function displayRoutes(routesToDisplay) {
             if (!routesToDisplay || routesToDisplay.length === 0) {
                 displayNoRoutes();
@@ -645,7 +572,6 @@ if ($_SESSION['id'] > 0) {
                     routeCard.classList.add('selected');
                 }
                 
-                // Obtener conteo de horarios únicos
                 const uniqueSchedules = getUniqueSchedules(route.horarios || []);
                 const isFavorite = favorites.has(route.id_ruta);
                 const favoriteIcon = isFavorite ? 'fas fa-heart' : 'far fa-heart';
@@ -653,16 +579,11 @@ if ($_SESSION['id'] > 0) {
                 routeCard.innerHTML = `
                     <div class="route-card-header">
                         <div class="route-card-title">
-                            <i class="fas fa-building"></i>
+                            <i class="fas fa-bus"></i>
                             <span class="route-company">${route.empresa_nombre || 'Transporte'}</span>
                         </div>
-                        ${ID_USUARIO !== 0 ? `
-                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-route-id="${route.id_ruta}" title="${isFavorite ? 'Eliminar de favoritas' : 'Agregar a favoritas'}">
-                            <i class="${favoriteIcon}"></i>
-                        </button>
-                        ` : ''}
                     </div>
-                    ${route.es_tramo ? `<div style="margin-bottom:6px;"><span style="background:#fef3c7;color:#92400e;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;">✂ Tramo parcial de: ${route.origen} → ${route.destino}</span></div>` : ''}
+                    ${route.es_tramo ? `<div style="margin-bottom:8px;"><span style="background:#fef3c7;color:#92400e;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;">✂ Tramo parcial de: ${route.origen} → ${route.destino}</span></div>` : ''}
                     <div class="route-path">
                         <div class="route-origin">
                             <i class="fas fa-map-marker-alt"></i>
@@ -675,19 +596,24 @@ if ($_SESSION['id'] > 0) {
                         </div>
                     </div>
                     <div class="route-card-divider"></div>
-                    <div class="route-card-footer">
+                    <div class="route-schedule-block">
                         <div class="route-schedule">
                             <i class="fas fa-calendar-alt"></i>
-                            <span>Horarios disponibles:</span>
+                            <span>Horarios disponibles</span>
                             <span class="route-schedule-count">${uniqueSchedules.length}</span>
                         </div>
+                    </div>
+                    <div class="route-card-footer">
+                        ${ID_USUARIO !== 0 ? `
+                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-route-id="${route.id_ruta}" title="${isFavorite ? 'Eliminar de favoritas' : 'Agregar a favoritas'}">
+                            <i class="${favoriteIcon}"></i>
+                        </button>
+                        ` : ''}
                         <button class="btn-details">Ver detalles</button>
                     </div>
                 `;
                 
-                // Agregar evento de clic a la tarjeta de ruta
                 routeCard.addEventListener('click', (e) => {
-                    // No seleccionar si se hace clic en el botón de favorita
                     if (!e.target.closest('.favorite-btn')) {
                         selectedRouteId = route.id_ruta;
                         updateSelectedRouteCard();
@@ -695,7 +621,6 @@ if ($_SESSION['id'] > 0) {
                     }
                 });
 
-                // Botón "Ver detalles"
                 const detailsBtn = routeCard.querySelector('.btn-details');
                 detailsBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -704,7 +629,6 @@ if ($_SESSION['id'] > 0) {
                     showRouteDetails(route);
                 });
 
-                // Agregar escucha de evento del botón de favorita
                 const favoriteBtn = routeCard.querySelector('.favorite-btn');
                 if (favoriteBtn) {
                     favoriteBtn.addEventListener('click', (e) => {
@@ -717,7 +641,6 @@ if ($_SESSION['id'] > 0) {
             });
         }
 
-        // Alternar estado de favorita para una ruta
         async function toggleFavorite(routeId, buttonElement) {
             const isFavorite = favorites.has(routeId);
             const action = isFavorite ? 'remove_favorite' : 'add_favorite';
@@ -741,7 +664,6 @@ if ($_SESSION['id'] > 0) {
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success) {
-                        // Actualizar el estado local
                         if (isFavorite) {
                             favorites.delete(routeId);
                             buttonElement.classList.remove('active');
@@ -755,15 +677,12 @@ if ($_SESSION['id'] > 0) {
                             buttonElement.title = 'Eliminar de favoritas';
                             showToast('Agregado a favoritas');
                         }
-                        
-                        // Si estamos en vista de favoritas, actualizar lista
                         if (currentFilter === 'favorites') {
                             filterAndDisplayRoutes();
                         }
                     }
                 } else {
                     showToast('Error al actualizar favorita');
-                    console.error('Error response:', await response.text());
                 }
             } catch (error) {
                 console.error('Error al cambiar favorita:', error);
@@ -771,7 +690,6 @@ if ($_SESSION['id'] > 0) {
             }
         }
 
-        // Actualizar estilo de tarjeta de ruta seleccionada
         function updateSelectedRouteCard() {
             document.querySelectorAll('.route-card').forEach(card => {
                 card.classList.remove('selected');
@@ -781,19 +699,15 @@ if ($_SESSION['id'] > 0) {
             });
         }
 
-        // Obtener horarios únicos (evitando duplicados)
         function getUniqueSchedules(schedules) {
             const scheduleMap = {};
-            
             schedules.forEach(schedule => {
                 const key = `${schedule.tipo_dia}-${schedule.hora_salida}-${schedule.hora_llegada}`;
                 scheduleMap[key] = schedule;
             });
-            
             return Object.values(scheduleMap);
         }
 
-        // Mostrar mensaje "sin rutas"
         function displayNoRoutes() {
             resultsContainer.innerHTML = `
                 <div class="no-routes">
@@ -802,7 +716,6 @@ if ($_SESSION['id'] > 0) {
             `;
         }
 
-        // Mostrar vista sin selección
         function showNoSelection() {
             routeDetailsContainer.innerHTML = `
                 <div class="no-selection">
@@ -813,7 +726,7 @@ if ($_SESSION['id'] > 0) {
             `;
         }
 
-        // Mostrar detalles de ruta en columna derecha
+        // ── showRouteDetails — schedule cards con nuevo diseño ───────
         function showRouteDetails(route) {
             if (!route) {
                 showNoSelection();
@@ -821,30 +734,14 @@ if ($_SESSION['id'] > 0) {
             }
             
             const uniqueSchedules = getUniqueSchedules(route.horarios || []);
-            const isFavorite = favorites.has(route.id_ruta);
-            const favoriteIcon = isFavorite ? 'fas fa-heart' : 'far fa-heart';
 
-            // Para tramos parciales: helper para sumar minutos a "HH:MM[:SS]"
-            function addMinutes(timeStr, minutes) {
-                if (!timeStr || !minutes) return timeStr;
-                const parts = timeStr.split(':');
-                const totalMin = parseInt(parts[0]) * 60 + parseInt(parts[1]) + parseInt(minutes);
-                const h = String(Math.floor(totalMin / 60) % 24).padStart(2, '0');
-                const m = String(totalMin % 60).padStart(2, '0');
-                return `${h}:${m}`;
-            }
+            const isTramo   = route.es_tramo == 1;
+            const boardStop = isTramo ? (route.parada_embarque || route.origen) : route.origen;
+            const alightStop= isTramo ? (route.parada_bajada   || route.destino) : route.destino;
 
-            const isTramo      = route.es_tramo == 1;
-            const boardStop    = isTramo ? (route.parada_embarque || route.origen) : route.origen;
-            const alightStop   = isTramo ? (route.parada_bajada   || route.destino) : route.destino;
-            const embedMinutes = parseInt(route.embarque_minutos) || 0;
-            const alightMinutes= parseInt(route.bajada_minutos)   || 0;
-
-            // Paradas estructuradas (si existen)
-            const paradasRuta = Array.isArray(route.paradas_ruta) ? route.paradas_ruta : [];
+            const paradasRuta     = Array.isArray(route.paradas_ruta) ? route.paradas_ruta : [];
             const paradasFallback = Array.isArray(route.paradas) ? route.paradas : ['No especificadas'];
             
-            // Construir contenido de detalles
             let contentHTML = `
                 <div class="route-details">
                     <div class="route-detail-header">
@@ -867,34 +764,34 @@ if ($_SESSION['id'] > 0) {
                     <div class="detail-card">
                         <h4 class="info-title">Información de la empresa:</h4>
                         <div class="info-rows-grid">
-                        <div class="info-row">
-                            <i class="fas fa-building"></i>
-                            <div class="info-text">
-                                <span class="info-label">Nombre:</span>
-                                <span class="info-value">${route.empresa_nombre || 'No especificado'}</span>
+                            <div class="info-row">
+                                <i class="fas fa-building"></i>
+                                <div class="info-text">
+                                    <span class="info-label">Nombre</span>
+                                    <span class="info-value">${route.empresa_nombre || 'No especificado'}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-phone"></i>
-                            <div class="info-text">
-                                <span class="info-label">Teléfono:</span>
-                                <span class="info-value">${route.empresa_telefono || 'No especificado'}</span>
+                            <div class="info-row">
+                                <i class="fas fa-phone"></i>
+                                <div class="info-text">
+                                    <span class="info-label">Teléfono</span>
+                                    <span class="info-value">${route.empresa_telefono || 'No especificado'}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div class="info-text">
-                                <span class="info-label">Dirección:</span>
-                                <span class="info-value">${route.empresa_direccion || 'No especificada'}</span>
+                            <div class="info-row">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div class="info-text">
+                                    <span class="info-label">Dirección</span>
+                                    <span class="info-value">${route.empresa_direccion || 'No especificada'}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-envelope"></i>
-                            <div class="info-text">
-                                <span class="info-label">Email:</span>
-                                <span class="info-value">${route.empresa_email || 'No especificado'}</span>
+                            <div class="info-row">
+                                <i class="fas fa-envelope"></i>
+                                <div class="info-text">
+                                    <span class="info-label">Email</span>
+                                    <span class="info-value">${route.empresa_email || 'No especificado'}</span>
+                                </div>
                             </div>
-                        </div>
                         </div>
                     </div>
 
@@ -903,18 +800,16 @@ if ($_SESSION['id'] > 0) {
                     <h4 class="info-title" style="margin-bottom:14px;font-size:17px;">Horarios disponibles:</h4>
             `;
 
-            // Agregar horarios
+            // ── Iterar horarios ──────────────────────────────────────
             uniqueSchedules.forEach(schedule => {
-                // La API ya precalcula hora_abordaje y hora_bajada usando minutos_desde_origen acumulados
                 const salida  = schedule.hora_abordaje || schedule.hora_salida;
                 const llegada = schedule.hora_bajada   || schedule.hora_llegada;
 
-                // Construir lista de paradas usando paradas_con_hora precalculadas por la API
+                // Construir lista de paradas
                 let paradasHTML = '';
                 const paradasConHora = Array.isArray(schedule.paradas_con_hora) ? schedule.paradas_con_hora : [];
 
                 if (paradasConHora.length > 0) {
-                    // Filtrar solo el segmento del tramo si aplica
                     let segmento = paradasConHora;
                     if (isTramo) {
                         const idxBoard  = paradasConHora.findIndex(p => p.nombre === boardStop);
@@ -926,89 +821,124 @@ if ($_SESSION['id'] > 0) {
                     const boardMin = isTramo && segmento.length > 0 ? segmento[0].minutos_desde_origen : 0;
                     paradasHTML = segmento.map(p => {
                         const minRel = p.minutos_desde_origen - boardMin;
-                        return `<li>${p.nombre} <span style="color:#64748b;font-size:11px;">${p.hora_estimada} <em>(+${minRel} min)</em></span></li>`;
+                        return `<li><strong>${p.nombre}</strong><span class="stop-time">+${minRel} min</span></li>`;
                     }).join('');
                 } else if (paradasRuta.length > 0) {
                     paradasHTML = paradasRuta.map(p =>
-                        `<li>${p.nombre} <span style="color:#64748b;font-size:11px;">(+${p.minutos_desde_origen} min)</span></li>`
+                        `<li><strong>${p.nombre}</strong><span class="stop-time">+${p.minutos_desde_origen} min</span></li>`
                     ).join('');
                 } else {
-                    paradasHTML = paradasFallback.map(p => `<li>${p}</li>`).join('');
+                    paradasHTML = paradasFallback.map(p => `<li><strong>${p}</strong></li>`).join('');
                 }
 
                 contentHTML += `
                     <div class="schedule-card">
+
+                        <!-- Header: icono calendario + empresa + ruta + badge día -->
                         <div class="schedule-header">
-                            <span class="schedule-company-name">${route.empresa_nombre || 'Transporte'}</span>
-                            <div class="schedule-day">
+                            <div class="schedule-header-icon">
                                 <i class="fas fa-calendar-alt"></i>
-                                ${schedule.tipo_dia || 'No especificado'}
                             </div>
-                        </div>
-
-                        <div class="schedule-route-path">
-                            <span>${boardStop}</span>
-                            <i class="fas fa-arrow-right"></i>
-                            <span>${alightStop}</span>
-                        </div>
-
-                        <div class="schedule-times">
-                            <div class="time-group departure">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <div class="time-text">
-                                    <span class="time-label">${isTramo ? 'Abordaje' : 'Hora de salida'}</span>
-                                    <span class="time-value">${salida || '--:--'}</span>
+                            <div class="schedule-header-info">
+                                <span class="schedule-company-name">${route.empresa_nombre || 'Transporte'}</span>
+                                <div class="schedule-route-path-sub">
+                                    <i class="fas fa-map-marker-alt" style="color:#2962FF;font-size:11px;"></i>
+                                    <span>${boardStop}</span>
+                                    <i class="fas fa-arrow-right" style="font-size:10px;color:#bdbdbd;"></i>
+                                    <i class="fas fa-map-marker-alt" style="color:#D32F2F;font-size:11px;"></i>
+                                    <span>${alightStop}</span>
                                 </div>
                             </div>
-                            <div class="time-group arrival">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <div class="time-text">
-                                    <span class="time-label">${isTramo ? 'Bajada' : 'Tiempo de llegada'}</span>
-                                    <span class="time-value">${llegada || '--:--'}</span>
-                                </div>
-                            </div>
+                            <span class="schedule-day-badge">${schedule.tipo_dia || 'No especificado'}</span>
                         </div>
 
+                        <!-- Cuerpo de la tarjeta -->
                         <div class="schedule-card-body">
-                            <div class="schedule-details">
+
+                            <!-- Salida / Llegada — ocupa las 2 columnas -->
+                            <div class="schedule-times">
+                                <div class="time-group departure">
+                                    <i class="fas fa-bus"></i>
+                                    <div class="time-text">
+                                        <span class="time-label">${isTramo ? 'Abordaje' : 'Salida'}</span>
+                                        <span class="time-value">${salida || '--:--'}</span>
+                                    </div>
+                                </div>
+                                <div class="time-group arrival">
+                                    <i class="fas fa-bus"></i>
+                                    <div class="time-text">
+                                        <span class="time-label">${isTramo ? 'Bajada' : 'Llegada'}</span>
+                                        <span class="time-value">${llegada || '--:--'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Columna izquierda: info -->
+                            <div class="schedule-left-col">
+
+                                <!-- Frecuencia -->
                                 <div class="detail-row">
                                     <i class="fas fa-redo" style="color:#FFA000;"></i>
-                                    <span>Frecuencia: ${schedule.frecuencia || 'No especificada'}</span>
+                                    <div class="detail-row-text">
+                                        <span class="detail-row-label">Frecuencia</span>
+                                        <span class="detail-row-value">${schedule.frecuencia || 'No especificada'}</span>
+                                    </div>
                                 </div>
-                                <div class="detail-row">
-                                    <i class="fas fa-traffic-light" style="color:#e67e00;"></i>
-                                    <span>${isTramo ? 'Paradas del tramo:' : 'Paradas:'}</span>
-                                </div>
-                                <ul class="stops-list">
-                                    ${paradasHTML}
-                                </ul>
-                            </div>
 
-                            <div class="driver-vehicle-info">
-                                <div class="driver-vehicle-row">
+                                <!-- Conductor -->
+                                <div class="detail-row">
                                     <i class="fas fa-user" style="color:#1565C0;"></i>
-                                    <span><strong>Conductor: ${schedule.conductor_nombre || 'N/A'}</strong></span>
+                                    <div class="detail-row-text">
+                                        <span class="detail-row-label">Conductor</span>
+                                        <span class="detail-row-value">${schedule.conductor_nombre || 'N/A'}</span>
+                                    </div>
                                 </div>
-                                <div class="driver-vehicle-row">
+
+                                <!-- Vehículo -->
+                                <div class="detail-row">
                                     <i class="fas fa-bus" style="color:#1565C0;"></i>
-                                    <span><strong>Vehículo: ${schedule.vehiculo_modelo || 'N/A'}</strong></span>
+                                    <div class="detail-row-text">
+                                        <span class="detail-row-label">Vehículo</span>
+                                        <span class="detail-row-value">${schedule.vehiculo_modelo || 'N/A'}</span>
+                                    </div>
                                 </div>
-                                <div class="driver-vehicle-row">
+
+                                <!-- Placa -->
+                                <div class="detail-row">
                                     <i class="fas fa-ticket-alt" style="color:#E65100;"></i>
-                                    <span><strong>Placa: ${schedule.vehiculo_placa || 'N/A'}</strong></span>
+                                    <div class="detail-row-text">
+                                        <span class="detail-row-label">Placa</span>
+                                        <span class="detail-row-value">${schedule.vehiculo_placa || 'N/A'}</span>
+                                    </div>
                                 </div>
+
+                                <!-- Disponibilidad de asientos -->
                                 ${renderSeatBadge(schedule.asientos_disponibles, schedule.vehiculo_capacidad)}
-                            </div>
-                        </div>
-                    </div>
+
+                            </div><!-- /schedule-left-col -->
+
+                            <!-- Columna derecha: paradas (label + lista juntos) -->
+                            <div class="schedule-right-col">
+                                <div class="detail-row">
+                                    <i class="fas fa-traffic-light" style="color:#FFA000;"></i>
+                                    <div class="detail-row-text">
+                                        <span class="detail-row-label">${isTramo ? 'Paradas del tramo' : 'Paradas'}</span>
+                                        <ul class="stops-list">
+                                            ${paradasHTML}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div><!-- /schedule-right-col -->
+
+                        </div><!-- /schedule-card-body -->
+                    </div><!-- /schedule-card -->
                 `;
             });
 
-            contentHTML += `</div>`; // Close route-details div
+            contentHTML += `</div>`; // /route-details
             routeDetailsContainer.innerHTML = contentHTML;
         }
 
-        // Mostrar indicador de carga
         function showLoading(show, container = document.body) {
             if (show) {
                 const loadingDiv = document.createElement('div');
@@ -1017,8 +947,6 @@ if ($_SESSION['id'] > 0) {
                     <div class="spinner"></div>
                     <div class="loading-text">Cargando...</div>
                 `;
-                
-                // Limpiar solo si es el contenedor de resultados
                 if (container === resultsContainer) {
                     container.innerHTML = '';
                 }
@@ -1029,11 +957,9 @@ if ($_SESSION['id'] > 0) {
             }
         }
 
-        // Mostrar notificación toast
         function showToast(message, duration = 3000) {
             toastMessage.textContent = message;
             toast.classList.add('show');
-            
             setTimeout(() => {
                 toast.classList.remove('show');
             }, duration);
@@ -1050,7 +976,6 @@ if ($_SESSION['id'] > 0) {
             document.getElementById('profilePanel').classList.remove('open');
             document.getElementById('profileOverlay').style.display = 'none';
             document.body.style.overflow = '';
-            // Reset to main view
             document.getElementById('panelViewsWrapper').classList.remove('show-terms');
         }
 
@@ -1071,7 +996,6 @@ if ($_SESSION['id'] > 0) {
             document.getElementById('panelViewsWrapper').classList.remove('show-terms');
         }
 
-        // Cerrar con Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeProfilePanel();
         });

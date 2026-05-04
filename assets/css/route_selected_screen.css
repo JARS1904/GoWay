@@ -1,6 +1,6 @@
 :root {
     --primary-color: #2962FF;
-    --primary-dark: #1565C0;
+    --primary-dark: #1e49e6;
     --secondary-color: #FFC107;
     --text-color: #333;
     --light-gray: #f5f5f5;
@@ -10,6 +10,7 @@
     --error-color: #D32F2F;
     --success-color: #388E3C;
     --header-height: 64px;
+    --blue-accent: #eaf2ff;
 }
 
 * {
@@ -357,20 +358,21 @@ select:focus {
     color: var(--dark-gray);
 }
 
+/* ── Route Card (nuevo diseño según imagen) ─────────────────── */
 .route-card {
     background-color: white;
-    border-radius: 16px;
+    border-radius: 20px;
     border: 1px solid #e8e8e8;
-    padding: 18px 20px;
+    padding: 18px 18px 14px 18px;
     margin-bottom: 14px;
-    transition: box-shadow 0.2s, transform 0.2s;
     cursor: pointer;
     position: relative;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .route-card:hover {
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
     transform: translateY(-2px);
 }
 
@@ -379,33 +381,43 @@ select:focus {
     box-shadow: 0 4px 16px rgba(41,98,255,0.15);
 }
 
-/* Fila superior de la tarjeta: icono + empresa + corazón */
+/* Header: icono bus + nombre empresa */
 .route-card-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 12px;
     margin-bottom: 14px;
+    justify-content: flex-start;
 }
 
 .route-card-title {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex: 1;
 }
 
+/* Icono de bus cuadrado redondeado */
 .route-card-title i {
-    font-size: 20px;
+    font-size: 18px;
     color: var(--primary-color);
+    background: #e8edff;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .route-company {
     font-weight: 700;
-    color: var(--primary-color);
-    font-size: 17px;
+    color: var(--black-color); 
+    font-size: 16px;
 }
 
-/* Línea divisora dentro de la tarjeta */
+/* Línea divisora interna */
 .route-card-divider {
     height: 1px;
     background-color: #f0f0f0;
@@ -416,32 +428,35 @@ select:focus {
 .route-path {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-color);
     margin-bottom: 0;
     flex-wrap: wrap;
-    font-size: 15px;
-    color: var(--text-color);
 }
 
 .route-path > i.arrow {
-    color: var(--dark-gray);
-    font-size: 13px;
+    color: #bdbdbd;
+    font-size: 12px;
 }
 
-.route-origin, .route-destination {
+.route-origin,
+.route-destination {
     display: flex;
     align-items: center;
     gap: 5px;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .route-origin i {
-    color: #1d4ed8;
-    font-size: 14px;
+    color: #2962FF;
+    font-size: 13px;
 }
 
 .route-destination i {
-    color: #D32F2F;
-    font-size: 14px;
+    color: #ee5a5d;
+    font-size: 13px;
 }
 
 /* Fila de horarios disponibles + botón */
@@ -462,22 +477,31 @@ select:focus {
 
 .route-schedule i {
     color: var(--primary-color);
-    font-size: 16px;
-}
-
-.route-schedule-count {
-    font-weight: 700;
     font-size: 15px;
 }
 
+/* Badge numérico azul para conteo de horarios */
+.route-schedule-count {
+    background: var(--blue-accent);
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 99px;
+    min-width: 24px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* Botón "Ver detalles" */
 .btn-details {
     background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 20px;
-    padding: 5px 12px;
+    padding: 8px 18px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s;
     white-space: nowrap;
@@ -585,98 +609,156 @@ select:focus {
 /* Encabezado de tarjeta de horario */
 .schedule-card {
     background-color: white;
-    border-radius: 16px;
+    border-radius: 20px;
     border: 1px solid #e8e8e8;
-    padding: 18px 20px;
+    padding: 0;
     margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    overflow: hidden;
 }
 
+/* Header: icono + empresa + badge día + chevron */
 .schedule-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.schedule-header-info {
+    flex: 1;          /* ← esto empuja el badge a la derecha */
+    min-width: 0;
+}
+
+.schedule-header-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #e8f5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.schedule-header-icon i {
+    font-size: 18px;
+    color: #388E3C;
 }
 
 .schedule-company-name {
     font-weight: 700;
     font-size: 15px;
     color: var(--black-color);
+    display: block;
+    line-height: 1.2;
 }
 
+/* Badge del día (ej: "Sábado") */
 .schedule-day {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--success-color);
-    font-weight: 500;
-    font-size: 14px;
+    background: #e8f5e9;
+    color: #388E3C;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 99px;
+    white-space: nowrap;
+    border: none;
+    gap: 0;
 }
 
-.schedule-day i {
-    font-size: 16px;
+.schedule-day-badge {
+    background: #e8f5e9;   /* ← mismo verde claro que el ícono */
+    color: #388E3C;         /* ← mismo verde oscuro que el ícono */
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 99px;
+    white-space: nowrap;
+    flex-shrink: 0;         /* ← no se encoge */
 }
+
+.schedule-day i { 
+    display: none; 
+}  /* ocultar el ícono FA, solo texto */
 
 /* Fila origen → destino dentro del horario */
 .schedule-route-path {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--black-color);
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.schedule-route-path > i {
-    color: var(--dark-gray);
+    gap: 6px;
     font-size: 13px;
+    color: var(--dark-gray);
+    margin-top: 3px;
 }
 
-/* Salida / Llegada */
-.schedule-times {
-    display: flex;
-    justify-content: flex-start;
-    gap: 40px;
-    margin: 0 0 16px 0;
-    padding: 12px 16px;
-    background-color: #f8f9ff;
-    border-radius: 10px;
+
+.schedule-route-path i {
+    font-size: 11px;
+    color: #bdbdbd;
 }
 
-/* Grid de 2 columnas: detalles a la izquierda, conductor/vehículo a la derecha */
+.schedule-route-path .origin-dot {
+    color: #2962FF;
+    font-size: 12px;
+}
+
+.schedule-route-path .dest-dot {
+    color: #D32F2F;
+    font-size: 12px;
+}
+
+/* Cuerpo de la tarjeta */
 .schedule-card-body {
+    padding: 30px 30px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0 24px;
+    gap: 0 32px;
     align-items: start;
 }
+
+/* Fila Salida / Llegada */
+.schedule-times {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-start;
+    gap: 48px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background: transparent;
+    margin-bottom: 0;
+}
+
 
 @media (max-width: 1200px) {
     .schedule-card-body {
         grid-template-columns: 1fr;
     }
+
+    .schedule-times {
+        grid-column: 1;
+    }
 }
 
 .time-group {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
 }
 
+
 .time-group i {
     font-size: 18px;
+    margin-top: 2px;
 }
 
-.departure i {
-    color: var(--primary-color);
+.departure i { 
+    color: #2962FF; 
 }
 
-.arrival i {
-    color: var(--error-color);
+.arrival i { 
+    color: #D32F2F; 
 }
 
 .time-text {
@@ -687,10 +769,12 @@ select:focus {
 .time-label {
     font-size: 12px;
     color: var(--dark-gray);
+    font-weight: 400;
+    line-height: 1.3;
 }
 
 .time-value {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--black-color);
     line-height: 1.2;
@@ -700,68 +784,139 @@ select:focus {
     margin-top: 4px;
 }
 
+/* Filas de info: icono + label arriba + valor abajo */
 .detail-row {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
     font-size: 14px;
     color: var(--text-color);
+    margin-bottom: 0;
+}
+
+.detail-row:last-child { 
+    border-bottom: none; 
 }
 
 .detail-row i {
-    font-size: 16px;
-    width: 20px;
+    font-size: 18px;
+    width: 22px;
     text-align: center;
     flex-shrink: 0;
+    margin-top: 1px;
 }
 
+/* Texto label + valor en columna */
+.detail-row-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-row-label {
+    font-size: 12px;
+    color: var(--dark-gray);
+    font-weight: 400;
+    line-height: 1.3;
+}
+
+.detail-row-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--black-color);
+    line-height: 1.3;
+}
+
+/* Driver / vehicle section — misma estructura que detail-row */
+.driver-vehicle-info {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.driver-vehicle-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.driver-vehicle-row:last-child { 
+    border-bottom: none; 
+}
+
+.driver-vehicle-row i {
+    font-size: 18px;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.driver-vehicle-row-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.driver-vehicle-label {
+    font-size: 12px;
+    color: var(--dark-gray);
+    font-weight: 400;
+}
+
+.driver-vehicle-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--black-color);
+}
+
+/* Paradas con tiempo a la derecha */
 .stops-list {
-    margin: 4px 0 10px 30px;
+    margin: 4px 0 0 0;
     list-style: none;
     padding: 0;
 }
 
 .stops-list li {
-    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
     font-size: 14px;
-    color: var(--dark-gray);
+    color: var(--text-color);
     position: relative;
-    padding-left: 14px;
+    padding-left: 18px;
+    margin-bottom: 0;
 }
 
 .stops-list li::before {
     content: '•';
     position: absolute;
     left: 0;
-    color: #e67e00;
+    color: #FFA000;
+    font-size: 18px;
+    line-height: 1;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-/* Separador dentro del schedule-card para driver/vehicle */
-.driver-vehicle-info {
-    margin-top: 0;
-    padding-top: 0;
-    border-top: none;
-}
-
-.driver-vehicle-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.driver-vehicle-row i {
-    font-size: 16px;
-    width: 20px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.driver-vehicle-row strong {
+.stops-list li strong {
     font-weight: 600;
     color: var(--black-color);
+}
+
+.stop-time {
+    font-size: 13px;
+    color: var(--dark-gray);
+    font-weight: 400;
+    flex-shrink: 0;
+    margin-left: 12px;
 }
 
 /* Grid 2 columnas para info de empresa */
@@ -897,7 +1052,7 @@ select:focus {
     font-size: 14px;
 }
 
-/* Botón de favorita */
+/* Botón corazón (favoritos) */
 .favorite-btn {
     background: none;
     border: none;
@@ -910,18 +1065,18 @@ select:focus {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-left: auto;
     width: auto;
     height: auto;
     line-height: 1;
+    margin-right: 4px;
 }
 
-.favorite-btn:hover {
-    transform: scale(1.2);
+.favorite-btn:hover { 
+    transform: scale(1.2); 
 }
 
-.favorite-btn.active {
-    color: #D32F2F;
+.favorite-btn.active { 
+    color: #ee5a5d; 
 }
 
 /* Filtro de favoritas */

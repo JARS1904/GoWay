@@ -20,6 +20,7 @@ function sendResponse($statusCode, $data) {
 }
 
 require_once '../config/conexion_bd.php';
+require_once '../config/opciones_reportes.php';
 
 try {
     $conn = $conexion;
@@ -85,8 +86,30 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $action = isset($_GET['action']) ? $_GET['action'] : '';
 
-        if (!in_array($action, ['get_assignment_data', 'get_reports', 'get_summary'])) {
+        if (!in_array($action, ['get_assignment_data', 'get_reports', 'get_summary', 'get_options'])) {
             sendResponse(400, ["error" => "Acción no válida."]);
+        }
+
+        // ── GET OPTIONS ──────────────────────────────────────────
+        if ($action === 'get_options') {
+            global $TIPOS_INCIDENCIA, $NIVELES_GRAVEDAD;
+            
+            // Format for app consumption (array of objects)
+            $tipos_arr = [];
+            foreach ($TIPOS_INCIDENCIA as $key => $val) {
+                $tipos_arr[] = ["id" => $key, "nombre" => $val];
+            }
+            
+            $gravedades_arr = [];
+            foreach ($NIVELES_GRAVEDAD as $key => $val) {
+                $gravedades_arr[] = ["id" => $key, "nombre" => $val];
+            }
+
+            sendResponse(200, [
+                "success" => true,
+                "tipos_incidencia" => $tipos_arr,
+                "niveles_gravedad" => $gravedades_arr
+            ]);
         }
 
         // ── GET SUMMARY ──────────────────────────────────────────
@@ -334,10 +357,15 @@ try {
             sendResponse(400, ["error" => "id_usuario o rfc_checador es requerido"]);
         }
 
+        // Validar tipo de incidente
+        global $TIPOS_INCIDENCIA, $NIVELES_GRAVEDAD;
+        if (!array_key_exists($tipo_incidente, $TIPOS_INCIDENCIA)) {
+            sendResponse(400, ["error" => "Tipo de incidente inválido. Valores aceptados: " . implode(', ', array_keys($TIPOS_INCIDENCIA))]);
+        }
+
         // Validar nivel de gravedad
-        $gravedad_validos = ['baja', 'media', 'alta', 'critica'];
-        if (!in_array($gravedad, $gravedad_validos)) {
-            sendResponse(400, ["error" => "Gravedad inválida. Valores aceptados: baja, media, alta, critica"]);
+        if (!array_key_exists($gravedad, $NIVELES_GRAVEDAD)) {
+            sendResponse(400, ["error" => "Gravedad inválida. Valores aceptados: " . implode(', ', array_keys($NIVELES_GRAVEDAD))]);
         }
 
         // Resolver asignación: placa tiene prioridad

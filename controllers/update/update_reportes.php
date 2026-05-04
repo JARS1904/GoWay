@@ -2,6 +2,7 @@
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 require_once '../../config/conexion_bd.php';
+require_once '../../config/opciones_reportes.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -23,6 +24,19 @@ $estado = isset($_POST['estado']) ? $conexion->real_escape_string($_POST['estado
 if ($id <= 0) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'ID inválido']);
+    exit;
+}
+
+global $TIPOS_INCIDENCIA, $NIVELES_GRAVEDAD;
+if (!array_key_exists($tipo_incidente, $TIPOS_INCIDENCIA)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Tipo de incidente inválido']);
+    exit;
+}
+
+if (!array_key_exists($gravedad, $NIVELES_GRAVEDAD)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Nivel de gravedad inválido']);
     exit;
 }
 
