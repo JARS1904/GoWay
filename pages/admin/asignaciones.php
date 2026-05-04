@@ -52,13 +52,13 @@ require_once '../../config/sync_session_foto.php';
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>RFC de la empresa</th>
-                            <th>Número de placa</th>
-                            <th>RFC del conductor</th>
+                            <th>Empresa</th>
+                            <th>Placa</th>
+                            <th>Conductor</th>
                             <th>Ruta</th>
                             <th>Horario</th>
-                            <th>Fecha de creación</th>
-                            <th>Asientos disp.</th>
+                            <th>Fecha</th>
+                            <th>Asientos</th>
                             <th>Estado</th>
                             <th>Activa</th>
                             <th>Acciones</th>
@@ -71,10 +71,11 @@ require_once '../../config/sync_session_foto.php';
                         
                         // Consulta con JOINs para obtener placa del vehículo y nombre de la ruta
                         // ANTES: $sql = "SELECT * FROM asignaciones";
-                        $sql = "SELECT a.*, v.placa, r.nombre as nombre_ruta 
+                        $sql = "SELECT a.*, v.placa, r.nombre as nombre_ruta, h.tipo_dia, h.hora_salida 
                                 FROM asignaciones a 
                                 LEFT JOIN vehiculos v ON a.id_vehiculo = v.id_vehiculo 
-                                LEFT JOIN rutas r ON a.id_ruta = r.id_ruta";
+                                LEFT JOIN rutas r ON a.id_ruta = r.id_ruta
+                                LEFT JOIN horarios h ON a.id_horario = h.id_horario";
                         $result = $conn->query($sql);
                         
                         if ($result->num_rows > 0) {
@@ -83,13 +84,17 @@ require_once '../../config/sync_session_foto.php';
                                 $statusText = $row["activa"] ? 'Sí' : 'No';
                                 
                                 echo '<tr>
-                                        <td data-label="RFC de la Empresa" data-id="'.$row["id_asignacion"].'">'.$row["rfc_empresa"].'</td>
-                                        <td data-label="Número de placa">'.$row["placa"].'</td>
-                                        <td data-label="RFC Conductor">'.$row["rfc_conductor"].'</td>
+                                        <td data-label="Empresa" data-id="'.$row["id_asignacion"].'">'.$row["rfc_empresa"].'</td>
+                                        <td data-label="Placa">'.$row["placa"].'</td>
+                                        <td data-label="Conductor">'.$row["rfc_conductor"].'</td>
                                         <td data-label="Ruta">'.$row["nombre_ruta"].'</td>
-                                        <td data-label="Horario">'.$row["id_horario"].'</td>
-                                        <td data-label="Fecha de creación">'.$row["fecha"].'</td>
-                                        <td data-label="Asientos disp.">'.$row["asientos_disp"].'</td>
+                                        <td data-label="Horario">
+                                            <strong>ID: '.$row["id_horario"].'</strong><br>
+                                            <span style="font-size: 0.85em; color: #666;">'.$row["tipo_dia"].'</span><br>
+                                            <span style="font-size: 0.85em; color: #666;">'.$row["hora_salida"].'</span>
+                                        </td>
+                                        <td data-label="Fecha">'.$row["fecha"].'</td>
+                                        <td data-label="Asientos">'.$row["asientos_disp"].'</td>
                                         <td data-label="Estado">'.ucfirst(str_replace("_", " ", $row["estado"])).'</td>
                                         <td data-label="Activa"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
@@ -98,7 +103,7 @@ require_once '../../config/sync_session_foto.php';
                                                     <span class="material-icons">more_vert</span>
                                                 </button>
                                                 <div class="dropdown-content">
-                                                    <button class="dropdown-item btn-edit" data-id="'.$row["id_asignacion"].'" data-empresa="'.$row["rfc_empresa"].'" data-ruta="'.$row["id_ruta"].'" data-horario="'.$row["id_horario"].'" data-conductor="'.$row["rfc_conductor"].'" data-vehiculo="'.$row["id_vehiculo"].'" data-fecha="'.$row["fecha"].'" data-estado="'.$row["estado"].'" data-asientos="'.$row["asientos_disp"].'">
+                                                    <button class="dropdown-item btn-edit" data-id="'.$row["id_asignacion"].'" data-empresa="'.$row["rfc_empresa"].'" data-ruta="'.$row["id_ruta"].'" data-horario="'.$row["id_horario"].'" data-conductor="'.$row["rfc_conductor"].'" data-vehiculo="'.$row["id_vehiculo"].'" data-fecha="'.$row["fecha"].'" data-estado="'.$row["estado"].'" data-asientos="'.$row["asientos_disp"].'" data-activa="'.$row["activa"].'">
                                                         <span class="material-icons">edit_square</span> Editar
                                                     </button>
                                                     <button class="dropdown-item btn-delete" data-id="'.$row["id_asignacion"].'">
@@ -330,6 +335,13 @@ require_once '../../config/sync_session_foto.php';
                             <label>Fecha de creación</label>
                             <input type="date" name="fecha" id="edit_fecha" required>
                         </div>
+                        <div class="modal-form-group">
+                            <label>Activa</label>
+                            <select name="activa" id="edit_activa" required>
+                                <option value="1">Sí</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -384,6 +396,7 @@ require_once '../../config/sync_session_foto.php';
                 document.getElementById('edit_id_vehiculo').value = button.dataset.vehiculo;
                 document.getElementById('edit_fecha').value = button.dataset.fecha;
                 document.getElementById('edit_estado').value = button.dataset.estado;
+                document.getElementById('edit_activa').value = button.dataset.activa;
                 document.getElementById('edit_asientos_disp').value = button.dataset.asientos;
                 document.getElementById('editAssignModal').classList.add('active');
             });

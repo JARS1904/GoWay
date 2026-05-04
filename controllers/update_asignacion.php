@@ -18,6 +18,7 @@ $id_horario = $_POST['id_horario'];
 $fecha = $_POST['fecha'];
 $estado = $_POST['estado'];
 $asientos_disp = $_POST['asientos_disp'];
+$activa = $_POST['activa'];
 
 // Obtener el vehículo actual
 $stmt_check = $conn->prepare("SELECT id_vehiculo FROM asignaciones WHERE id_asignacion = ?");
@@ -39,10 +40,11 @@ if ($current_vehiculo != $id_vehiculo) {
                   a.id_horario = ?,
                   a.fecha = ?, 
                   a.estado = ?,
+                  a.activa = ?,
                   a.asientos_disp = v.capacidad
               WHERE a.id_asignacion = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("isssiissi", $id_vehiculo, $rfc_empresa, $rfc_conductor, $id_vehiculo, $id_ruta, $id_horario, $fecha, $estado, $id_asignacion);
+    $stmt->bind_param("isssiissii", $id_vehiculo, $rfc_empresa, $rfc_conductor, $id_vehiculo, $id_ruta, $id_horario, $fecha, $estado, $activa, $id_asignacion);
 } else {
     // Vehículo es el mismo, actualizar asientos_disp con el valor proporcionado
     $query = "UPDATE asignaciones 
@@ -52,10 +54,11 @@ if ($current_vehiculo != $id_vehiculo) {
                   id_horario = ?,
                   fecha = ?, 
                   estado = ?,
+                  activa = ?,
                   asientos_disp = ?
               WHERE id_asignacion = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssiissii", $rfc_empresa, $rfc_conductor, $id_ruta, $id_horario, $fecha, $estado, $asientos_disp, $id_asignacion);
+    $stmt->bind_param("ssiissiii", $rfc_empresa, $rfc_conductor, $id_ruta, $id_horario, $fecha, $estado, $activa, $asientos_disp, $id_asignacion);
 }
 
 if ($stmt->execute()) {
