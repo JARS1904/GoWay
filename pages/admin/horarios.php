@@ -60,6 +60,10 @@ require_once '../../config/sync_session_foto.php';
                         <?php
                         $conn = $conexion;
                         $sql  = "SELECT h.*, r.nombre AS nombre_ruta FROM horarios h LEFT JOIN rutas r ON h.id_ruta = r.id_ruta";
+                        if ($_SESSION['rol'] == 4) {
+                            $rfc_empresa_session = $_SESSION['rfc_empresa'];
+                            $sql .= " WHERE r.rfc_empresa = '$rfc_empresa_session'";
+                        }
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
@@ -131,7 +135,8 @@ require_once '../../config/sync_session_foto.php';
                             
                             <?php
                             $conn = $conexion;
-                            $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
+                            $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                            $result = $conn->query("SELECT id_ruta, nombre FROM rutas" . $where_emp);
                             while ($row = $result->fetch_assoc()) {
                             echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";
                             }
@@ -195,7 +200,8 @@ require_once '../../config/sync_session_foto.php';
             <select name="id_ruta" id="edit_id_ruta">
               <?php
               $conn = $conexion;
-              $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
+              $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+              $result = $conn->query("SELECT id_ruta, nombre FROM rutas" . $where_emp);
               while ($row = $result->fetch_assoc()) {
                 echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";
               }

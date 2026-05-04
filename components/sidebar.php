@@ -18,23 +18,37 @@ $logout_url   = $base_url . 'pages/logout.php';
 // Categorías de navegación: [Categoría => [slug => [label, icon_file, href]]]
 $nav_categories = [
     'Principal' => [
-        'dashboard'   => ['label' => 'Dashboard',   'icon' => 'icon_dashboard.png',   'href' => $base_url . 'index.php'],
-        'empresas'    => ['label' => 'Empresa',     'icon' => 'icon_empresas.png',    'href' => $admin_prefix . 'empresas.php'],
-        'rutas'       => ['label' => 'Rutas',       'icon' => 'icon_rutas.png',       'href' => $admin_prefix . 'rutas.php'],
-        'horarios'    => ['label' => 'Horarios',    'icon' => 'icon_horarios.png',    'href' => $admin_prefix . 'horarios.php'],
-        'conductores' => ['label' => 'Conductores', 'icon' => 'icon_conductores.png', 'href' => $admin_prefix . 'conductores.php'],
-        'vehiculos'   => ['label' => 'Vehículos',   'icon' => 'icon_vehiculos.png',   'href' => $admin_prefix . 'vehiculos.php'],
-        'paradas'     => ['label' => 'Paradas',     'icon' => 'icon_paradas.png',     'href' => $admin_prefix . 'paradas_ruta.php'],
-        'asignaciones'=> ['label' => 'Asignaciones','icon' => 'icon_asignacion.png',  'href' => $admin_prefix . 'asignaciones.php'],
-    ],
-    'Usuarios' => [
-        'usuarios'    => ['label' => 'Usuarios',    'icon' => 'icon_usuarios.png',    'href' => $admin_prefix . 'usuarios.php'],
-        'checadores'  => ['label' => 'Checador',    'icon' => 'icon_checadores.png',  'href' => $admin_prefix . 'checadores.php'],
-    ],
-    'Gestión' => [
-        'reportes'    => ['label' => 'Reportes',    'icon' => 'icon_reportes.png',    'href' => $admin_prefix . 'reportes.php'],
-        'notificaciones'=>['label'=> 'Notificaciones','icon'=> 'icons_notifications.png', 'href' => $admin_prefix . 'notificaciones.php'],
+        'dashboard'   => ['label' => 'Dashboard',   'icon' => 'icon_dashboard.png',   'href' => $base_url . 'index.php']
     ]
+];
+
+// Solo los súper administradores pueden ver y gestionar Empresas
+if ($_SESSION['rol'] == 1) {
+    $nav_categories['Principal']['empresas'] = ['label' => 'Empresa', 'icon' => 'icon_empresas.png', 'href' => $admin_prefix . 'empresas.php'];
+}
+
+$nav_categories['Principal'] = array_merge($nav_categories['Principal'], [
+    'rutas'       => ['label' => 'Rutas',       'icon' => 'icon_rutas.png',       'href' => $admin_prefix . 'rutas.php'],
+    'horarios'    => ['label' => 'Horarios',    'icon' => 'icon_horarios.png',    'href' => $admin_prefix . 'horarios.php'],
+    'conductores' => ['label' => 'Conductores', 'icon' => 'icon_conductores.png', 'href' => $admin_prefix . 'conductores.php'],
+    'vehiculos'   => ['label' => 'Vehículos',   'icon' => 'icon_vehiculos.png',   'href' => $admin_prefix . 'vehiculos.php'],
+    'paradas'     => ['label' => 'Paradas',     'icon' => 'icon_paradas.png',     'href' => $admin_prefix . 'paradas_ruta.php'],
+    'asignaciones'=> ['label' => 'Asignaciones','icon' => 'icon_asignacion.png',  'href' => $admin_prefix . 'asignaciones.php']
+]);
+
+// Solo los súper administradores pueden ver a los Usuarios (app móvil)
+$usuarios_nav = [];
+if ($_SESSION['rol'] == 1) {
+    $usuarios_nav['usuarios'] = ['label' => 'Usuarios', 'icon' => 'icon_usuarios.png', 'href' => $admin_prefix . 'usuarios.php'];
+}
+// Todas las empresas ven a sus checadores
+$usuarios_nav['checadores'] = ['label' => 'Checadores', 'icon' => 'icon_checadores.png', 'href' => $admin_prefix . 'checadores.php'];
+
+$nav_categories['Usuarios'] = $usuarios_nav;
+
+$nav_categories['Gestión'] = [
+    'reportes'    => ['label' => 'Reportes',    'icon' => 'icon_reportes.png',    'href' => $admin_prefix . 'reportes.php'],
+    'notificaciones'=>['label'=> 'Notificaciones','icon'=> 'icons_notifications.png', 'href' => $admin_prefix . 'notificaciones.php'],
 ];
 ?>
 

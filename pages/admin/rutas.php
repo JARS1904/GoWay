@@ -72,8 +72,12 @@ require_once '../../config/sync_session_foto.php';
                                        ret.nombre AS nombre_retorno,
                                        (SELECT COUNT(*) FROM paradas_ruta pr WHERE pr.id_ruta = r.id_ruta) AS total_paradas
                                 FROM rutas r
-                                LEFT JOIN rutas ret ON r.id_ruta_retorno = ret.id_ruta
-                                ORDER BY r.id_ruta";
+                                LEFT JOIN rutas ret ON r.id_ruta_retorno = ret.id_ruta";
+                        if ($_SESSION['rol'] == 4) {
+                            $rfc_empresa_session = $_SESSION['rfc_empresa'];
+                            $sql .= " WHERE r.rfc_empresa = '$rfc_empresa_session'";
+                        }
+                        $sql .= " ORDER BY r.id_ruta";
                         $result = $conn->query($sql);
 
                         if ($result->num_rows > 0) {
@@ -153,9 +157,9 @@ require_once '../../config/sync_session_foto.php';
                     <div>
                         <div class="modal-form-group">
                             <label>RFC de Empresa</label>
-                            
+                            <?php if ($_SESSION['rol'] == 1): ?>
                             <select id="" name="rfc_empresa" required>
-                                <option disabled selected>Seleccione Empresa</option>
+                                <option value="" disabled selected>Seleccione Empresa</option>
                                 <?php
                                 $conn = $conexion;
                                 $result = $conn->query("SELECT rfc_empresa, nombre FROM empresas");
@@ -164,6 +168,10 @@ require_once '../../config/sync_session_foto.php';
                                 }
                                 ?>
                             </select>
+                            <?php else: ?>
+                            <input type="text" value="<?php echo htmlspecialchars($_SESSION['nombre']); ?>" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                            <input type="hidden" name="rfc_empresa" value="<?php echo $_SESSION['rfc_empresa']; ?>">
+                            <?php endif; ?>
                         </div>
 
                         <div class="modal-form-group">
@@ -218,6 +226,7 @@ require_once '../../config/sync_session_foto.php';
                     <div>
                         <div class="modal-form-group">
                             <label>RFC de Empresa</label>
+                            <?php if ($_SESSION['rol'] == 1): ?>
                             <select id="edit_rfc_empresa" name="rfc_empresa" required>
                                 <?php
                                 $conn = $conexion;
@@ -227,6 +236,10 @@ require_once '../../config/sync_session_foto.php';
                                 }
                                 ?>
                             </select>
+                            <?php else: ?>
+                            <input type="text" value="<?php echo htmlspecialchars($_SESSION['nombre']); ?>" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                            <input type="hidden" id="edit_rfc_empresa" name="rfc_empresa" value="<?php echo $_SESSION['rfc_empresa']; ?>">
+                            <?php endif; ?>
                         </div>
 
                         <div class="modal-form-group">

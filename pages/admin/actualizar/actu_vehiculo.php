@@ -22,7 +22,8 @@
 
             <section class="content">
                 <?php
-                require_once '../../../config/conexion_bd.php';
+session_start();
+require_once '../../../config/conexion_bd.php';
                 // Obtener el ID del vehículo de la URL
                 $id_vehiculo = isset($_GET['id']) ? $_GET['id'] : null;
                 

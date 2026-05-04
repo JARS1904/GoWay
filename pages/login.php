@@ -300,7 +300,7 @@ body {
             <button name="btninvitado" type="submit" class="lg-btn" style="background: transparent; color: #2962FF; border: 1.5px solid #2962FF; box-shadow: none;">Continuar como invitado</button>
         </form>
 
-        <p class="lg-footer">¿No tienes cuenta? <a href="registro.php">Regístrate</a></p>
+        <p class="lg-footer">¿No tienes cuenta? <a href="registro.php">Regístrate</a> &nbsp;·&nbsp; <a href="registro_empresa.php">Registrar empresa</a></p>
 
         <hr class="lg-divider">
         <button class="lg-admin-btn" onclick="openAdminModal()">

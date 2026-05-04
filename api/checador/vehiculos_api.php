@@ -22,11 +22,27 @@ try {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $placa = isset($_GET['placa']) ? strtoupper(trim($_GET['placa'])) : '';
+        $placa       = isset($_GET['placa'])        ? strtoupper(trim($_GET['placa']))   : '';
+        $rfc_checador = isset($_GET['rfc_checador']) ? trim($_GET['rfc_checador'])        : '';
 
         if (empty($placa)) {
             sendResponse(400, ["error" => "El parámetro 'placa' es requerido"]);
         }
+        if (empty($rfc_checador)) {
+            sendResponse(400, ["error" => "El parámetro 'rfc_checador' es requerido"]);
+        }
+
+        // ── Obtener rfc_empresa del checador ────────────────────────────
+        $stmt_ch = $conn->prepare("SELECT rfc_empresa FROM checadores WHERE rfc_checador = ? AND activo = 1 LIMIT 1");
+        if (!$stmt_ch) sendResponse(500, ["error" => "Error preparando consulta del checador"]);
+        $stmt_ch->bind_param("s", $rfc_checador);
+        $stmt_ch->execute();
+        $result_ch = $stmt_ch->get_result();
+        if ($result_ch->num_rows === 0) {
+            sendResponse(403, ["error" => "Checador no encontrado o inactivo"]);
+        }
+        $rfc_empresa_checador = $result_ch->fetch_assoc()['rfc_empresa'];
+        $stmt_ch->close();
 
         // ── Zona horaria y tipo de día actual ────────────────────────────
         date_default_timezone_set('America/Mexico_City');
@@ -35,7 +51,7 @@ try {
         elseif ($numeroDia === 6)               $tipo_dia = 'Sábado';
         else                                    $tipo_dia = 'Domingo';
 
-        // ── 1. Info básica del vehículo ──────────────────────────────────
+        // ── 1. Info básica del vehículo (filtrado por empresa del checador) ──
         $sql_v = "SELECT
                       v.id_vehiculo,
                       v.placa,
@@ -45,23 +61,24 @@ try {
                       e.nombre AS empresa_nombre
                   FROM vehiculos v
                   LEFT JOIN empresas e ON v.rfc_empresa = e.rfc_empresa
-                  WHERE v.placa = ?
+                  WHERE v.placa = ? AND v.rfc_empresa = ?
                   LIMIT 1";
 
         $stmt_v = $conn->prepare($sql_v);
         if (!$stmt_v) {
             sendResponse(500, ["error" => "Error preparando consulta de vehículo: " . $conn->error]);
         }
-        $stmt_v->bind_param("s", $placa);
+        $stmt_v->bind_param("ss", $placa, $rfc_empresa_checador);
         $stmt_v->execute();
         $result_v = $stmt_v->get_result();
 
         if ($result_v->num_rows === 0) {
-            sendResponse(404, ["error" => "No se encontró ningún vehículo con la placa '$placa'"]);
+            sendResponse(404, ["error" => "No se encontró el vehículo con placa '$placa' en tu empresa"]);
         }
 
         $vehiculo = $result_v->fetch_assoc();
         $stmt_v->close();
+
 
         // ── 2. Todas las asignaciones activas del vehículo para hoy ──────
         $sql_a = "SELECT

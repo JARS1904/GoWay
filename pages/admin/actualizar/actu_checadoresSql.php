@@ -1,5 +1,6 @@
 
 <?php
+session_start();
 header('Content-Type: application/json');
 require_once '../../../config/conexion_bd.php';
 require_once '../../../controllers/upload_foto.php';
@@ -13,6 +14,9 @@ if ($conn->connect_error) {
 
 $rfc_checador = $_POST['rfc_checador'];
 $rfc_empresa  = $_POST['rfc_empresa'];
+if (isset($_SESSION['rol']) && $_SESSION['rol'] == 4) {
+    $rfc_empresa = $_SESSION['rfc_empresa'];
+}
 $nombre       = $_POST['nombre'];
 $usuario      = $_POST['usuario'];
 $contrasena   = $_POST['password'] ?? '';

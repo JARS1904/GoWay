@@ -1,4 +1,5 @@
 <?php
+session_start();
 // actualizar_ruta.php
 header('Content-Type: application/json');
 require_once '../../config/conexion_bd.php';
@@ -21,6 +22,9 @@ $destino = isset($_POST['destino']) ? trim($_POST['destino']) : '';
 $id_ruta_retorno = isset($_POST['id_ruta_retorno']) && $_POST['id_ruta_retorno'] !== '' ? (int)$_POST['id_ruta_retorno'] : null;
 $activa = isset($_POST['activa']) ? (int)$_POST['activa'] : 0;
 $rfc_empresa = isset($_POST['rfc_empresa']) ? trim($_POST['rfc_empresa']) : '';
+if (isset($_SESSION['rol']) && $_SESSION['rol'] == 4) {
+    $rfc_empresa = $_SESSION['rfc_empresa'];
+}
 
 // Validar datos
 if (empty($id_ruta) || empty($nombre) || empty($origen) || empty($destino) || empty($rfc_empresa)) {

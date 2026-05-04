@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 require_once '../config/conexion_bd.php';
 
@@ -11,6 +12,9 @@ if ($conn->connect_error) {
 
 $id_asignacion = $_POST['id_asignacion'];
 $rfc_empresa = $_POST['rfc_empresa'];
+if (isset($_SESSION['rol']) && $_SESSION['rol'] == 4) {
+    $rfc_empresa = $_SESSION['rfc_empresa'];
+}
 $id_vehiculo = $_POST['id_vehiculo'];
 $rfc_conductor = $_POST['rfc_conductor'];
 $id_ruta = $_POST['id_ruta'];

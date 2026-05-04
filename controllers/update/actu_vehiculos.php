@@ -1,5 +1,6 @@
 
 <?php
+session_start();
 header('Content-Type: application/json');
 
 // actualizar_vehiculo.php
@@ -21,6 +22,9 @@ $modelo = $_POST['modelo'];
 $capacidad = $_POST['capacidad'];
 $activo = $_POST['activo'];
 $rfc_empresa = $_POST['rfc_empresa'];
+if (isset($_SESSION['rol']) && $_SESSION['rol'] == 4) {
+    $rfc_empresa = $_SESSION['rfc_empresa'];
+}
 
 // Preparar la consulta SQL
 $sql = "UPDATE vehiculos SET

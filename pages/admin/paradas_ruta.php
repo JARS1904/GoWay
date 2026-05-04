@@ -106,8 +106,9 @@ require_once '../../config/sync_session_foto.php';
                     <select id="routeSelect">
                         <option value="">— Selecciona una ruta —</option>
                         <?php
+                        $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
                         $res = $conexion->query(
-                            "SELECT id_ruta, nombre, origen, destino FROM rutas ORDER BY nombre ASC"
+                            "SELECT id_ruta, nombre, origen, destino FROM rutas" . $where_emp . " ORDER BY nombre ASC"
                         );
                         while ($r = $res->fetch_assoc()) {
                             $label = htmlspecialchars($r['nombre'] . ' (' . $r['origen'] . ' → ' . $r['destino'] . ')');

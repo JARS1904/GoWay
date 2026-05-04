@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 require_once '../config/conexion_bd.php';
 
@@ -18,6 +19,9 @@ $stmt->bind_param("sssii", $placa, $rfc_empresa, $modelo, $capacidad, $activo);
 // Establecer parámetros y ejecutar
 $placa = $_POST['placa'];
 $rfc_empresa = $_POST['rfc_empresa'];
+if (isset($_SESSION['rol']) && $_SESSION['rol'] == 4) {
+    $rfc_empresa = $_SESSION['rfc_empresa'];
+}
 $modelo = $_POST['modelo'];
 $capacidad = $_POST['capacidad'];
 $activo = $_POST['activo'];

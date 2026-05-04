@@ -58,18 +58,34 @@ require_once 'config/sync_session_foto.php';
                         die("Error de conexi├│n: " . $conn->connect_error);
                     }
 
-                    $sql = "SELECT 
-                            (SELECT COUNT(*) FROM empresas) AS total_empresas,
-                            (SELECT COUNT(*) FROM rutas) AS total_rutas,
-                            (SELECT COUNT(*) FROM vehiculos) AS total_vehiculos,
-                            (SELECT COUNT(*) FROM conductores) AS total_conductores,
-                            (SELECT COUNT(*) FROM horarios) AS total_horarios,
-                            (SELECT COUNT(*) FROM checadores) AS total_checadores";
+                    $is_superadmin = ($_SESSION['rol'] == 1);
+                    $rfc_empresa_session = isset($_SESSION['rfc_empresa']) ? $_SESSION['rfc_empresa'] : '';
+                    
+                    if ($is_superadmin) {
+                        $sql = "SELECT 
+                                (SELECT COUNT(*) FROM empresas) AS total_empresas,
+                                (SELECT COUNT(*) FROM rutas) AS total_rutas,
+                                (SELECT COUNT(*) FROM vehiculos) AS total_vehiculos,
+                                (SELECT COUNT(*) FROM conductores) AS total_conductores,
+                                (SELECT COUNT(*) FROM horarios) AS total_horarios,
+                                (SELECT COUNT(*) FROM checadores) AS total_checadores";
+                    } else {
+                        // Filtro por empresa
+                        $sql = "SELECT 
+                                0 AS total_empresas,
+                                (SELECT COUNT(*) FROM rutas WHERE rfc_empresa = '$rfc_empresa_session') AS total_rutas,
+                                (SELECT COUNT(*) FROM vehiculos WHERE rfc_empresa = '$rfc_empresa_session') AS total_vehiculos,
+                                (SELECT COUNT(*) FROM conductores WHERE rfc_empresa = '$rfc_empresa_session') AS total_conductores,
+                                (SELECT COUNT(*) FROM horarios h JOIN rutas r ON h.id_ruta = r.id_ruta WHERE r.rfc_empresa = '$rfc_empresa_session') AS total_horarios,
+                                (SELECT COUNT(*) FROM checadores WHERE rfc_empresa = '$rfc_empresa_session') AS total_checadores";
+                    }
+                    
                     $result = $conn->query($sql);
                     $row = $result->fetch_assoc();
                     ?>
 
-                    <!-- Tarjeta Empresas -->
+                    <!-- Tarjeta Empresas (Solo Súper Admin) -->
+                    <?php if ($is_superadmin): ?>
                     <div class="stat-card">
                         <div class="stat-card-icon empresas">
                             <img src="assets/images/icons/icons8-empresa-dashboard-resumen.png" alt="Empresas">
@@ -80,6 +96,7 @@ require_once 'config/sync_session_foto.php';
                             <span class="stat-label">Registradas</span>
                         </div>
                     </div>
+                    <?php endif; ?>
 
                     <!-- Tarjeta Rutas -->
                     <div class="stat-card">

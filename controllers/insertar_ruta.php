@@ -1,4 +1,5 @@
 <?php
+session_start();
 // insertar_ruta.php
 header('Content-Type: application/json');
 require_once '../config/conexion_bd.php';

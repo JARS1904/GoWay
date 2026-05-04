@@ -144,11 +144,15 @@ require_once '../../config/sync_session_foto.php';
                     <div>
                         <div class="modal-form-group">
                             <label for="origen">Telefono</label>
-                            <input type="text" id="tel_empresa" name="tel_empresa" placeholder="" required>
+                            <input type="text" id="tel_empresa" name="tel_empresa" placeholder="">
                         </div>
                         <div class="modal-form-group">
-                            <label for="paradas">E-mail</label>
-                            <input type="email" id="email_empresa" name="email_empresa" placeholder=""></input>
+                            <label for="paradas">E-mail *</label>
+                            <input type="email" id="email_empresa" name="email_empresa" placeholder="" required></input>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Contraseña *</label>
+                            <input type="password" name="password" placeholder="••••••••" required>
                         </div>
                     </div>
                 </div>
@@ -192,6 +196,10 @@ require_once '../../config/sync_session_foto.php';
                         <div class="modal-form-group">
                             <label for="edit_email_empresa">E-mail</label>
                             <input type="text" id="edit_email_empresa" name="email_empresa" required>
+                        </div>
+                        <div class="modal-form-group">
+                            <label for="edit_password">Nueva Contraseña <small style="color:#9ca3af;font-weight:400">(dejar en blanco para no cambiar)</small></label>
+                            <input type="password" id="edit_password" name="password" placeholder="••••••••">
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_activo">Activo</label>

@@ -70,12 +70,15 @@ require_once '../../config/sync_session_foto.php';
                         $conn = $conexion;
                         
                         // Consulta con JOINs para obtener placa del vehículo y nombre de la ruta
-                        // ANTES: $sql = "SELECT * FROM asignaciones";
                         $sql = "SELECT a.*, v.placa, r.nombre as nombre_ruta, h.tipo_dia, h.hora_salida 
                                 FROM asignaciones a 
                                 LEFT JOIN vehiculos v ON a.id_vehiculo = v.id_vehiculo 
                                 LEFT JOIN rutas r ON a.id_ruta = r.id_ruta
                                 LEFT JOIN horarios h ON a.id_horario = h.id_horario";
+                        if ($_SESSION['rol'] == 4) {
+                            $rfc_empresa_session = $_SESSION['rfc_empresa'];
+                            $sql .= " WHERE a.rfc_empresa = '$rfc_empresa_session'";
+                        }
                         $result = $conn->query($sql);
                         
                         if ($result->num_rows > 0) {
@@ -145,6 +148,7 @@ require_once '../../config/sync_session_foto.php';
                     <div>
                         <div class="modal-form-group">
                             <label>RFC de la Empresa</label>
+                            <?php if ($_SESSION['rol'] == 1): ?>
                             <select name="rfc_empresa" required>
                                 <option value="" disabled selected>Seleccionar empresa</option>
                                 <?php
@@ -155,6 +159,10 @@ require_once '../../config/sync_session_foto.php';
                                 }
                                 ?>
                             </select>
+                            <?php else: ?>
+                            <input type="text" value="<?php echo htmlspecialchars($_SESSION['nombre']); ?>" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                            <input type="hidden" name="rfc_empresa" value="<?php echo $_SESSION['rfc_empresa']; ?>">
+                            <?php endif; ?>
                         </div>
                         <div class="modal-form-group">
                             <label>Vehículo</label>
@@ -162,7 +170,8 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar vehículo</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT id_vehiculo, placa, modelo FROM vehiculos");
+                                $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                                $result = $conn->query("SELECT id_vehiculo, placa, modelo FROM vehiculos" . $where_emp);
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['id_vehiculo']}'>{$row['placa']} - {$row['modelo']}</option>";
                                 }
@@ -175,7 +184,8 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar conductor</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT rfc_conductor, nombre FROM conductores");
+                                $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                                $result = $conn->query("SELECT rfc_conductor, nombre FROM conductores" . $where_emp);
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['rfc_conductor']}'>{$row['nombre']}</option>";
                                 }
@@ -202,7 +212,8 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar ruta</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
+                                $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                                $result = $conn->query("SELECT id_ruta, nombre FROM rutas" . $where_emp);
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";
                                 }
@@ -215,7 +226,8 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar horario</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT id_horario, tipo_dia, hora_salida FROM horarios");
+                                $where_horario = ($_SESSION['rol'] == 4) ? " JOIN rutas r ON h.id_ruta = r.id_ruta WHERE r.rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                                $result = $conn->query("SELECT h.id_horario, h.tipo_dia, h.hora_salida FROM horarios h" . $where_horario);
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['id_horario']}'>{$row['tipo_dia']} - {$row['hora_salida']}</option>";
                                 }
@@ -250,6 +262,7 @@ require_once '../../config/sync_session_foto.php';
                     <div>
                         <div class="modal-form-group">
                             <label>RFC de la Empresa</label>
+                            <?php if ($_SESSION['rol'] == 1): ?>
                             <select name="rfc_empresa" id="edit_rfc_empresa" required>
                                 <option value="" disabled selected>Seleccionar empresa</option>
                                 <?php
@@ -260,6 +273,10 @@ require_once '../../config/sync_session_foto.php';
                                 }
                                 ?>
                             </select>
+                            <?php else: ?>
+                            <input type="text" value="<?php echo htmlspecialchars($_SESSION['nombre']); ?>" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                            <input type="hidden" id="edit_rfc_empresa" name="rfc_empresa" value="<?php echo $_SESSION['rfc_empresa']; ?>">
+                            <?php endif; ?>
                         </div>
                         <div class="modal-form-group">
                             <label>Vehículo</label>
@@ -267,7 +284,8 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar vehículo</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT id_vehiculo, placa, modelo FROM vehiculos");
+                                $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                                $result = $conn->query("SELECT id_vehiculo, placa, modelo FROM vehiculos" . $where_emp);
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['id_vehiculo']}'>{$row['placa']} - {$row['modelo']}</option>";
                                 }
@@ -280,7 +298,8 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar conductor</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT rfc_conductor, nombre FROM conductores");
+                                $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                                $result = $conn->query("SELECT rfc_conductor, nombre FROM conductores" . $where_emp);
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['rfc_conductor']}'>{$row['nombre']}</option>";
                                 }
@@ -311,7 +330,8 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar ruta</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT id_ruta, nombre FROM rutas");
+                                $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                                $result = $conn->query("SELECT id_ruta, nombre FROM rutas" . $where_emp);
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['id_ruta']}'>{$row['nombre']}</option>";
                                 }
@@ -324,7 +344,8 @@ require_once '../../config/sync_session_foto.php';
                                 <option value="" disabled selected>Seleccionar horario</option>
                                 <?php
                                 $conn = $conexion;
-                                $result = $conn->query("SELECT id_horario, tipo_dia, hora_salida FROM horarios");
+                                $where_horario = ($_SESSION['rol'] == 4) ? " JOIN rutas r ON h.id_ruta = r.id_ruta WHERE r.rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                                $result = $conn->query("SELECT h.id_horario, h.tipo_dia, h.hora_salida FROM horarios h" . $where_horario);
                                 while ($row = $result->fetch_assoc()) {
                                 echo "<option value='{$row['id_horario']}'>{$row['tipo_dia']} - {$row['hora_salida']}</option>";
                                 }

@@ -12,16 +12,20 @@ require_once '../../config/conexion_bd.php';
 require_once '../../config/sync_session_foto.php';
 require_once '../../config/opciones_reportes.php';
 
+// Filtro para multi-tenant (Empresas)
+$where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+$where_emp_v = ($_SESSION['rol'] == 4) ? " WHERE v.rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+
 // Obtener lista de vehículos con placa y modelo
-$sql_vehiculos = "SELECT id_vehiculo, placa, modelo FROM vehiculos ORDER BY placa";
+$sql_vehiculos = "SELECT id_vehiculo, placa, modelo FROM vehiculos" . $where_emp . " ORDER BY placa";
 $result_vehiculos = $conexion->query($sql_vehiculos);
 
 // Obtener lista de conductores
-$sql_conductores = "SELECT rfc_conductor, nombre FROM conductores ORDER BY nombre";
+$sql_conductores = "SELECT rfc_conductor, nombre FROM conductores" . $where_emp . " ORDER BY nombre";
 $result_conductores = $conexion->query($sql_conductores);
 
 // Obtener lista de rutas
-$sql_rutas = "SELECT id_ruta, nombre FROM rutas ORDER BY nombre";
+$sql_rutas = "SELECT id_ruta, nombre FROM rutas" . $where_emp . " ORDER BY nombre";
 $result_rutas = $conexion->query($sql_rutas);
 
 // Obtener reportes recientes
@@ -33,6 +37,7 @@ $sql_reportes = "SELECT r.*,
                  INNER JOIN vehiculos v ON r.id_vehiculo = v.id_vehiculo
                  INNER JOIN conductores c ON r.rfc_conductor = c.rfc_conductor
                  INNER JOIN rutas ru ON r.id_ruta = ru.id_ruta
+                 " . $where_emp_v . "
                  ORDER BY r.created_at DESC
                  LIMIT 150";
 $result_reportes = $conexion->query($sql_reportes);
