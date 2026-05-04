@@ -26,7 +26,15 @@ if (!empty(trim($password)) && trim($password) !== '●●●●●●●●' &&
     $password = $row['password'];
 }
 
-$nueva_foto = uploadFoto($_FILES['foto'] ?? [], 'usuario');
+if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
+    $nueva_foto = uploadFoto($_FILES['foto'], 'usuario');
+    if ($nueva_foto === null) {
+        echo json_encode(["success" => false, "message" => "Error al subir la foto. Verifique que sea JPG/PNG/WebP y menor a 2MB."]);
+        exit();
+    }
+} else {
+    $nueva_foto = null;
+}
 
 if ($nueva_foto !== null) {
     $stmt = $conn->prepare("UPDATE usuarios SET nombre=?, email=?, password=?, rol=?, foto=? WHERE id=?");

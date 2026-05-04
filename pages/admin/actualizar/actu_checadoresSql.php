@@ -31,7 +31,15 @@ if (empty(trim($contrasena)) || trim($contrasena) === '●●●●●●●●'
     $contrasena = password_hash($contrasena, PASSWORD_DEFAULT);
 }
 
-$nueva_foto = uploadFoto($_FILES['foto'] ?? [], 'checador');
+if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
+    $nueva_foto = uploadFoto($_FILES['foto'], 'checador');
+    if ($nueva_foto === null) {
+        echo json_encode(["success" => false, "message" => "Error al subir la foto. Verifique que sea JPG/PNG/WebP y menor a 2MB."]);
+        exit();
+    }
+} else {
+    $nueva_foto = null;
+}
 
 if ($nueva_foto !== null) {
     $stmt = $conn->prepare("UPDATE checadores SET rfc_empresa=?, nombre=?, usuario=?, contrasena=?, activo=?, foto=? WHERE rfc_checador=?");
@@ -39,7 +47,7 @@ if ($nueva_foto !== null) {
         echo json_encode(["success" => false, "message" => "Error en la preparación: " . $conn->error]);
         exit();
     }
-    $stmt->bind_param("ssssisss", $rfc_empresa, $nombre, $usuario, $contrasena, $activo, $nueva_foto, $rfc_checador);
+    $stmt->bind_param("ssssiss", $rfc_empresa, $nombre, $usuario, $contrasena, $activo, $nueva_foto, $rfc_checador);
 } else {
     $stmt = $conn->prepare("UPDATE checadores SET rfc_empresa=?, nombre=?, usuario=?, contrasena=?, activo=? WHERE rfc_checador=?");
     if ($stmt === false) {
