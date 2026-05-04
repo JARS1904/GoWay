@@ -21,7 +21,6 @@ try {
     $method = $_SERVER['REQUEST_METHOD'];
     $data = [];
 
-    // Capturar datos según el método
     if ($method === 'GET') {
         $data = $_GET;
     } elseif ($method === 'POST') {
@@ -31,71 +30,104 @@ try {
             $data = $_POST;
         }
         if (empty($data)) {
-            $data = $_GET; // fallback
+            $data = $_GET;
         }
     }
 
-    $action = isset($data['action']) ? $data['action'] : '';
+    $action     = $data['action']     ?? '';
     $id_usuario = isset($data['id_usuario']) ? intval($data['id_usuario']) : 0;
 
     if (!$action) {
         sendResponse(400, ["error" => "Acción no especificada"]);
     }
 
-    // 1. Obtener notificaciones
+    // ── 1. Obtener notificaciones ────────────────────────────────────────
     if ($action === 'get_notifications') {
         if (!$id_usuario) {
             sendResponse(400, ["error" => "ID de usuario requerido"]);
         }
 
-        // Obtener notificaciones del usuario (y las globales donde id_usuario IS NULL)
-        $sql = "SELECT * FROM notificaciones 
-                WHERE id_usuario = ? OR id_usuario IS NULL 
-                ORDER BY fecha_creacion DESC";
-                
+        // Un usuario recibe notificaciones si:
+        // a) Es global del Super Admin (id_usuario IS NULL AND rfc_empresa IS NULL)
+        // b) Está dirigida directamente a él (id_usuario = ?)
+        // c) Viene de una empresa cuya ruta tiene en favoritos (rfc_empresa IN (...))
+        $sql = "SELECT n.* FROM notificaciones n
+                WHERE
+                  (n.id_usuario IS NULL AND n.rfc_empresa IS NULL)
+                  OR n.id_usuario = ?
+                  OR (
+                      n.rfc_empresa IS NOT NULL
+                      AND n.rfc_empresa IN (
+                          SELECT r.rfc_empresa
+                          FROM rutas_favoritas rf
+                          JOIN rutas r ON rf.id_ruta = r.id_ruta
+                          WHERE rf.id_usuario = ?
+                      )
+                  )
+                ORDER BY n.fecha_creacion DESC";
+
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $id_usuario);
+        $stmt->bind_param("ii", $id_usuario, $id_usuario);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         $notificaciones = [];
-        $unread_count = 0;
-        
+        $unread_count   = 0;
+
         while ($row = $result->fetch_assoc()) {
             $notificaciones[] = $row;
             if ($row['leido'] == 0) {
                 $unread_count++;
             }
         }
-        
+
         sendResponse(200, [
-            "success" => true, 
+            "success"        => true,
             "notificaciones" => $notificaciones,
-            "unread_count" => $unread_count
+            "unread_count"   => $unread_count
         ]);
         $stmt->close();
     }
-    
-    // 2. Marcar como leída
-    else if ($action === 'mark_as_read') {
+
+    // ── 2. Marcar como leída ─────────────────────────────────────────────
+    elseif ($action === 'mark_as_read') {
         if (!$id_usuario) {
             sendResponse(400, ["error" => "ID de usuario requerido"]);
         }
-        
+
         $id_notificacion = isset($data['id_notificacion']) ? intval($data['id_notificacion']) : 0;
-        
+
         if ($id_notificacion > 0) {
-            // Marcar una específica
-            $sql = "UPDATE notificaciones SET leido = 1 WHERE id_notificacion = ? AND (id_usuario = ? OR id_usuario IS NULL)";
+            // Marcar una específica (cualquiera que le corresponda al usuario)
+            $sql = "UPDATE notificaciones SET leido = 1
+                    WHERE id_notificacion = ?
+                    AND (
+                        (id_usuario IS NULL AND rfc_empresa IS NULL)
+                        OR id_usuario = ?
+                        OR (rfc_empresa IS NOT NULL AND rfc_empresa IN (
+                            SELECT r.rfc_empresa
+                            FROM rutas_favoritas rf
+                            JOIN rutas r ON rf.id_ruta = r.id_ruta
+                            WHERE rf.id_usuario = ?
+                        ))
+                    )";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ii", $id_notificacion, $id_usuario);
+            $stmt->bind_param("iii", $id_notificacion, $id_usuario, $id_usuario);
         } else {
-            // Marcar todas
-            $sql = "UPDATE notificaciones SET leido = 1 WHERE id_usuario = ? OR id_usuario IS NULL";
+            // Marcar todas las que le corresponden
+            $sql = "UPDATE notificaciones SET leido = 1
+                    WHERE (id_usuario IS NULL AND rfc_empresa IS NULL)
+                    OR id_usuario = ?
+                    OR (rfc_empresa IS NOT NULL AND rfc_empresa IN (
+                        SELECT r.rfc_empresa
+                        FROM rutas_favoritas rf
+                        JOIN rutas r ON rf.id_ruta = r.id_ruta
+                        WHERE rf.id_usuario = ?
+                    ))";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $id_usuario);
+            $stmt->bind_param("ii", $id_usuario, $id_usuario);
         }
-        
+
         if ($stmt->execute()) {
             sendResponse(200, ["success" => true, "message" => "Notificaciones actualizadas"]);
         } else {
@@ -103,23 +135,23 @@ try {
         }
         $stmt->close();
     }
-    
-    // 3. Crear notificación (internamente o vía POST)
-    else if ($action === 'create_notification') {
-        $titulo = isset($data['titulo']) ? $data['titulo'] : '';
-        $mensaje = isset($data['mensaje']) ? $data['mensaje'] : '';
-        $tipo = isset($data['tipo']) ? $data['tipo'] : 'general';
-        
+
+    // ── 3. Crear notificación (vía API — solo para Super Admin o uso interno) ─
+    elseif ($action === 'create_notification') {
+        $titulo  = $data['titulo']  ?? '';
+        $mensaje = $data['mensaje'] ?? '';
+        $tipo    = $data['tipo']    ?? 'general';
+
         $id_usu = ($id_usuario > 0) ? $id_usuario : null;
 
         if (empty($titulo) || empty($mensaje)) {
             sendResponse(400, ["error" => "El título y el mensaje son requeridos"]);
         }
 
-        $sql = "INSERT INTO notificaciones (id_usuario, titulo, mensaje, tipo) VALUES (?, ?, ?, ?)";
+        $sql  = "INSERT INTO notificaciones (id_usuario, rfc_empresa, titulo, mensaje, tipo) VALUES (?, NULL, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("isss", $id_usu, $titulo, $mensaje, $tipo);
-        
+
         if ($stmt->execute()) {
             sendResponse(200, ["success" => true, "message" => "Notificación creada", "id_notificacion" => $stmt->insert_id]);
         } else {
@@ -127,6 +159,7 @@ try {
         }
         $stmt->close();
     }
+
     else {
         sendResponse(400, ["error" => "Acción no válida. Use: get_notifications, mark_as_read, create_notification"]);
     }

@@ -14,7 +14,9 @@ if (!isset($conn)) {
     }
 }
 
-$is_admin = (isset($_SESSION['rol']) && $_SESSION['rol'] == 1);
+$is_admin   = (isset($_SESSION['rol']) && ($_SESSION['rol'] == 1 || $_SESSION['rol'] == 2));
+$is_empresa = (isset($_SESSION['rol']) && $_SESSION['rol'] == 4 && !empty($_SESSION['rfc_empresa']));
+$can_send   = $is_admin || $is_empresa;
 ?>
 <style>
 /* Reset for buttons inside the panel to avoid global CSS collisions */
@@ -58,7 +60,7 @@ $is_admin = (isset($_SESSION['rol']) && $_SESSION['rol'] == 1);
         <button class="notif-chip" onclick="filterByChip(this, 'general')">Aviso General</button>
     </div>
 
-    <?php if ($is_admin): ?>
+    <?php if ($can_send): ?>
     <div class="notifications-actions">
         <button class="btn-add full-width" id="openAddNotificationModal" style="margin: 0; width: 100%;">+ Enviar notificación</button>
     </div>
@@ -67,19 +69,31 @@ $is_admin = (isset($_SESSION['rol']) && $_SESSION['rol'] == 1);
     <div class="notifications-body" id="notifListBody">
         <?php
         if (isset($conn) && $conn) {
-            $sql_notif  = "SELECT n.*, u.nombre AS usuario_nombre 
-                           FROM notificaciones n 
-                           LEFT JOIN usuarios u ON n.id_usuario = u.id ";
-            if (!$is_admin) {
-                if (isset($_SESSION['id']) && $_SESSION['id'] > 0) {
-                    $user_id = (int)$_SESSION['id'];
-                    $sql_notif .= " WHERE n.id_usuario IS NULL OR n.id_usuario = $user_id ";
-                } else {
-                    $sql_notif .= " WHERE n.id_usuario IS NULL ";
+            if ($is_empresa) {
+                // Empresa: solo ve su historial de enviadas
+                $stmt_panel = $conn->prepare(
+                    "SELECT n.*, NULL AS usuario_nombre FROM notificaciones n
+                     WHERE n.rfc_empresa = ?
+                     ORDER BY n.fecha_creacion DESC LIMIT 50"
+                );
+                $stmt_panel->bind_param("s", $_SESSION['rfc_empresa']);
+                $stmt_panel->execute();
+                $result_notif = $stmt_panel->get_result();
+            } else {
+                $sql_notif = "SELECT n.*, u.nombre AS usuario_nombre
+                              FROM notificaciones n
+                              LEFT JOIN usuarios u ON n.id_usuario = u.id ";
+                if (!$is_admin) {
+                    if (isset($_SESSION['id']) && $_SESSION['id'] > 0) {
+                        $user_id = (int)$_SESSION['id'];
+                        $sql_notif .= " WHERE n.id_usuario IS NULL OR n.id_usuario = $user_id ";
+                    } else {
+                        $sql_notif .= " WHERE n.id_usuario IS NULL ";
+                    }
                 }
+                $sql_notif .= " ORDER BY n.fecha_creacion DESC LIMIT 50";
+                $result_notif = $conn->query($sql_notif);
             }
-            $sql_notif .= " ORDER BY n.fecha_creacion DESC LIMIT 50";
-            $result_notif = $conn->query($sql_notif);
             
             if ($result_notif && $result_notif->num_rows > 0) {
                 date_default_timezone_set('America/Mexico_City');
@@ -242,12 +256,12 @@ function applyFilters(search, type) {
         <form id="notificationForm" action="<?php echo $notif_base; ?>controllers/insert_notificacion.php" method="POST">
             <div class="modal-body">
                 <div>
-                    <div class="modal-form-group">
+                    <div class="modal-form-group" <?php echo $is_empresa ? 'style="display:none"' : ''; ?>>
                         <label>Destinatario (Usuario)</label>
-                        <select name="id_usuario" required>
+                        <select name="id_usuario">
                             <option value="todos">Todos los usuarios (Global)</option>
                             <?php
-                            if (isset($conn)) {
+                            if (isset($conn) && !$is_empresa) {
                                 $res_usuarios = $conn->query("SELECT id, nombre, email FROM usuarios ORDER BY nombre ASC");
                                 if ($res_usuarios) {
                                     while ($u_row = $res_usuarios->fetch_assoc()) {
@@ -258,6 +272,14 @@ function applyFilters(search, type) {
                             ?>
                         </select>
                     </div>
+                    <?php if ($is_empresa): ?>
+                    <div class="modal-form-group">
+                        <p style="font-size:.85rem; color:#6B7280; background:#F3F4F6; border-radius:8px; padding:10px 12px; margin:0;">
+                            <strong>📢 Tus suscriptores</strong><br>
+                            Esta notificación llegará a todos los usuarios que tienen alguna de tus rutas en favoritos.
+                        </p>
+                    </div>
+                    <?php endif; ?>
                     <div class="modal-form-group">
                         <label>Tipo de Mensaje</label>
                         <select name="tipo" required>

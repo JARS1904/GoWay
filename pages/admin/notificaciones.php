@@ -53,14 +53,37 @@ require_once '../../config/conexion_bd.php';
                     <tbody>
                         <?php
                         $conn = $conexion;
-                        $sql  = "SELECT n.*, u.nombre AS usuario_nombre 
-                                 FROM notificaciones n 
-                                 LEFT JOIN usuarios u ON n.id_usuario = u.id 
-                                 ORDER BY n.fecha_creacion DESC";
-                        $result = $conn->query($sql);
+                        $is_empresa = isset($_SESSION['rol']) && $_SESSION['rol'] == 4 && !empty($_SESSION['rfc_empresa']);
+
+                        if ($is_empresa) {
+                            // Empresa: solo ve sus propias notificaciones enviadas
+                            $stmt_n = $conn->prepare(
+                                "SELECT n.*, NULL AS usuario_nombre FROM notificaciones n
+                                 WHERE n.rfc_empresa = ?
+                                 ORDER BY n.fecha_creacion DESC"
+                            );
+                            $stmt_n->bind_param("s", $_SESSION['rfc_empresa']);
+                        } else {
+                            // Super Admin: ve todo
+                            $stmt_n = $conn->prepare(
+                                "SELECT n.*, u.nombre AS usuario_nombre
+                                 FROM notificaciones n
+                                 LEFT JOIN usuarios u ON n.id_usuario = u.id
+                                 ORDER BY n.fecha_creacion DESC"
+                            );
+                        }
+                        $stmt_n->execute();
+                        $result = $stmt_n->get_result();
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
-                                $target = ($row['id_usuario'] === null) ? '<strong>Todos los usuarios</strong>' : htmlspecialchars($row['usuario_nombre']);
+                                // Determinar destinatario
+                                if ($row['rfc_empresa'] !== null) {
+                                    $target = '<span style="color:#2962FF;font-weight:600">Suscriptores de la empresa</span>';
+                                } elseif ($row['id_usuario'] === null) {
+                                    $target = '<strong>Todos los usuarios</strong>';
+                                } else {
+                                    $target = htmlspecialchars($row['usuario_nombre'] ?? 'Usuario #'.$row['id_usuario']);
+                                }
                                 $titulo = htmlspecialchars($row['titulo']);
                                 $tipo = htmlspecialchars($row['tipo']);
                                 $fecha = htmlspecialchars($row['fecha_creacion']);
