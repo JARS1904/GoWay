@@ -1,536 +1,270 @@
 <?php
+// Si el usuario ya tiene sesión, ir al dashboard
 session_start();
-if (!isset($_SESSION['id'])) {
-    header('Location: pages/login.php');
+if (isset($_SESSION['id'])) {
+    header('Location: pages/admin/dashboard.php');
     exit();
 }
-require_once 'config/conexion_bd.php';
-require_once 'config/sync_session_foto.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Transporte Público</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
+    <title>GoWay — Tu destino, a un solo toque</title>
+    <meta name="description" content="GoWay conecta ciudades, personas y destinos. Gestiona rutas, flotas y checadores en tiempo real.">
     <link rel="icon" href="assets/images/logo_new.png" type="image/png">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --blue:    #2962FF;
+    --blue-dk: #1a50e8;
+    --blue-lt: #EEF3FF;
+    --text:    #111827;
+    --sub:     #6B7280;
+    --border:  #E5E7EB;
+    --bg:      #F9FAFB;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; color: var(--text); background: #fff; overflow-x: hidden; }
+
+/* NAV */
+nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 6%; height: 68px;
+    background: rgba(255,255,255,0.88); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(229,231,235,0.7); transition: box-shadow .2s;
+}
+nav.scrolled { box-shadow: 0 4px 24px rgba(41,98,255,.09); }
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-brand img { width: 36px; height: 36px; object-fit: contain; }
+.nav-brand span { font-size: 1.35rem; font-weight: 800; color: var(--blue); letter-spacing: -.5px; }
+.nav-links { display: flex; align-items: center; gap: 10px; }
+.nav-links a {
+    text-decoration: none; font-size: .88rem; font-weight: 500;
+    color: var(--sub); padding: 8px 16px; border-radius: 9px;
+    transition: color .18s, background .18s;
+}
+.nav-links a:hover { color: var(--text); background: var(--bg); }
+.nav-links .btn-primary { background: var(--blue); color: #fff !important; box-shadow: 0 3px 10px rgba(41,98,255,.28); }
+.nav-links .btn-primary:hover { background: var(--blue-dk); }
+
+/* HERO */
+.hero {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #0a2fa8 0%, #1e4fff 45%, #4d86ff 100%);
+    display: flex; align-items: center;
+    padding: 100px 6% 80px; position: relative; overflow: hidden;
+}
+.hero::before { content:''; position:absolute; width:600px; height:600px; border-radius:50%; background:rgba(255,255,255,.05); top:-200px; right:-100px; }
+.hero::after  { content:''; position:absolute; width:400px; height:400px; border-radius:50%; background:rgba(255,255,255,.04); bottom:-150px; left:-80px; }
+.hero-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:60px; width:100%; position:relative; z-index:1; }
+.hero-text { flex: 1; }
+.hero-badge {
+    display:inline-flex; align-items:center; gap:7px;
+    background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25);
+    color:#fff; font-size:.78rem; font-weight:600;
+    padding:6px 14px; border-radius:99px; margin-bottom:28px;
+    letter-spacing:.06em; text-transform:uppercase;
+}
+.hero-badge span { width:7px; height:7px; border-radius:50%; background:#4ade80; display:inline-block; }
+.hero h1 { font-size:clamp(2.4rem,5vw,3.8rem); font-weight:900; color:#fff; line-height:1.1; letter-spacing:-.03em; margin-bottom:22px; }
+.hero h1 em { font-style:normal; color:#93c5fd; }
+.hero-sub { font-size:1.1rem; color:rgba(255,255,255,.78); line-height:1.65; max-width:480px; margin-bottom:40px; }
+.hero-cta { display:flex; gap:14px; flex-wrap:wrap; }
+.btn-hero-main {
+    display:inline-flex; align-items:center; gap:8px;
+    background:#fff; color:var(--blue); font-size:.97rem; font-weight:700;
+    padding:14px 28px; border-radius:12px; text-decoration:none;
+    box-shadow:0 8px 28px rgba(0,0,0,.18); transition:transform .18s,box-shadow .18s;
+}
+.btn-hero-main:hover { transform:translateY(-2px); box-shadow:0 12px 36px rgba(0,0,0,.22); }
+.btn-hero-sec {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,.12); color:#fff;
+    border:1.5px solid rgba(255,255,255,.3);
+    font-size:.97rem; font-weight:600;
+    padding:14px 28px; border-radius:12px; text-decoration:none;
+    transition:background .18s,transform .18s;
+}
+.btn-hero-sec:hover { background:rgba(255,255,255,.2); transform:translateY(-2px); }
+.hero-visual { flex:0 0 420px; display:flex; align-items:center; justify-content:center; }
+.hero-card {
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2);
+    border-radius:24px; padding:32px; backdrop-filter:blur(12px); width:100%;
+    animation:float 4s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.hero-card-logo { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+.hero-card-logo img { width:44px; height:44px; }
+.hero-card-logo span { font-size:1.5rem; font-weight:800; color:#fff; }
+.hero-stats { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.hero-stat { background:rgba(255,255,255,.1); border-radius:14px; padding:16px; text-align:center; }
+.hero-stat-num { font-size:1.8rem; font-weight:800; color:#fff; }
+.hero-stat-lbl { font-size:.75rem; color:rgba(255,255,255,.65); margin-top:2px; }
+
+/* FEATURES */
+.features { padding:100px 6%; background:var(--bg); }
+.section-label { text-align:center; font-size:.78rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--blue); margin-bottom:12px; }
+.section-title { text-align:center; font-size:clamp(1.6rem,3vw,2.4rem); font-weight:800; color:var(--text); letter-spacing:-.03em; margin-bottom:14px; }
+.section-sub { text-align:center; font-size:1rem; color:var(--sub); max-width:500px; margin:0 auto 60px; line-height:1.65; }
+.features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; max-width:1100px; margin:0 auto; }
+.feat-card { background:#fff; border-radius:20px; padding:32px; border:1px solid var(--border); box-shadow:0 2px 12px rgba(0,0,0,.04); transition:transform .2s,box-shadow .2s; }
+.feat-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(41,98,255,.1); }
+.feat-icon { width:52px; height:52px; border-radius:14px; background:var(--blue-lt); display:flex; align-items:center; justify-content:center; margin-bottom:20px; font-size:1.5rem; }
+.feat-card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; }
+.feat-card p  { font-size:.88rem; color:var(--sub); line-height:1.6; }
+
+/* FOR WHO */
+.forwho { padding:100px 6%; background:#fff; }
+.forwho-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px; max-width:1100px; margin:0 auto; }
+.who-card { border-radius:20px; padding:36px 28px; display:flex; flex-direction:column; gap:14px; transition:transform .2s; }
+.who-card:hover { transform:translateY(-4px); }
+.who-card.blue   { background:linear-gradient(135deg,#2962FF,#1a50e8); color:#fff; }
+.who-card.indigo { background:linear-gradient(135deg,#4f46e5,#3730a3); color:#fff; }
+.who-card.teal   { background:linear-gradient(135deg,#0d9488,#0f766e); color:#fff; }
+.who-icon { font-size:2.2rem; }
+.who-card h3 { font-size:1.15rem; font-weight:700; }
+.who-card p  { font-size:.88rem; opacity:.82; line-height:1.6; }
+.who-link { margin-top:auto; display:inline-flex; align-items:center; gap:6px; font-size:.85rem; font-weight:600; color:rgba(255,255,255,.9); text-decoration:none; transition:gap .18s; }
+.who-link:hover { gap:10px; }
+
+/* CTA */
+.cta-section { padding:100px 6%; background:linear-gradient(135deg,#0a2fa8,#2962FF); text-align:center; }
+.cta-section h2 { font-size:clamp(1.8rem,3vw,2.6rem); font-weight:900; color:#fff; letter-spacing:-.03em; margin-bottom:16px; }
+.cta-section p { color:rgba(255,255,255,.78); font-size:1.05rem; margin-bottom:40px; }
+.cta-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+
+/* FOOTER */
+footer { background:#0f172a; color:rgba(255,255,255,.5); text-align:center; padding:28px 6%; font-size:.83rem; }
+footer strong { color:rgba(255,255,255,.8); }
+
+/* RESPONSIVE */
+@media (max-width:860px) {
+    .hero-inner { flex-direction:column; text-align:center; }
+    .hero-sub { max-width:100%; }
+    .hero-cta { justify-content:center; }
+    .hero-visual { flex:none; width:100%; max-width:360px; }
+    .nav-links a:not(.btn-primary) { display:none; }
+    .nav-links .btn-primary { display:flex; }
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <?php
-        $page_title  = 'Dashboard';
-        $active_page = 'dashboard';
-        $base_url    = '';
-        require_once __DIR__ . '/components/sidebar.php';
-        ?>
 
-        <!-- Contenido Principal -->
-        <main class="main-content" id="mainContent">
-            <!-- Header para escritorio -->
-            <header class="header">
-                <h2>Dashboard</h2>
-                <div class="header-notif-wrap">
-                    <button class="notification-bell" id="desktopNotifBtn" onclick="toggleNotifications()">
-                        <span class="material-icons">notifications_none</span>
-                    </button>
-                </div>
-            </header>
-
-            <section class="content">
-
-                <!-- Sección de Bienvenida -->
-                <div class="dashboard-welcome">
-                    <h1>Bienvenido, <?php echo $_SESSION['nombre']; ?> 👋</h1>
-                    <p>Aquí puedes ver un resumen del estado general de tu sistema de transporte</p>
-                </div>
-
-                <!-- Grid de Estadísticas -->
-                <div class="stats-grid">
-                    <?php
-                    $conn = $conexion;
-
-                    if ($conn->connect_error) {
-                        die("Error de conexión: " . $conn->connect_error);
-                    }
-
-                    $is_superadmin = ($_SESSION['rol'] == 1);
-                    $rfc_empresa_session = isset($_SESSION['rfc_empresa']) ? $_SESSION['rfc_empresa'] : '';
-                    
-                    if ($is_superadmin) {
-                        $sql = "SELECT 
-                                (SELECT COUNT(*) FROM empresas) AS total_empresas,
-                                (SELECT COUNT(*) FROM rutas) AS total_rutas,
-                                (SELECT COUNT(*) FROM vehiculos) AS total_vehiculos,
-                                (SELECT COUNT(*) FROM conductores) AS total_conductores,
-                                (SELECT COUNT(*) FROM horarios) AS total_horarios,
-                                (SELECT COUNT(*) FROM checadores) AS total_checadores";
-                    } else {
-                        // Filtro por empresa
-                        $sql = "SELECT 
-                                0 AS total_empresas,
-                                (SELECT COUNT(*) FROM rutas WHERE rfc_empresa = '$rfc_empresa_session') AS total_rutas,
-                                (SELECT COUNT(*) FROM vehiculos WHERE rfc_empresa = '$rfc_empresa_session') AS total_vehiculos,
-                                (SELECT COUNT(*) FROM conductores WHERE rfc_empresa = '$rfc_empresa_session') AS total_conductores,
-                                (SELECT COUNT(*) FROM horarios h JOIN rutas r ON h.id_ruta = r.id_ruta WHERE r.rfc_empresa = '$rfc_empresa_session') AS total_horarios,
-                                (SELECT COUNT(*) FROM checadores WHERE rfc_empresa = '$rfc_empresa_session') AS total_checadores";
-                    }
-                    
-                    $result = $conn->query($sql);
-                    $row = $result->fetch_assoc();
-                    ?>
-
-                    <!-- Tarjeta Empresas (Solo Súper Admin) -->
-                    <?php if ($is_superadmin): ?>
-                    <div class="stat-card">
-                        <div class="stat-card-icon empresas">
-                            <img src="assets/images/icons/icons8-empresa-dashboard-resumen.png" alt="Empresas">
-                        </div>
-                        <div class="stat-card-content">
-                            <h3>Empresas</h3>
-                            <p class="stat-number"><?php echo $row['total_empresas']; ?></p>
-                            <span class="stat-label">Registradas</span>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-
-                    <!-- Tarjeta Rutas -->
-                    <div class="stat-card">
-                        <div class="stat-card-icon rutas">
-                            <img src="assets/images/icons/icons8-ruta-dashboard-resumen.png" alt="Rutas">
-                        </div>
-                        <div class="stat-card-content">
-                            <h3>Rutas</h3>
-                            <p class="stat-number"><?php echo $row['total_rutas']; ?></p>
-                            <span class="stat-label">Activas</span>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta Vehículos -->
-                    <div class="stat-card">
-                        <div class="stat-card-icon vehiculos">
-                            <img src="assets/images/icons/icons8-vehiculo-dashboard-resumen.png" alt="Vehículos">
-                        </div>
-                        <div class="stat-card-content">
-                            <h3>Vehículos</h3>
-                            <p class="stat-number"><?php echo $row['total_vehiculos']; ?></p>
-                            <span class="stat-label">En operación</span>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta Conductores -->
-                    <div class="stat-card">
-                        <div class="stat-card-icon conductores">
-                            <img src="assets/images/icons/icons8-conductor-dashboard-resumen.png" alt="Conductores">
-                        </div>
-                        <div class="stat-card-content">
-                            <h3>Conductores</h3>
-                            <p class="stat-number"><?php echo $row['total_conductores']; ?></p>
-                            <span class="stat-label">Activos</span>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta Horarios -->
-                    <div class="stat-card">
-                        <div class="stat-card-icon horarios">
-                            <img src="assets/images/icons/icons8-horario-dashboard-resumen.png" alt="Horarios">
-                        </div>
-                        <div class="stat-card-content">
-                            <h3>Horarios</h3>
-                            <p class="stat-number"><?php echo $row['total_horarios']; ?></p>
-                            <span class="stat-label">Configurados</span>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta Checadores -->
-                    <div class="stat-card">
-                        <div class="stat-card-icon checadores">
-                            <img src="assets/images/icons/icons8-checador-dashboard-resumen.png" alt="Checadores">
-                        </div>
-                        <div class="stat-card-content">
-                            <h3>Checadores</h3>
-                            <p class="stat-number"><?php echo $row['total_checadores']; ?></p>
-                            <span class="stat-label">Registrados</span>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- KPI CHARTS SECTION -->
-                <div class="kpi-section-title">
-                    <h2>Indicadores de Rendimiento</h2>
-                    <span class="kpi-section-badge">KPI en Tiempo Real</span>
-                </div>
-
-                <!-- Fila 1: KPIs Esenciales -->
-                <div class="charts-grid-3">
-                    <!-- Estado de la Flota -->
-                    <div class="chart-card">
-                        <div class="chart-card-header" style="margin-bottom: 10px;">
-                            <div class="chart-card-title">
-                                <h4>Estado de la Flota</h4>
-                                <span>Veh&iacute;culos registrados</span>
-                            </div>
-                            <div class="chart-card-icon green">
-                                <span class="material-icons">directions_bus</span>
-                            </div>
-                        </div>
-                        <div id="flotaDonaStats" style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;justify-content:center;"></div>
-                        <canvas id="chartFlotaDona" height="140"></canvas>
-                    </div>
-
-                    <!-- Asignaciones -->
-                    <div class="chart-card">
-                        <div class="chart-card-header" style="margin-bottom: 10px;">
-                            <div class="chart-card-title">
-                                <h4>Asignaciones</h4>
-                                <span>&Uacute;ltimos 7 d&iacute;as</span>
-                            </div>
-                            <div class="chart-card-icon blue">
-                                <span class="material-icons">calendar_today</span>
-                            </div>
-                        </div>
-                        <canvas id="chartAsigDias" height="160"></canvas>
-                    </div>
-
-                    <!-- Estado de Reportes -->
-                    <div class="chart-card">
-                        <div class="chart-card-header" style="margin-bottom: 10px;">
-                            <div class="chart-card-title">
-                                <h4>Estado de Reportes</h4>
-                                <span>Sin archivar</span>
-                            </div>
-                            <div class="chart-card-icon purple">
-                                <span class="material-icons">fact_check</span>
-                            </div>
-                        </div>
-                        <canvas id="chartRepEstado" height="160"></canvas>
-                    </div>
-                </div> <!-- End charts-grid-3 -->
-
-                <!-- Sección de Acciones Rápidas -->
-                <div class="quick-actions">
-                    <h2>Acciones Rápidas</h2>
-                    <div class="actions-grid">
-                        <a href="pages/admin/rutas.php" class="action-btn">
-                            <img class="action-icon" src="assets/images/icons/icons8-rutas-dashboard.png" alt="Rutas">
-                            <span>Gestionar Rutas</span>
-                        </a>
-                        <a href="pages/admin/vehiculos.php" class="action-btn">
-                            <img class="action-icon" src="assets/images/icons/icons8-vehiculos-dashboard.png" alt="Vehículos">
-                            <span>Gestionar Vehículos</span>
-                        </a>
-                        <a href="pages/admin/conductores.php" class="action-btn">
-                            <img class="action-icon" src="assets/images/icons/icons8-conditores-dashboard.png" alt="Conductores">
-                            <span>Gestionar Conductores</span>
-                        </a>
-                        <a href="pages/admin/horarios.php" class="action-btn">
-                            <img class="action-icon" src="assets/images/icons/icons8-horario-dashboard.png" alt="Horarios">
-                            <span>Gestionar Horarios</span>
-                        </a>
-                        <a href="pages/admin/checadores.php" class="action-btn">
-                            <img class="action-icon" src="assets/images/icons/icons8-checadores-dashboard.png" alt="Checadores">
-                            <span>Gestionar Checadores</span>
-                        </a>
-                    </div>
-                </div>
-            </section>
-        </main>
+<nav id="mainNav">
+    <a href="index.php" class="nav-brand">
+        <img src="assets/images/logo_new.png" alt="GoWay">
+        <span>GoWay</span>
+    </a>
+    <div class="nav-links">
+        <a href="#features">Características</a>
+        <a href="#quien">Para quién</a>
+        <a href="pages/registro.php" style="color:var(--blue);font-weight:600;">Crear cuenta</a>
+        <a href="pages/login.php" class="btn-primary">Iniciar sesión</a>
     </div>
+</nav>
 
-    <!-- Integración del Panel Lateral de Notificaciones Compartido -->
-    <?php require_once __DIR__ . '/components/notifications_panel.php'; ?>
-
-    <!-- Modal para agregar nueva Empresa -->
-    <div class="modal-overlay" id="addRouteModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3>Agregar nueva empresa</h3>
-                <button class="modal-close" id="closeModal">&times;</button>
+<section class="hero" id="inicio">
+    <div class="hero-inner">
+        <div class="hero-text">
+            <div class="hero-badge">
+                <span></span> Sistema de Transporte Público
             </div>
-            <form id="routeForm" action="./controllers/insert_empresa.php" method="POST">
-                <div class="modal-body">
-                    <!-- Columna izquierda -->
-                    <div>
-                        <div class="modal-form-group">
-                            <label for="nombre">RFC de la Empresa</label>
-                            <input type="text" id="rfc_empresa" name="rfc_empresa" placeholder="" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label for="destino">Nombre de Empresa</label>
-                            <input type="text" id="nombre_empresa" name="nombre_empresa" placeholder="" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label for="destino">Direccion de Empresa</label>
-                            <input type="text" id="direccion_empresa" name="direccion_empresa" placeholder="" required>
-                        </div>
-                    </div>
-
-                    <!-- Columna derecha -->
-                    <div>
-                        <div class="modal-form-group">
-                            <label for="origen">Telefono</label>
-                            <input type="text" id="tel_empresa" name="tel_empresa" placeholder="" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label for="paradas">E-mail</label>
-                            <input type="email" id="email_empresa" name="email_empresa" placeholder=""></input>
-                        </div>
-                    </div>
+            <h1>Tu destino,<br><em>a un solo toque.</em></h1>
+            <p class="hero-sub">
+                GoWay conecta empresas de transporte, conductores y usuarios en una plataforma inteligente. Gestiona rutas, flotas y horarios en tiempo real.
+            </p>
+            <div class="hero-cta">
+                <a href="pages/login.php" class="btn-hero-main">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    Iniciar sesión
+                </a>
+                <a href="pages/registro.php" class="btn-hero-sec">
+                    Crear cuenta gratis
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-card">
+                <div class="hero-card-logo">
+                    <img src="assets/images/logo_new.png" alt="GoWay">
+                    <span>GoWay</span>
                 </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelModal">Cancelar</button>
-                    <button type="submit" class="modal-btn modal-btn-save">Guardar</button>
+                <div class="hero-stats">
+                    <div class="hero-stat"><div class="hero-stat-num">🚌</div><div class="hero-stat-lbl">Flotas</div></div>
+                    <div class="hero-stat"><div class="hero-stat-num">📍</div><div class="hero-stat-lbl">Rutas</div></div>
+                    <div class="hero-stat"><div class="hero-stat-num">🕐</div><div class="hero-stat-lbl">Horarios</div></div>
+                    <div class="hero-stat"><div class="hero-stat-num">📊</div><div class="hero-stat-lbl">KPIs</div></div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
+</section>
 
-    <script>
-        // Funciones para el men├║ hamburguesa
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            const toggleBtn = document.querySelector('.toggle-btn');
-            
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            
-            // Ocultar/mostrar botón hamburguesa con la X
-            if (sidebar.classList.contains('active')) {
-                toggleBtn.innerHTML = '&times;';
-                toggleBtn.style.fontSize = '36px';
-            } else {
-                toggleBtn.innerHTML = '&#9776;';
-                toggleBtn.style.fontSize = '';
-            }
-            
-            // Prevenir scroll del body cuando el men├║ est├í abierto
-            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
-        }
+<section class="features" id="features">
+    <p class="section-label">¿Por qué GoWay?</p>
+    <h2 class="section-title">Todo lo que necesitas en un solo lugar</h2>
+    <p class="section-sub">Una plataforma completa para gestionar el transporte público de manera eficiente y segura.</p>
+    <div class="features-grid">
+        <div class="feat-card"><div class="feat-icon">🗺️</div><h3>Gestión de Rutas</h3><p>Define, edita y monitorea todas tus rutas de transporte con paradas y destinos configurables.</p></div>
+        <div class="feat-card"><div class="feat-icon">🚌</div><h3>Control de Flota</h3><p>Administra tu flota de vehículos, conductores y asignaciones desde un panel centralizado.</p></div>
+        <div class="feat-card"><div class="feat-icon">🕐</div><h3>Horarios en Tiempo Real</h3><p>Configura y consulta horarios actualizados para cada ruta y vehículo de tu empresa.</p></div>
+        <div class="feat-card"><div class="feat-icon">📊</div><h3>KPIs e Indicadores</h3><p>Visualiza el rendimiento de tu operación con gráficos y estadísticas en tiempo real.</p></div>
+        <div class="feat-card"><div class="feat-icon">🔔</div><h3>Notificaciones</h3><p>Envía avisos instantáneos a tus usuarios y checadores sobre cambios en el servicio.</p></div>
+        <div class="feat-card"><div class="feat-icon">🔒</div><h3>Seguridad Avanzada</h3><p>Acceso multi-rol con contraseñas fuertes. Cada empresa gestiona sus propios datos de forma aislada.</p></div>
+    </div>
+</section>
 
-        function closeSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            const toggleBtn = document.querySelector('.toggle-btn');
-            
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            
-            // Mostrar bot├│n hamburguesa al cerrar
-            toggleBtn.style.opacity = '1';
-            toggleBtn.style.visibility = 'visible';
-            
-            document.body.style.overflow = '';
-        }
+<section class="forwho" id="quien">
+    <p class="section-label">Para quién es GoWay</p>
+    <h2 class="section-title">Una solución para cada rol</h2>
+    <p class="section-sub">Desde el administrador hasta el usuario final, GoWay tiene una experiencia diseñada para ti.</p>
+    <div class="forwho-grid">
+        <div class="who-card blue">
+            <div class="who-icon">🏢</div>
+            <h3>Empresas de Transporte</h3>
+            <p>Registra tu empresa, gestiona tu flota y mantén control total de rutas, conductores y horarios.</p>
+            <a href="pages/registro_empresa.php" class="who-link">Registrar empresa →</a>
+        </div>
+        <div class="who-card indigo">
+            <div class="who-icon">✅</div>
+            <h3>Checadores</h3>
+            <p>Reporta incidencias en tiempo real directamente desde la app móvil asignada por tu empresa.</p>
+            <a href="pages/login.php" class="who-link">Acceder →</a>
+        </div>
+        <div class="who-card teal">
+            <div class="who-icon">👤</div>
+            <h3>Usuarios</h3>
+            <p>Consulta rutas, horarios y favoritos desde la app GoWay. Recibe notificaciones de tu servicio.</p>
+            <a href="pages/registro.php" class="who-link">Crear cuenta →</a>
+        </div>
+    </div>
+</section>
 
-        // Cerrar sidebar al hacer clic en un enlace (en m├│vil)
-        document.querySelectorAll('.sidebar nav a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    closeSidebar();
-                }
-            });
-        });
+<section class="cta-section">
+    <h2>¿Listo para comenzar?</h2>
+    <p>Únete a GoWay y transforma la forma en que gestionas el transporte público.</p>
+    <div class="cta-btns">
+        <a href="pages/registro_empresa.php" class="btn-hero-main">Registrar mi empresa</a>
+        <a href="pages/login.php" class="btn-hero-sec">Iniciar sesión</a>
+    </div>
+</section>
 
-        // Cerrar sidebar con tecla ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeSidebar();
-            }
-        });
+<footer>
+    <p>&copy; <?php echo date('Y'); ?> <strong>GoWay</strong> — Sistema de Transporte Público. Todos los derechos reservados.</p>
+</footer>
 
-        // Ajustar en redimensionamiento de ventana
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                closeSidebar();
-            }
-        });
-    </script>
-
-    <script src="assets/js/notifications.js"></script>
-    <script src="assets/js/main.js"></script>
-
-    <?php require_once __DIR__ . '/components/logout_modal.php'; ?>
-
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-
-    <script>
-    // ═══════════════════════════════════════════
-    // PALETA GOWAY
-    // ═══════════════════════════════════════════
-    const GW = {
-        blue:   '#0660fe',
-        blue2:  '#3b82f6',
-        blue3:  '#93c5fd',
-        green:  '#10b981',
-        green2: '#34d399',
-        orange: '#f59e0b',
-        red:    '#ef4444',
-        red2:   '#fca5a5',
-        purple: '#8b5cf6',
-        gray:   '#e2e8f0',
-        text:   '#1a1c23',
-        sub:    '#94a3b8',
-    };
-
-    // Opciones base reutilizables
-    const baseFont = { family: "'Inter', system-ui, sans-serif", size: 12 };
-
-    const baseTooltip = {
-        backgroundColor: 'rgba(15,20,40,0.88)',
-        titleFont: { ...baseFont, weight: 700, size: 13 },
-        bodyFont: baseFont,
-        padding: 10,
-        cornerRadius: 8,
-        borderColor: 'rgba(255,255,255,0.08)',
-        borderWidth: 1,
-    };
-
-    const baseGrid = { color: 'rgba(0,0,0,0.05)', drawBorder: false };
-
-    function baseTick(color) {
-        return { color: GW.sub, font: baseFont };
-    }
-
-    // Helper: empty-state
-    function showEmpty(canvasId, msg) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        const parent = canvas.parentElement;
-        canvas.style.display = 'none';
-        const d = document.createElement('div');
-        d.className = 'chart-empty';
-        d.innerHTML = '<span class="material-icons">bar_chart</span><p>' + msg + '</p>';
-        parent.appendChild(d);
-    }
-
-    // ═══════════════════════════════════════════
-    // CARGAR KPIs Y RENDERIZAR TODOS LOS GRÁFICOS
-    // ═══════════════════════════════════════════
-    fetch('api/kpis_api.php')
-        .then(r => r.json())
-        .then(data => {
-            if (!data.success) return;
-            renderFlotaDona(data.flota_dona, data.kpi.vehiculos);
-            renderAsigDias(data.asig_dias);
-            renderRepEstado(data.rep_estados);
-        })
-        .catch(err => console.error('KPI API error:', err));
-
-    // ── 1. DONA: Estado de la flota ─────────────────────────────
-    function renderFlotaDona(flota, kpiVeh) {
-        // Mini stats
-        const statsDiv = document.getElementById('flotaDonaStats');
-        if (statsDiv && kpiVeh) {
-            statsDiv.innerHTML = `
-                <div class="chart-stat-item">
-                    <span class="stat-val" style="color:${GW.blue}">${kpiVeh.activos}</span>
-                    <span class="stat-lbl">Activos</span>
-                </div>
-                <div class="chart-stat-item">
-                    <span class="stat-val" style="color:${GW.red}">${kpiVeh.total - kpiVeh.activos}</span>
-                    <span class="stat-lbl">Inactivos</span>
-                </div>
-                <div class="chart-stat-item">
-                    <span class="stat-val">${kpiVeh.total}</span>
-                    <span class="stat-lbl">Total</span>
-                </div>`;
-        }
-
-        if (!flota.data || flota.data.every(v => v === 0)) {
-            showEmpty('chartFlotaDona', 'Sin datos de vehículos'); return;
-        }
-        new Chart(document.getElementById('chartFlotaDona'), {
-            type: 'doughnut',
-            data: {
-                labels: flota.labels,
-                datasets: [{
-                    data: flota.data,
-                    backgroundColor: [GW.blue, '#e2e8f0'],
-                    borderColor: ['#fff', '#fff'],
-                    borderWidth: 3,
-                    hoverOffset: 6,
-                }]
-            },
-            options: {
-                cutout: '72%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { font: baseFont, padding: 16, boxWidth: 12, color: GW.text } },
-                    tooltip: { ...baseTooltip, callbacks: {
-                        label: (ctx) => ` ${ctx.label}: ${ctx.parsed}`
-                    }}
-                }
-            }
-        });
-    }
-
-    // ── 2. BARRAS APILADAS: Asignaciones 7 días ─────────────────
-    function renderAsigDias(d) {
-        if (!d.labels || d.labels.length === 0) {
-            showEmpty('chartAsigDias', 'Sin asignaciones en los últimos 7 días'); return;
-        }
-        new Chart(document.getElementById('chartAsigDias'), {
-            type: 'bar',
-            data: {
-                labels: d.labels,
-                datasets: [
-                    { label: 'Completadas', data: d.completadas, backgroundColor: GW.green,  borderRadius: 4, stack: 'a' },
-                    { label: 'En Ruta',     data: d.en_ruta,     backgroundColor: GW.blue,   borderRadius: 4, stack: 'a' },
-                    { label: 'Programadas', data: d.programadas,  backgroundColor: GW.blue3,  borderRadius: 4, stack: 'a' },
-                    { label: 'Canceladas',  data: d.canceladas,   backgroundColor: GW.red2,   borderRadius: 4, stack: 'a' },
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { position: 'bottom', labels: { font: baseFont, padding: 14, boxWidth: 12, color: GW.text } },
-                    tooltip: { ...baseTooltip, mode: 'index', intersect: false }
-                },
-                scales: {
-                    x: { stacked: true, grid: { display: false }, ticks: baseTick() },
-                    y: { stacked: true, grid: baseGrid, ticks: { ...baseTick(), stepSize: 1 }, beginAtZero: true }
-                }
-            }
-        });
-    }
-
-
-    // ── 5. DONA: Estado de reportes ─────────────────────────────
-    function renderRepEstado(d) {
-        if (!d.labels || d.labels.length === 0) {
-            showEmpty('chartRepEstado', 'Sin reportes registrados'); return;
-        }
-        const colorMap = { 'Pendiente': GW.orange, 'En Proceso': GW.blue, 'Resuelto': GW.green };
-        const colors = d.labels.map(l => colorMap[l] || GW.gray);
-        new Chart(document.getElementById('chartRepEstado'), {
-            type: 'doughnut',
-            data: {
-                labels: d.labels,
-                datasets: [{
-                    data: d.data,
-                    backgroundColor: colors,
-                    borderColor: '#fff',
-                    borderWidth: 3,
-                    hoverOffset: 6,
-                }]
-            },
-            options: {
-                cutout: '68%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { font: baseFont, padding: 14, boxWidth: 12, color: GW.text } },
-                    tooltip: { ...baseTooltip }
-                }
-            }
-        });
-    }
-
-
-    </script>
+<script>
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 20);
+    });
+</script>
 </body>
 </html>

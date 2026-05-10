@@ -12,13 +12,13 @@
  *   '../../' para páginas admin → los links admin van como 'X.php' (misma carpeta)
  */
 
-$admin_prefix = ($base_url === '') ? 'pages/admin/' : '';
+$admin_prefix = ($base_url === '../../') ? '' : 'pages/admin/';
 $logout_url   = $base_url . 'pages/logout.php';
 
 // Categorías de navegación: [Categoría => [slug => [label, icon_file, href]]]
 $nav_categories = [
     'Principal' => [
-        'dashboard'   => ['label' => 'Dashboard',   'icon' => 'icon_dashboard.png',   'href' => $base_url . 'index.php']
+        'dashboard'   => ['label' => 'Dashboard',   'icon' => 'icon_dashboard.png',   'href' => $admin_prefix . 'dashboard.php']
     ]
 ];
 

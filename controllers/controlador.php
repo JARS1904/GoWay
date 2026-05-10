@@ -88,7 +88,7 @@ if (isset($_POST['btnadmin'])) {
                 $_SESSION['rol']    = 1; // Superadmin
                 $_SESSION['rfc_empresa'] = null; // Superadmin ve todo
                 
-                header("Location: ../index.php");
+                header("Location: ../pages/admin/dashboard.php");
                 exit();
             }
         }
@@ -111,7 +111,7 @@ if (isset($_POST['btnadmin'])) {
                 $_SESSION['rol']    = 4; // Empresa
                 $_SESSION['rfc_empresa'] = $empresa['rfc_empresa'];
                 
-                header("Location: ../index.php");
+                header("Location: ../pages/admin/dashboard.php");
                 exit();
             } else {
                 $_SESSION['admin_error_message'] = "⚠️ Usuario o contraseña incorrectos";
