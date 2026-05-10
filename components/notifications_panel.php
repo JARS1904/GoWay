@@ -246,7 +246,7 @@ function applyFilters(search, type) {
 <div class="notifications-overlay" id="notificationsOverlay" onclick="toggleNotifications()"></div>
 
 <!-- Modal para agregar nueva notificación -->
-<?php if ($is_admin): ?>
+<?php if ($can_send): ?>
 <div class="modal-overlay" id="addNotificationModal">
     <div class="modal-container">
         <div class="modal-header">
@@ -274,10 +274,11 @@ function applyFilters(search, type) {
                     </div>
                     <?php if ($is_empresa): ?>
                     <div class="modal-form-group">
-                        <p style="font-size:.85rem; color:#6B7280; background:#F3F4F6; border-radius:8px; padding:10px 12px; margin:0;">
-                            <strong>📢 Tus suscriptores</strong><br>
-                            Esta notificación llegará a todos los usuarios que tienen alguna de tus rutas en favoritos.
-                        </p>
+                        <label>Destinatario</label>
+                        <select name="destinatario_empresa" required>
+                            <option value="favoritos">Usuarios con rutas en favoritos</option>
+                            <option value="checadores">Checadores de la empresa</option>
+                        </select>
                     </div>
                     <?php endif; ?>
                     <div class="modal-form-group">

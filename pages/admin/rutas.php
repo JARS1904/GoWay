@@ -1,4 +1,4 @@
-<!--Se agreo para el manejo de sesión-->
+﻿<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -43,6 +43,32 @@ require_once '../../config/sync_session_foto.php';
             </header>
 
             <section class="content">
+    <!-- KPI Dashboard Section -->
+    <div class="kpi-section-title" style="margin-top:0;">
+        <h2>Indicadores Operativos</h2>
+        <span class="kpi-section-badge">Gestión de Rutas</span>
+    </div>
+    
+    <div class="stats-grid" id="rutasStatsGrid" style="display:none; margin-bottom:20px;">
+        <!-- Filled via JS -->
+    </div>
+
+    <div class="charts-grid" id="rutasChartsGrid" style="display:none; grid-template-columns: 1fr 2fr;">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <div class="chart-card-title"><h4>Estado de Rutas</h4><span>Activas vs Inactivas</span></div>
+                <div class="chart-card-icon blue"><span class="material-icons">route</span></div>
+            </div>
+            <canvas id="chartEstadoRutas" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <div class="chart-card-title"><h4>Top Rutas</h4><span>Con más paradas asignadas</span></div>
+                <div class="chart-card-icon green"><span class="material-icons">place</span></div>
+            </div>
+            <canvas id="chartTopParadas" height="160"></canvas>
+        </div>
+    </div>
                 <div class="section-header">
                     <h3>Lista de Rutas</h3>
                     <button class="btn-add">+ Agregar nueva ruta</button>
@@ -377,5 +403,37 @@ require_once '../../config/sync_session_foto.php';
     <script src="../../assets/js/pagination.js"></script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
     <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const GW = { blue:'#0660fe', green:'#10b981', orange:'#f59e0b', red:'#ef4444', text:'#1a1c23', gray:'#e2e8f0', sub:'#94a3b8' };
+    const baseOpt = { plugins: { legend: { position: 'bottom', labels: {font:{family:"'Inter',sans-serif", size:12}} } } };
+
+    fetch('../../api/kpis_api.php?seccion=rutas').then(r=>r.json()).then(data => {
+        if(!data.success) return;
+        
+        // 1. Render Stats
+        document.getElementById('rutasStatsGrid').style.display = 'grid';
+        document.getElementById('rutasStatsGrid').innerHTML = `
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">route</span></div><div class="stat-card-content"><h3>Rutas Activas</h3><p class="stat-number">${data.kpi.activas}</p><span class="stat-label">De ${data.kpi.total} totales</span></div></div>
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">place</span></div><div class="stat-card-content"><h3>Paradas Totales</h3><p class="stat-number">${data.kpi.paradas}</p><span class="stat-label">En el sistema</span></div></div>
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#f59e0b;">loop</span></div><div class="stat-card-content"><h3>Rutas con Retorno</h3><p class="stat-number">${data.kpi.con_retorno}</p><span class="stat-label">Configuradas</span></div></div>
+        `;
+
+        // 2. Render Charts
+        document.getElementById('rutasChartsGrid').style.display = 'grid';
+        if(data.estado_rutas && data.estado_rutas.data.some(v=>v>0)) {
+            new Chart(document.getElementById('chartEstadoRutas'), {
+                type: 'doughnut', data: { labels: data.estado_rutas.labels, datasets: [{ data: data.estado_rutas.data, backgroundColor: [GW.blue, GW.gray] }] }, options: {...baseOpt, cutout: '70%'}
+            });
+        }
+        if(data.top_paradas && data.top_paradas.data.length > 0) {
+            new Chart(document.getElementById('chartTopParadas'), {
+                type: 'bar', data: { labels: data.top_paradas.labels.map(l=>l.substring(0,20)), datasets: [{ label:'Paradas', data: data.top_paradas.data, backgroundColor: GW.green, borderRadius:4 }] }, options: { indexAxis: 'y', plugins:{legend:{display:false}} }
+            });
+        }
+    });
+});
+</script>
 </body>
 </html>

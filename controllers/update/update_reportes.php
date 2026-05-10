@@ -57,13 +57,13 @@ try {
     $check_stmt->close();
 
     // Actualizar
-    $sql = 'UPDATE reportes SET id_vehiculo = ?, rfc_conductor = ?, id_ruta = ?, tipo_incidente = ?, fecha_incidente = ?, descripcion = ?, gravedad = ?, estado = ?, id_usuario = ? WHERE id = ?';
+    $sql = 'UPDATE reportes SET id_vehiculo = ?, rfc_conductor = ?, id_ruta = ?, tipo_incidente = ?, fecha_incidente = ?, descripcion = ?, gravedad = ?, estado = ? WHERE id = ?';
     $stmt = $conexion->prepare($sql);
     if (!$stmt) {
         echo json_encode(['success' => false, 'message' => 'Error preparando actualización: ' . $conexion->error]);
         exit;
     }
-    $stmt->bind_param('isssssssii',
+    $stmt->bind_param('isssssssi',
         $id_vehiculo,
         $rfc_conductor,
         $id_ruta,
@@ -72,7 +72,6 @@ try {
         $descripcion,
         $gravedad,
         $estado,
-        $id_usuario,
         $id
     );
 

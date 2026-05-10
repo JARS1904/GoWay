@@ -1,4 +1,4 @@
-<!--Se agreo para el manejo de sesión-->
+﻿<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -43,6 +43,30 @@ require_once '../../config/sync_session_foto.php';
             </header>
 
             <section class="content">
+    <!-- KPI Dashboard Section -->
+    <div class="kpi-section-title" style="margin-top:0;">
+        <h2>Indicadores Operativos</h2>
+        <span class="kpi-section-badge">Flota de Vehículos</span>
+    </div>
+    
+    <div class="stats-grid" id="vehiculosStatsGrid" style="display:none; margin-bottom:20px;"></div>
+
+    <div class="charts-grid" id="vehiculosChartsGrid" style="display:none; grid-template-columns: 1fr 2fr;">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <div class="chart-card-title"><h4>Estado del Parque</h4><span>Disponibilidad actual</span></div>
+                <div class="chart-card-icon green"><span class="material-icons">directions_bus</span></div>
+            </div>
+            <canvas id="chartEstadoVehiculos" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <div class="chart-card-title"><h4>Antigüedad y Modelos</h4><span>Distribución de la flota</span></div>
+                <div class="chart-card-icon orange"><span class="material-icons">commute</span></div>
+            </div>
+            <canvas id="chartModelos" height="160"></canvas>
+        </div>
+    </div>
                 <div class="section-header">
                     <h3>Lista de Vehículos</h3>
                     <button class="btn-add">+ Agregar nuevo vehículo</button>
@@ -288,5 +312,31 @@ require_once '../../config/sync_session_foto.php';
     <script src="../../assets/js/pagination.js"></script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
     <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const GW = { blue:'#0660fe', green:'#10b981', orange:'#f59e0b', red:'#ef4444', text:'#1a1c23', gray:'#e2e8f0' };
+    fetch('../../api/kpis_api.php?seccion=vehiculos').then(r=>r.json()).then(data => {
+        if(!data.success) return;
+        document.getElementById('vehiculosStatsGrid').style.display = 'grid';
+        document.getElementById('vehiculosStatsGrid').innerHTML = `
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">directions_bus</span></div><div class="stat-card-content"><h3>Total Flota</h3><p class="stat-number">${data.kpi.total}</p><span class="stat-label">Registrados</span></div></div>
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">check_circle</span></div><div class="stat-card-content"><h3>Disponibilidad</h3><p class="stat-number">${data.kpi.disp}%</p><span class="stat-label">Activos</span></div></div>
+            
+        `;
+        document.getElementById('vehiculosChartsGrid').style.display = 'grid';
+        if(data.estado_vehiculos && data.estado_vehiculos.data.some(v=>v>0)) {
+            new Chart(document.getElementById('chartEstadoVehiculos'), {
+                type: 'doughnut', data: { labels: data.estado_vehiculos.labels, datasets: [{ data: data.estado_vehiculos.data, backgroundColor: [GW.green, GW.orange] }] }, options: {plugins: {legend: {position: 'bottom'}}, cutout: '70%'}
+            });
+        }
+        if(data.modelos && data.modelos.data.length > 0) {
+            new Chart(document.getElementById('chartModelos'), {
+                type: 'bar', data: { labels: data.modelos.labels, datasets: [{ label:'Unidades', data: data.modelos.data, backgroundColor: GW.blue, borderRadius:4 }] }, options: { plugins:{legend:{display:false}} }
+            });
+        }
+    });
+});
+</script>
 </body>
 </html>

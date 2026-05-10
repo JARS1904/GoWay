@@ -155,16 +155,18 @@ require_once '../../config/conexion_bd.php';
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Abrir Modal
-        document.getElementById('openAddModal').addEventListener('click', function() {
-            document.getElementById('addNotificationModal').classList.add('active');
-        });
-
-        // Cerrar Modal
-        const closeModalFn = () => document.getElementById('addNotificationModal').classList.remove('active');
-        document.getElementById('closeAddModal').addEventListener('click', closeModalFn);
-        document.getElementById('cancelAddModal').addEventListener('click', closeModalFn);
-
-        // Envío AJAX manejado globalmente por notifications_panel.php
+        const openBtn = document.getElementById('openAddModal');
+        if (openBtn) {
+            openBtn.addEventListener('click', function() {
+                const modal = document.getElementById('addNotificationModal');
+                if (modal) {
+                    modal.classList.add('active');
+                } else {
+                    console.error('El modal de notificaciones no existe en el DOM.');
+                }
+            });
+        }
+        // Envío AJAX y cierre manejado globalmente por notifications_panel.php
     });
     </script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>

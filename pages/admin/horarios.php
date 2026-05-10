@@ -1,4 +1,4 @@
-<!--Se agreo para el manejo de sesión-->
+﻿<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -41,6 +41,30 @@ require_once '../../config/sync_session_foto.php';
             </header>
 
             <section class="content">
+    <!-- KPI Dashboard Section -->
+    <div class="kpi-section-title" style="margin-top:0;">
+        <h2>Indicadores Operativos</h2>
+        <span class="kpi-section-badge">Horarios y Frecuencias</span>
+    </div>
+    
+    <div class="stats-grid" id="horariosStatsGrid" style="display:none; margin-bottom:20px;"></div>
+
+    <div class="charts-grid" id="horariosChartsGrid" style="display:none; grid-template-columns: 1fr 1fr;">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <div class="chart-card-title"><h4>Bandas Horarias</h4><span>Distribución por franja del día</span></div>
+                <div class="chart-card-icon purple"><span class="material-icons">schedule</span></div>
+            </div>
+            <canvas id="chartFranjas" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <div class="chart-card-title"><h4>Tipos de Día</h4><span>Configuraciones activas</span></div>
+                <div class="chart-card-icon blue"><span class="material-icons">event</span></div>
+            </div>
+            <canvas id="chartTipoDia" height="160"></canvas>
+        </div>
+    </div>
                 <div class="section-header">
                     <h3>Horarios Disponibles</h3>
                     <button class="btn-add">+ Agregar nuevo horario</button>
@@ -294,5 +318,31 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
     <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const GW = { blue:'#0660fe', green:'#10b981', orange:'#f59e0b', purple:'#8b5cf6', red:'#ef4444' };
+    fetch('../../api/kpis_api.php?seccion=horarios').then(r=>r.json()).then(data => {
+        if(!data.success) return;
+        document.getElementById('horariosStatsGrid').style.display = 'grid';
+        document.getElementById('horariosStatsGrid').innerHTML = `
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">schedule</span></div><div class="stat-card-content"><h3>Servicios Diarios</h3><p class="stat-number">${data.kpi.total}</p><span class="stat-label">Registrados</span></div></div>
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">route</span></div><div class="stat-card-content"><h3>Rutas Cubiertas</h3><p class="stat-number">${data.kpi.rutas_cubiertas}</p><span class="stat-label">Con horario asignado</span></div></div>
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#8b5cf6;">av_timer</span></div><div class="stat-card-content"><h3>Con Frecuencia</h3><p class="stat-number">${data.kpi.con_frecuencia}</p><span class="stat-label">Definida</span></div></div>
+        `;
+        document.getElementById('horariosChartsGrid').style.display = 'grid';
+        if(data.franjas && data.franjas.data.some(v=>v>0)) {
+            new Chart(document.getElementById('chartFranjas'), {
+                type: 'pie', data: { labels: data.franjas.labels, datasets: [{ data: data.franjas.data, backgroundColor: [GW.purple, GW.orange, GW.green, GW.blue] }] }, options: {plugins: {legend: {position: 'bottom'}}}
+            });
+        }
+        if(data.tipo_dia && data.tipo_dia.data.length > 0) {
+            new Chart(document.getElementById('chartTipoDia'), {
+                type: 'bar', data: { labels: data.tipo_dia.labels, datasets: [{ label:'Horarios', data: data.tipo_dia.data, backgroundColor: GW.blue, borderRadius:4 }] }, options: { plugins:{legend:{display:false}} }
+            });
+        }
+    });
+});
+</script>
 </body>
 </html>

@@ -1,4 +1,3 @@
-<!--Se agreo para el manejo de sesi├│n-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -11,16 +10,14 @@ require_once 'config/sync_session_foto.php';
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Transporte Público</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="icon" href="assets/images/logo_new.png" type="image/png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-
 <body>
     <div class="container">
         <?php
@@ -43,19 +40,20 @@ require_once 'config/sync_session_foto.php';
             </header>
 
             <section class="content">
-                <!-- Secci├│n de Bienvenida -->
+
+                <!-- Sección de Bienvenida -->
                 <div class="dashboard-welcome">
                     <h1>Bienvenido, <?php echo $_SESSION['nombre']; ?> 👋</h1>
                     <p>Aquí puedes ver un resumen del estado general de tu sistema de transporte</p>
                 </div>
 
-                <!-- Grid de Estad├¡sticas -->
+                <!-- Grid de Estadísticas -->
                 <div class="stats-grid">
                     <?php
                     $conn = $conexion;
 
                     if ($conn->connect_error) {
-                        die("Error de conexi├│n: " . $conn->connect_error);
+                        die("Error de conexión: " . $conn->connect_error);
                     }
 
                     $is_superadmin = ($_SESSION['rol'] == 1);
@@ -110,10 +108,10 @@ require_once 'config/sync_session_foto.php';
                         </div>
                     </div>
 
-                    <!-- Tarjeta Veh├¡culos -->
+                    <!-- Tarjeta Vehículos -->
                     <div class="stat-card">
                         <div class="stat-card-icon vehiculos">
-                            <img src="assets/images/icons/icons8-vehiculo-dashboard-resumen.png" alt="Veh├¡culos">
+                            <img src="assets/images/icons/icons8-vehiculo-dashboard-resumen.png" alt="Vehículos">
                         </div>
                         <div class="stat-card-content">
                             <h3>Vehículos</h3>
@@ -159,7 +157,60 @@ require_once 'config/sync_session_foto.php';
                     </div>
                 </div>
 
-                <!-- Secci├│n de Acciones R├ípidas -->
+
+                <!-- KPI CHARTS SECTION -->
+                <div class="kpi-section-title">
+                    <h2>Indicadores de Rendimiento</h2>
+                    <span class="kpi-section-badge">KPI en Tiempo Real</span>
+                </div>
+
+                <!-- Fila 1: KPIs Esenciales -->
+                <div class="charts-grid-3">
+                    <!-- Estado de la Flota -->
+                    <div class="chart-card">
+                        <div class="chart-card-header" style="margin-bottom: 10px;">
+                            <div class="chart-card-title">
+                                <h4>Estado de la Flota</h4>
+                                <span>Veh&iacute;culos registrados</span>
+                            </div>
+                            <div class="chart-card-icon green">
+                                <span class="material-icons">directions_bus</span>
+                            </div>
+                        </div>
+                        <div id="flotaDonaStats" style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;justify-content:center;"></div>
+                        <canvas id="chartFlotaDona" height="140"></canvas>
+                    </div>
+
+                    <!-- Asignaciones -->
+                    <div class="chart-card">
+                        <div class="chart-card-header" style="margin-bottom: 10px;">
+                            <div class="chart-card-title">
+                                <h4>Asignaciones</h4>
+                                <span>&Uacute;ltimos 7 d&iacute;as</span>
+                            </div>
+                            <div class="chart-card-icon blue">
+                                <span class="material-icons">calendar_today</span>
+                            </div>
+                        </div>
+                        <canvas id="chartAsigDias" height="160"></canvas>
+                    </div>
+
+                    <!-- Estado de Reportes -->
+                    <div class="chart-card">
+                        <div class="chart-card-header" style="margin-bottom: 10px;">
+                            <div class="chart-card-title">
+                                <h4>Estado de Reportes</h4>
+                                <span>Sin archivar</span>
+                            </div>
+                            <div class="chart-card-icon purple">
+                                <span class="material-icons">fact_check</span>
+                            </div>
+                        </div>
+                        <canvas id="chartRepEstado" height="160"></canvas>
+                    </div>
+                </div> <!-- End charts-grid-3 -->
+
+                <!-- Sección de Acciones Rápidas -->
                 <div class="quick-actions">
                     <h2>Acciones Rápidas</h2>
                     <div class="actions-grid">
@@ -168,7 +219,7 @@ require_once 'config/sync_session_foto.php';
                             <span>Gestionar Rutas</span>
                         </a>
                         <a href="pages/admin/vehiculos.php" class="action-btn">
-                            <img class="action-icon" src="assets/images/icons/icons8-vehiculos-dashboard.png" alt="Veh├¡culos">
+                            <img class="action-icon" src="assets/images/icons/icons8-vehiculos-dashboard.png" alt="Vehículos">
                             <span>Gestionar Vehículos</span>
                         </a>
                         <a href="pages/admin/conductores.php" class="action-btn">
@@ -191,59 +242,6 @@ require_once 'config/sync_session_foto.php';
 
     <!-- Integración del Panel Lateral de Notificaciones Compartido -->
     <?php require_once __DIR__ . '/components/notifications_panel.php'; ?>
-
-    <!-- Modal para agregar nueva notificación -->
-    <div class="modal-overlay" id="addNotificationModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3>Enviar Notificación</h3>
-                <button class="modal-close" id="closeAddNotifModal">&times;</button>
-            </div>
-            <form id="notificationForm" action="controllers/insert_notificacion.php" method="POST">
-                <div class="modal-body">
-                    <div>
-                        <div class="modal-form-group">
-                            <label>Destinatario (Usuario)</label>
-                            <select name="id_usuario" required>
-                                <option value="todos">Todos los usuarios (Global)</option>
-                                <?php
-                                $res_usuarios = $conn->query("SELECT id, nombre, email FROM usuarios ORDER BY nombre ASC");
-                                if ($res_usuarios) {
-                                    while ($u_row = $res_usuarios->fetch_assoc()) {
-                                        echo "<option value='{$u_row['id']}'>" . htmlspecialchars($u_row['nombre']) . " ({$u_row['email']})</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="modal-form-group">
-                            <label>Tipo de Mensaje</label>
-                            <select name="tipo" required>
-                                <option value="Alerta">Alerta de Seguridad</option>
-                                <option value="Cierre">Cierre Vial</option>
-                                <option value="Trafico">Tráfico Pesado</option>
-                                <option value="General" selected>Aviso General</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="modal-form-group">
-                            <label>Título de la Notificación</label>
-                            <input type="text" name="titulo" placeholder="Ej. Accidente en el centro" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label>Mensaje / Detalles</label>
-                            <textarea name="mensaje" rows="4" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc" placeholder="Escribe aquí las instrucciones para los usuarios..." required></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelAddNotifModal">Cancelar</button>
-                    <button type="submit" class="modal-btn modal-btn-save">Enviar Notificación ¡Ahora!</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- Modal para agregar nueva Empresa -->
     <div class="modal-overlay" id="addRouteModal">
@@ -357,5 +355,182 @@ require_once 'config/sync_session_foto.php';
     <script src="assets/js/main.js"></script>
 
     <?php require_once __DIR__ . '/components/logout_modal.php'; ?>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+    <script>
+    // ═══════════════════════════════════════════
+    // PALETA GOWAY
+    // ═══════════════════════════════════════════
+    const GW = {
+        blue:   '#0660fe',
+        blue2:  '#3b82f6',
+        blue3:  '#93c5fd',
+        green:  '#10b981',
+        green2: '#34d399',
+        orange: '#f59e0b',
+        red:    '#ef4444',
+        red2:   '#fca5a5',
+        purple: '#8b5cf6',
+        gray:   '#e2e8f0',
+        text:   '#1a1c23',
+        sub:    '#94a3b8',
+    };
+
+    // Opciones base reutilizables
+    const baseFont = { family: "'Inter', system-ui, sans-serif", size: 12 };
+
+    const baseTooltip = {
+        backgroundColor: 'rgba(15,20,40,0.88)',
+        titleFont: { ...baseFont, weight: 700, size: 13 },
+        bodyFont: baseFont,
+        padding: 10,
+        cornerRadius: 8,
+        borderColor: 'rgba(255,255,255,0.08)',
+        borderWidth: 1,
+    };
+
+    const baseGrid = { color: 'rgba(0,0,0,0.05)', drawBorder: false };
+
+    function baseTick(color) {
+        return { color: GW.sub, font: baseFont };
+    }
+
+    // Helper: empty-state
+    function showEmpty(canvasId, msg) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const parent = canvas.parentElement;
+        canvas.style.display = 'none';
+        const d = document.createElement('div');
+        d.className = 'chart-empty';
+        d.innerHTML = '<span class="material-icons">bar_chart</span><p>' + msg + '</p>';
+        parent.appendChild(d);
+    }
+
+    // ═══════════════════════════════════════════
+    // CARGAR KPIs Y RENDERIZAR TODOS LOS GRÁFICOS
+    // ═══════════════════════════════════════════
+    fetch('api/kpis_api.php')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) return;
+            renderFlotaDona(data.flota_dona, data.kpi.vehiculos);
+            renderAsigDias(data.asig_dias);
+            renderRepEstado(data.rep_estados);
+        })
+        .catch(err => console.error('KPI API error:', err));
+
+    // ── 1. DONA: Estado de la flota ─────────────────────────────
+    function renderFlotaDona(flota, kpiVeh) {
+        // Mini stats
+        const statsDiv = document.getElementById('flotaDonaStats');
+        if (statsDiv && kpiVeh) {
+            statsDiv.innerHTML = `
+                <div class="chart-stat-item">
+                    <span class="stat-val" style="color:${GW.blue}">${kpiVeh.activos}</span>
+                    <span class="stat-lbl">Activos</span>
+                </div>
+                <div class="chart-stat-item">
+                    <span class="stat-val" style="color:${GW.red}">${kpiVeh.total - kpiVeh.activos}</span>
+                    <span class="stat-lbl">Inactivos</span>
+                </div>
+                <div class="chart-stat-item">
+                    <span class="stat-val">${kpiVeh.total}</span>
+                    <span class="stat-lbl">Total</span>
+                </div>`;
+        }
+
+        if (!flota.data || flota.data.every(v => v === 0)) {
+            showEmpty('chartFlotaDona', 'Sin datos de vehículos'); return;
+        }
+        new Chart(document.getElementById('chartFlotaDona'), {
+            type: 'doughnut',
+            data: {
+                labels: flota.labels,
+                datasets: [{
+                    data: flota.data,
+                    backgroundColor: [GW.blue, '#e2e8f0'],
+                    borderColor: ['#fff', '#fff'],
+                    borderWidth: 3,
+                    hoverOffset: 6,
+                }]
+            },
+            options: {
+                cutout: '72%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: baseFont, padding: 16, boxWidth: 12, color: GW.text } },
+                    tooltip: { ...baseTooltip, callbacks: {
+                        label: (ctx) => ` ${ctx.label}: ${ctx.parsed}`
+                    }}
+                }
+            }
+        });
+    }
+
+    // ── 2. BARRAS APILADAS: Asignaciones 7 días ─────────────────
+    function renderAsigDias(d) {
+        if (!d.labels || d.labels.length === 0) {
+            showEmpty('chartAsigDias', 'Sin asignaciones en los últimos 7 días'); return;
+        }
+        new Chart(document.getElementById('chartAsigDias'), {
+            type: 'bar',
+            data: {
+                labels: d.labels,
+                datasets: [
+                    { label: 'Completadas', data: d.completadas, backgroundColor: GW.green,  borderRadius: 4, stack: 'a' },
+                    { label: 'En Ruta',     data: d.en_ruta,     backgroundColor: GW.blue,   borderRadius: 4, stack: 'a' },
+                    { label: 'Programadas', data: d.programadas,  backgroundColor: GW.blue3,  borderRadius: 4, stack: 'a' },
+                    { label: 'Canceladas',  data: d.canceladas,   backgroundColor: GW.red2,   borderRadius: 4, stack: 'a' },
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: baseFont, padding: 14, boxWidth: 12, color: GW.text } },
+                    tooltip: { ...baseTooltip, mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false }, ticks: baseTick() },
+                    y: { stacked: true, grid: baseGrid, ticks: { ...baseTick(), stepSize: 1 }, beginAtZero: true }
+                }
+            }
+        });
+    }
+
+
+    // ── 5. DONA: Estado de reportes ─────────────────────────────
+    function renderRepEstado(d) {
+        if (!d.labels || d.labels.length === 0) {
+            showEmpty('chartRepEstado', 'Sin reportes registrados'); return;
+        }
+        const colorMap = { 'Pendiente': GW.orange, 'En Proceso': GW.blue, 'Resuelto': GW.green };
+        const colors = d.labels.map(l => colorMap[l] || GW.gray);
+        new Chart(document.getElementById('chartRepEstado'), {
+            type: 'doughnut',
+            data: {
+                labels: d.labels,
+                datasets: [{
+                    data: d.data,
+                    backgroundColor: colors,
+                    borderColor: '#fff',
+                    borderWidth: 3,
+                    hoverOffset: 6,
+                }]
+            },
+            options: {
+                cutout: '68%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: baseFont, padding: 14, boxWidth: 12, color: GW.text } },
+                    tooltip: { ...baseTooltip }
+                }
+            }
+        });
+    }
+
+
+    </script>
 </body>
 </html>

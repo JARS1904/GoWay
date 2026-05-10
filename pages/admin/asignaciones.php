@@ -1,4 +1,4 @@
-<!--Se agreo para el manejo de sesión-->
+﻿<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -44,6 +44,30 @@ require_once '../../config/sync_session_foto.php';
             </header>
 
             <section class="content">
+    <!-- KPI Dashboard Section -->
+    <div class="kpi-section-title" style="margin-top:0;">
+        <h2>Indicadores Operativos</h2>
+        <span class="kpi-section-badge">Asignaciones Operativas</span>
+    </div>
+    
+    <div class="stats-grid" id="asignacionesStatsGrid" style="display:none; margin-bottom:20px;"></div>
+
+    <div class="charts-grid" id="asignacionesChartsGrid" style="display:none; grid-template-columns: 1fr 2fr;">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <div class="chart-card-title"><h4>Estado Operativo</h4><span>Total Histórico</span></div>
+                <div class="chart-card-icon orange"><span class="material-icons">assignment</span></div>
+            </div>
+            <canvas id="chartEstadoHoy" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <div class="chart-card-title"><h4>Carga de Conductores</h4><span>Top 5 en los últimos 7 días</span></div>
+                <div class="chart-card-icon blue"><span class="material-icons">badge</span></div>
+            </div>
+            <canvas id="chartConductores" height="160"></canvas>
+        </div>
+    </div>
                 <div class="section-header">
                     <h3>Lista de Asignaciones</h3>
                     <button class="btn-add">+ Agregar nueva asignación</button>
@@ -442,5 +466,31 @@ require_once '../../config/sync_session_foto.php';
     </script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
     <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const GW = { blue:'#0660fe', green:'#10b981', orange:'#f59e0b', red:'#ef4444', gray:'#e2e8f0', purple:'#8b5cf6' };
+    fetch('../../api/kpis_api.php?seccion=asignaciones').then(r=>r.json()).then(data => {
+        if(!data.success) return;
+        document.getElementById('asignacionesStatsGrid').style.display = 'grid';
+        document.getElementById('asignacionesStatsGrid').innerHTML = `
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">assignment</span></div><div class="stat-card-content"><h3>Total Asignaciones</h3><p class="stat-number">${data.kpi.hoy_total}</p><span class="stat-label">Registradas</span></div></div>
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">check_circle</span></div><div class="stat-card-content"><h3>Turnos Cubiertos</h3><p class="stat-number">${data.kpi.porcentaje}%</p><span class="stat-label">${data.kpi.hoy_completadas} completados</span></div></div>
+            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#ef4444;">warning</span></div><div class="stat-card-content"><h3>Conflictos</h3><p class="stat-number">${data.kpi.hoy_conflictivas}</p><span class="stat-label">Canceladas/Retrasadas</span></div></div>
+        `;
+        document.getElementById('asignacionesChartsGrid').style.display = 'grid';
+        if(data.estado_hoy && data.estado_hoy.data.some(v=>v>0)) {
+            new Chart(document.getElementById('chartEstadoHoy'), {
+                type: 'doughnut', data: { labels: data.estado_hoy.labels, datasets: [{ data: data.estado_hoy.data, backgroundColor: [GW.blue, GW.purple, GW.green, GW.red, GW.orange] }] }, options: {plugins: {legend: {position: 'bottom'}}, cutout:'70%'}
+            });
+        }
+        if(data.top_conductores && data.top_conductores.data.length > 0) {
+            new Chart(document.getElementById('chartConductores'), {
+                type: 'bar', data: { labels: data.top_conductores.labels, datasets: [{ label:'Asignaciones', data: data.top_conductores.data, backgroundColor: GW.blue, borderRadius:4 }] }, options: { indexAxis: 'y', plugins:{legend:{display:false}} }
+            });
+        }
+    });
+});
+</script>
 </body>
 </html>
