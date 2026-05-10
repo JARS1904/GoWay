@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 header('Content-Type: application/json');
@@ -19,6 +18,11 @@ $password = $_POST['password'] ?? '';
 $rol      = $_POST['rol'];
 
 if (!empty(trim($password)) && trim($password) !== '●●●●●●●●' && trim($password) !== 'Sin contraseña') {
+    require_once '../../../config/password_validation.php';
+    if (!validarContrasenaFuerte($password)) {
+        echo json_encode(["success" => false, "message" => "La nueva contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."]);
+        exit();
+    }
     $password = password_hash($password, PASSWORD_DEFAULT);
 } else {
     // Keep existing password

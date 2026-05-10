@@ -153,6 +153,7 @@ require_once '../../config/sync_session_foto.php';
                         <div class="modal-form-group">
                             <label>Contraseña *</label>
                             <input type="password" name="password" placeholder="••••••••" required>
+                            <small style="color: #6B7280; font-size: 0.75rem; display: block; margin-top: 4px;">Mín. 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo (!@#$...).</small>
                         </div>
                     </div>
                 </div>
@@ -200,6 +201,7 @@ require_once '../../config/sync_session_foto.php';
                         <div class="modal-form-group">
                             <label for="edit_password">Nueva Contraseña <small style="color:#9ca3af;font-weight:400">(dejar en blanco para no cambiar)</small></label>
                             <input type="password" id="edit_password" name="password" placeholder="••••••••">
+                            <small style="color: #6B7280; font-size: 0.75rem; display: block; margin-top: 4px;">Mín. 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo (!@#$...).</small>
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_activo">Activo</label>

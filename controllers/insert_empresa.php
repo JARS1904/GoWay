@@ -22,6 +22,12 @@ if (empty($rfc_empresa) || empty($nombre) || empty($email) || empty($password_ra
     exit();
 }
 
+require_once '../config/password_validation.php';
+if (!validarContrasenaFuerte($password_raw)) {
+    echo json_encode(["success" => false, "message" => "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."]);
+    exit();
+}
+
 // Verificar que el RFC o email no estén ya registrados
 $stmt_check = $conn->prepare("SELECT rfc_empresa FROM empresas WHERE rfc_empresa = ? OR email = ?");
 $stmt_check->bind_param("ss", $rfc_empresa, $email);

@@ -21,8 +21,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $conexion->query($query);
 
         if ($result->num_rows > 0) {
-            echo "Este correo ya está registrado.";
+            echo '<script>alert("Este correo ya está registrado."); window.location = "../pages/registro.php";</script>';
         } else {
+            require_once "password_validation.php";
+            if (!validarContrasenaFuerte($password)) {
+                echo '<script>alert("La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."); window.location = "../pages/registro.php";</script>';
+                exit();
+            }
+
             // Encriptar la contraseña con hash
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 

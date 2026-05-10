@@ -201,6 +201,20 @@ body {
 .rg-btn:hover  { opacity: .91; transform: translateY(-1px); }
 .rg-btn:active { transform: translateY(0); }
 
+/* ── Error/Success alert ─────────────────────────── */
+.rg-alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: .85rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+    display: none;
+}
+.rg-alert.error   { background: #FEF2F2; border: 1px solid #FECACA; color: #B91C1C; }
+.rg-alert.success { background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; }
+.rg-alert.visible { display: flex; align-items: center; gap: 8px; }
+.rg-alert svg { width: 18px; height: 18px; flex-shrink: 0; }
+
 .rg-footer {
     text-align: center;
     margin-top: 20px;
@@ -271,6 +285,14 @@ body {
     <div class="rg-card">
         <h1 class="rg-title">Crea tu cuenta</h1>
         <p class="rg-sub">Regístrate para empezar a usar GoWay</p>
+
+        <!-- Alert -->
+        <div class="rg-alert" id="rgAlert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span id="rgAlertMsg"></span>
+        </div>
 
     <form method="post" action="../config/login_registro.php">
         <div class="rg-field">
@@ -450,6 +472,27 @@ body {
         const i = document.getElementById('confirm-password');
         i.type = i.type==='password' ? 'text' : 'password';
     });
+
+    // Show alert helper
+    function showAlert(msg, type) {
+        const alertBox = document.getElementById('rgAlert');
+        const msgEl = document.getElementById('rgAlertMsg');
+        alertBox.className = 'rg-alert ' + type + ' visible';
+        msgEl.textContent = msg;
+        alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    const userRegForm = document.querySelector('form[action="../config/login_registro.php"]');
+    if (userRegForm) {
+        userRegForm.addEventListener('submit', function(e) {
+            const pass = document.getElementById('password').value;
+            const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+            if (!strongPasswordRegex.test(pass)) {
+                e.preventDefault();
+                showAlert('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo especial.', 'error');
+            }
+        });
+    }
 </script>
 </body>
 </html>

@@ -52,6 +52,15 @@ switch ($method) {
         
         $nombre = $data['nombre'];
         $email  = $data['email'];
+
+        // Validar fortaleza de la contraseña
+        require_once '../config/password_validation.php';
+        if (!validarContrasenaFuerte($data['password'])) {
+            http_response_code(422);
+            echo json_encode(["error" => "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."]);
+            break;
+        }
+
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         
         // Verificar si el email ya existe

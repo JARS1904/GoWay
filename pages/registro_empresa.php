@@ -457,8 +457,9 @@ document.getElementById('empresaRegForm').addEventListener('submit', async funct
         showAlert('Las contraseñas no coinciden.', 'error');
         return;
     }
-    if (pass.length < 6) {
-        showAlert('La contraseña debe tener al menos 6 caracteres.', 'error');
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!strongPasswordRegex.test(pass)) {
+        showAlert('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.', 'error');
         return;
     }
 

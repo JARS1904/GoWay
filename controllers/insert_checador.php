@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 header('Content-Type: application/json');
@@ -19,7 +18,15 @@ if (isset($_SESSION['rol']) && $_SESSION['rol'] == 4) {
 }
 $nombre       = $_POST['nombre'];
 $usuario      = $_POST['usuario'];
-$contrasena   = password_hash($_POST['password'], PASSWORD_DEFAULT);
+$password_raw = $_POST['password'];
+
+require_once '../config/password_validation.php';
+if (!validarContrasenaFuerte($password_raw)) {
+    echo json_encode(["success" => false, "message" => "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."]);
+    exit();
+}
+
+$contrasena   = password_hash($password_raw, PASSWORD_DEFAULT);
 $foto         = uploadFoto($_FILES['foto'] ?? [], 'checador');
 
 $stmt = $conn->prepare("INSERT INTO checadores (rfc_checador, rfc_empresa, nombre, usuario, contrasena, foto) VALUES (?, ?, ?, ?, ?, ?)");

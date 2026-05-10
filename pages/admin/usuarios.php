@@ -148,6 +148,7 @@ require_once '../../config/sync_session_foto.php';
                         <div class="modal-form-group">
                             <label for="password">Contraseña</label>
                             <input type="password" id="password" name="password" placeholder="Ingresa una contraseña" required>
+                            <small style="color: #6B7280; font-size: 0.75rem; display: block; margin-top: 4px;">Mín. 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo (!@#$...).</small>
                         </div>
                         <div class="modal-form-group">
                             <label for="rol">Rol</label>
@@ -205,6 +206,7 @@ require_once '../../config/sync_session_foto.php';
                         <div class="modal-form-group">
                             <label for="edit_password">Contraseña</label>
                             <input type="password" id="edit_password" name="password" placeholder="Deja vacío para conservar la contraseña actual">
+                            <small style="color: #6B7280; font-size: 0.75rem; display: block; margin-top: 4px;">Mín. 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo (!@#$...).</small>
                         </div>
                         <div class="modal-form-group">
                             <label for="edit_rol">Rol</label>

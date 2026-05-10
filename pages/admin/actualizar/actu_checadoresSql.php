@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 header('Content-Type: application/json');
@@ -32,6 +31,11 @@ if (empty(trim($contrasena)) || trim($contrasena) === '●●●●●●●●'
     }
     $stmt_pwd->close();
 } else {
+    require_once '../../../config/password_validation.php';
+    if (!validarContrasenaFuerte($contrasena)) {
+        echo json_encode(["success" => false, "message" => "La nueva contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."]);
+        exit();
+    }
     $contrasena = password_hash($contrasena, PASSWORD_DEFAULT);
 }
 
