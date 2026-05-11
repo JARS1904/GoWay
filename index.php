@@ -931,8 +931,7 @@ footer:not(.site-footer) {
         <a href="#empresas">Empresas</a>
         <a href="#checadores">Checadores</a>
         <a href="#usuarios">Usuarios</a>
-        <a href="pages/login.php">Iniciar sesión</a>
-        <a href="pages/registro_empresa.php" class="btn-primary-nav">Registrar empresa</a>
+        <a href="pages/login.php" class="btn-primary-nav">Iniciar sesión</a>
     </div>
 </nav>
 

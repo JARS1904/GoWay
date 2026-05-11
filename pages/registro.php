@@ -8,6 +8,18 @@
 </head>
 <body>
 
+<nav id="mainNav">
+    <a href="../index.php" class="nav-brand">
+        <img src="../assets/images/logo_new.png" alt="GoWay Logo">
+        <span>GoWay</span>
+    </a>
+    <div class="nav-links">
+        <a href="../index.php">Inicio</a>
+        <a href="login.php">Iniciar sesión</a>
+        <a href="registro_empresa.php" class="btn-primary-nav">Registrar empresa</a>
+    </div>
+</nav>
+
 <style>
 /* ── Registro Page ─────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,7 +30,45 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px 16px;
+    padding: 88px 16px 24px;
+}
+
+/* ── Navbar ─────────────────────────────────────────── */
+nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 6%; height: 64px;
+    background: rgba(251, 251, 253, 0.8); 
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    transition: background 0.3s, box-shadow 0.3s;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+.nav-brand {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: #1d1d1f;
+    font-weight: 700; font-size: 1.25rem;
+    letter-spacing: -0.02em;
+}
+.nav-brand img { width: 32px; height: 32px; object-fit: contain; }
+
+.nav-links { display: flex; align-items: center; gap: 24px; }
+.nav-links a {
+    text-decoration: none; color: #86868b;
+    font-size: 0.9rem; font-weight: 500;
+    transition: color 0.2s;
+}
+.nav-links a:hover { color: #1d1d1f; }
+
+.btn-primary-nav {
+    background: #2962FF; color: #fff !important;
+    padding: 8px 16px; border-radius: 99px; font-weight: 600;
+    transition: opacity 0.2s !important;
+}
+.btn-primary-nav:hover { opacity: 0.9; color: #fff !important; }
+
+@media (max-width: 768px) {
+    .nav-links a:not(.btn-primary-nav) { display: none; }
 }
 
 /* ── Split wrapper ───────────────────────────────── */
