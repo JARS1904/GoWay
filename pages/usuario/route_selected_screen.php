@@ -246,13 +246,39 @@ if ($_SESSION['id'] > 0) {
         function renderSeatBadge(disponibles, capacidad) {
             if (disponibles === null || disponibles === undefined || !capacidad) {
                 return `
-                    <div class="driver-vehicle-row">
-                        <i class="fas fa-users" style="color:#FFA000;"></i>
-                        <div class="driver-vehicle-row-text">
+                    <div class="driver-vehicle-row" style="align-items:flex-start;">
+                        <i class="fas fa-users" style="color:#FFA000;margin-top:2px;"></i>
+                        <div class="driver-vehicle-row-text" style="width:100%;">
                             <span class="driver-vehicle-label">Disponibilidad de asientos</span>
-                            <div class="seats-bar-wrap" style="margin-top:6px;"><div class="seats-bar" style="width:0%"></div></div>
-                            <span class="driver-vehicle-value" style="font-size:13px;font-weight:400;color:#64748b;">Sin datos de disponibilidad</span>
-                            <span class="seats-status status-agotado" style="margin-top:4px;">Sin asignar</span>
+                            <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px;">
+                                <div class="circular-seats-wrap" style="
+                                    width: 56px;
+                                    height: 56px;
+                                    border-radius: 50%;
+                                    background: conic-gradient(#e0e0e0 100%, #e0e0e0 0);
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    flex-shrink: 0;
+                                ">
+                                    <div style="
+                                        width: 44px;
+                                        height: 44px;
+                                        background: white;
+                                        border-radius: 50%;
+                                        display: flex;
+                                        flex-direction: column;
+                                        align-items: center;
+                                        justify-content: center;
+                                    ">
+                                        <i class="fas fa-users" style="color:#9e9e9e; font-size:16px;"></i>
+                                    </div>
+                                </div>
+                                <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                                    <span class="driver-vehicle-value" style="font-size:13px; font-weight:400; color:#64748b;">Sin datos de disponibilidad</span>
+                                    <span class="seats-status status-agotado" style="margin-top:6px;">Sin asignar</span>
+                                </div>
+                            </div>
                         </div>
                     </div>`;
             }
@@ -261,10 +287,12 @@ if ($_SESSION['id'] > 0) {
             const pct  = cap > 0 ? Math.round((disp / cap) * 100) : 0;
 
             let barColor;
-            if (disp === 0)      barColor = '#9e9e9e';
-            else if (pct < 15)   barColor = '#E64A19';
-            else if (pct < 50)   barColor = '#FBC02D';
-            else                 barColor = '#689F38';
+            let bgColor = '#e2e8f0';
+            let conicPct = pct;
+            if (disp === 0)      { barColor = '#ef4444'; bgColor = '#fee2e2'; conicPct = 100; }
+            else if (pct < 15)   { barColor = '#f97316'; bgColor = '#ffedd5'; }
+            else if (pct < 50)   { barColor = '#eab308'; bgColor = '#fef9c3'; }
+            else                 { barColor = '#689F38'; bgColor = '#e8f5e9'; }
 
             let statusText, statusClass;
             if (disp === 0)      { statusText = 'Agotado';       statusClass = 'status-agotado'; }
@@ -277,11 +305,37 @@ if ($_SESSION['id'] > 0) {
                     <i class="fas fa-users" style="color:#FFA000;margin-top:2px;"></i>
                     <div class="driver-vehicle-row-text" style="width:100%;">
                         <span class="driver-vehicle-label">Disponibilidad de asientos</span>
-                        <div class="seats-bar-wrap" style="margin-top:8px;">
-                            <div class="seats-bar" style="width:${pct}%;background:${barColor};"></div>
+                        <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px;">
+                            <div class="circular-seats-wrap" style="
+                                width: 56px;
+                                height: 56px;
+                                border-radius: 50%;
+                                background: conic-gradient(${barColor} ${conicPct}%, ${bgColor} 0);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                flex-shrink: 0;
+                            ">
+                                <div style="
+                                    width: 44px;
+                                    height: 44px;
+                                    background: white;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    justify-content: center;
+                                    line-height: 1.1;
+                                ">
+                                    <strong style="font-size: 15px; color: #333;">${disp}</strong>
+                                    <span style="font-size: 10px; color: #757575;">de ${cap}</span>
+                                </div>
+                            </div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                                <span class="driver-vehicle-value" style="font-size:13px; font-weight:500;">${statusText === 'Agotado' ? 'Sin lugares disponibles' : '<strong>' + disp + '</strong> lugares disponibles'}</span>
+                                <span class="seats-status ${statusClass}" style="margin-top:6px;">${statusText}</span>
+                            </div>
                         </div>
-                        <span class="driver-vehicle-value" style="font-size:13px;font-weight:500;margin-top:4px;"><strong>${disp}</strong> de ${cap} lugares disponibles</span>
-                        <span class="seats-status ${statusClass}" style="margin-top:6px;">${statusText}</span>
                     </div>
                 </div>`;
         }
@@ -866,10 +920,12 @@ if ($_SESSION['id'] > 0) {
                                         <i class="fas fa-map-marker-alt" style="color:#D32F2F;font-size:11px;"></i>
                                         <span>${alightStop}</span>
                                     </div>
+                                    <div class="schedule-state-wrap" style="margin-top: 6px;">
+                                        ${renderEstadoAsignacionBadge(schedule.estado)}
+                                    </div>
                                 </div>
-                                <div class="schedule-header-pills" aria-label="Tipo de día y estado del servicio">
-                                    <span class="schedule-pill schedule-day-badge">${schedule.tipo_dia || 'No especificado'}</span>
-                                    ${renderEstadoAsignacionBadge(schedule.estado)}
+                                <div class="schedule-header-pills" aria-label="Tipo de día">
+                                    <span class="schedule-pill schedule-day-badge schedule-day-absolute">${schedule.tipo_dia || 'No especificado'}</span>
                                 </div>
                             </div>
                         </div>

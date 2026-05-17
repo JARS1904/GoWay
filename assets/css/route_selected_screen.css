@@ -1892,3 +1892,16 @@ select:focus {
     background: #f1f5f9;
     color: #64748b;
 }
+
+@media (min-width: 769px) {
+    .schedule-card {
+        position: relative !important;
+    }
+    .schedule-day-absolute {
+        position: absolute !important;
+        top: 16px !important;
+        right: 18px !important;
+        margin: 0 !important;
+        z-index: 10;
+    }
+}
