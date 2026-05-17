@@ -16,7 +16,7 @@ if (!isset($conn)) {
 
 $is_admin   = (isset($_SESSION['rol']) && ($_SESSION['rol'] == 1 || $_SESSION['rol'] == 2));
 $is_empresa = (isset($_SESSION['rol']) && $_SESSION['rol'] == 4 && !empty($_SESSION['rfc_empresa']));
-$can_send   = $is_admin || $is_empresa;
+$can_send   = ($is_admin || $is_empresa) && empty($hide_send_notification);
 ?>
 <style>
 /* Reset for buttons inside the panel to avoid global CSS collisions */
@@ -86,9 +86,15 @@ $can_send   = $is_admin || $is_empresa;
                 if (!$is_admin) {
                     if (isset($_SESSION['id']) && $_SESSION['id'] > 0) {
                         $user_id = (int)$_SESSION['id'];
-                        $sql_notif .= " WHERE n.id_usuario IS NULL OR n.id_usuario = $user_id ";
+                        $sql_notif .= " WHERE n.id_usuario = $user_id 
+                                        OR (n.id_usuario IS NULL AND n.rfc_empresa IS NULL)
+                                        OR (n.id_usuario IS NULL AND n.rfc_empresa IN (
+                                            SELECT r.rfc_empresa FROM rutas r 
+                                            INNER JOIN favoritos f ON r.id = f.id_ruta 
+                                            WHERE f.id_usuario = $user_id
+                                        )) ";
                     } else {
-                        $sql_notif .= " WHERE n.id_usuario IS NULL ";
+                        $sql_notif .= " WHERE n.id_usuario IS NULL AND n.rfc_empresa IS NULL ";
                     }
                 }
                 $sql_notif .= " ORDER BY n.fecha_creacion DESC LIMIT 50";

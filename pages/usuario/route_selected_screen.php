@@ -1094,6 +1094,9 @@ if ($_SESSION['id'] > 0) {
             e.stopPropagation();
         });
     </script>
-    <?php require_once '../../components/notifications_panel.php'; ?>
+    <?php 
+    $hide_send_notification = true;
+    require_once '../../components/notifications_panel.php'; 
+    ?>
 </body>
 </html>
