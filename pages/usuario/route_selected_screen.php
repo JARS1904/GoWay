@@ -892,14 +892,14 @@ if ($_SESSION['id'] > 0) {
                     const boardMin = isTramo && segmento.length > 0 ? segmento[0].minutos_desde_origen : 0;
                     paradasHTML = segmento.map(p => {
                         const minRel = p.minutos_desde_origen - boardMin;
-                        return `<li><strong>${p.nombre}</strong><span class="stop-time">+${minRel} min</span></li>`;
+                        return `<li><span class="stop-name">${p.nombre}</span>${minRel > 0 ? '<span class="stop-time">+' + minRel + ' min</span>' : ''}</li>`;
                     }).join('');
                 } else if (paradasRuta.length > 0) {
                     paradasHTML = paradasRuta.map(p =>
-                        `<li><strong>${p.nombre}</strong><span class="stop-time">+${p.minutos_desde_origen} min</span></li>`
+                        `<li><span class="stop-name">${p.nombre}</span>${p.minutos_desde_origen > 0 ? '<span class="stop-time">+' + p.minutos_desde_origen + ' min</span>' : ''}</li>`
                     ).join('');
                 } else {
-                    paradasHTML = paradasFallback.map(p => `<li><strong>${p}</strong></li>`).join('');
+                    paradasHTML = paradasFallback.map(p => `<li><span class="stop-name">${p}</span></li>`).join('');
                 }
 
                 contentHTML += `
@@ -998,10 +998,10 @@ if ($_SESSION['id'] > 0) {
                             <!-- Columna derecha: paradas (label + lista juntos) -->
                             <div class="schedule-right-col">
                                 <div class="detail-row">
-                                    <i class="fas fa-traffic-light" style="color:#FFA000;"></i>
+                                    <i class="fas fa-route" style="color:#FFA000;"></i>
                                     <div class="detail-row-text">
                                         <span class="detail-row-label">${isTramo ? 'Paradas del tramo' : 'Paradas'}</span>
-                                        <ul class="stops-list">
+                                        <ul class="stops-list stops-timeline ${isTramo ? 'is-tramo' : ''}">
                                             ${paradasHTML}
                                         </ul>
                                     </div>
