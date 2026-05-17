@@ -94,6 +94,7 @@ try {
                       ret.destino AS ruta_retorno_destino,
                       c.nombre        AS conductor_nombre,
                       c.rfc_conductor,
+                      a.estado,
                       a.asientos_disp AS asientos_disponibles
                   FROM asignaciones a
                   JOIN horarios h

@@ -171,6 +171,7 @@ try {
                                  v.modelo   AS vehiculo_modelo,
                                  v.capacidad AS vehiculo_capacidad,
                                  a.id_asignacion,
+                                 a.estado AS estado,
                                  a.asientos_disp AS asientos_disponibles
                           FROM horarios h
                           LEFT JOIN asignaciones a

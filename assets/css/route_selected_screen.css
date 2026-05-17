@@ -617,18 +617,48 @@ select:focus {
     overflow: hidden;
 }
 
-/* Header: icono + empresa + badge día + chevron */
+/* Header: icono + bloque texto + fila de cápsulas (día / estado) */
 .schedule-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     padding: 16px 18px;
     border-bottom: 1px solid #f0f0f0;
 }
 
-.schedule-header-info {
-    flex: 1;          /* ← esto empuja el badge a la derecha */
+.schedule-header-body {
+    flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.schedule-header-info {
+    min-width: 0;
+}
+
+/* Fila de cápsulas: mismo estilo que tipo de día, orden día → estado */
+.schedule-header-pills {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Base compartida: cápsula tipo “tipo de día” */
+.schedule-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+    line-height: 1.25;
+    flex-shrink: 0;
+    border: 1px solid transparent;
 }
 
 .schedule-header-icon {
@@ -669,14 +699,46 @@ select:focus {
 }
 
 .schedule-day-badge {
-    background: #e8f5e9;   /* ← mismo verde claro que el ícono */
-    color: #388E3C;         /* ← mismo verde oscuro que el ícono */
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 99px;
-    white-space: nowrap;
-    flex-shrink: 0;         /* ← no se encoge */
+    background: #e8f5e9;
+    color: #388e3c;
+    border-color: rgba(56, 142, 60, 0.22);
+}
+
+/* Colores de estado (misma cápsula que .schedule-pill) */
+.schedule-estado-programado {
+    background: #e3f2fd;
+    color: #1565c0;
+    border-color: rgba(21, 101, 192, 0.2);
+}
+
+.schedule-estado-en_ruta {
+    background: #e8eaf6;
+    color: #3949ab;
+    border-color: rgba(57, 73, 171, 0.22);
+}
+
+.schedule-estado-completado {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: rgba(46, 125, 50, 0.22);
+}
+
+.schedule-estado-cancelado {
+    background: #ffebee;
+    color: #c62828;
+    border-color: rgba(198, 40, 40, 0.2);
+}
+
+.schedule-estado-retrasado {
+    background: #fff3e0;
+    color: #ef6c00;
+    border-color: rgba(239, 108, 0, 0.22);
+}
+
+.schedule-estado-sin-asignar {
+    background: #eceff1;
+    color: #546e7a;
+    border-color: rgba(84, 110, 122, 0.2);
 }
 
 .schedule-day i { 

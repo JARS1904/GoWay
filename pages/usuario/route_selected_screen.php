@@ -286,6 +286,22 @@ if ($_SESSION['id'] > 0) {
                 </div>`;
         }
 
+        /** Estado operativo de la asignación activa (tabla asignaciones.estado, vía API). */
+        function renderEstadoAsignacionBadge(estadoRaw) {
+            const raw = estadoRaw == null || estadoRaw === ''
+                ? ''
+                : String(estadoRaw).trim().toLowerCase().replace(/\s+/g, '_');
+            const map = {
+                programado: { label: 'Programado', cls: 'schedule-estado-programado' },
+                en_ruta: { label: 'En Ruta', cls: 'schedule-estado-en_ruta' },
+                completado: { label: 'Completado', cls: 'schedule-estado-completado' },
+                cancelado: { label: 'Cancelado', cls: 'schedule-estado-cancelado' },
+                retrasado: { label: 'Retrasado', cls: 'schedule-estado-retrasado' },
+            };
+            const entry = map[raw] || { label: 'Sin asignar', cls: 'schedule-estado-sin-asignar' };
+            return `<span class="schedule-pill schedule-estado-badge ${entry.cls}" title="Estado del servicio">${entry.label}</span>`;
+        }
+
         // Configuración de API
         const API_BASE_URL = window.location.origin;
         const API_URL = `${API_BASE_URL}/GoWay/api/routes_api.php`;
@@ -311,7 +327,8 @@ if ($_SESSION['id'] > 0) {
                 conductor_licencia: "LIC-12345",
                 vehiculo_modelo: "Mercedes Benz",
                 vehiculo_placa: "ABC-123",
-                vehiculo_capacidad: 40
+                vehiculo_capacidad: 40,
+                estado: "programado"
             }],
             paradas: ["Parada A", "Parada B", "Parada C"]
         }];
@@ -834,22 +851,27 @@ if ($_SESSION['id'] > 0) {
                 contentHTML += `
                     <div class="schedule-card">
 
-                        <!-- Header: icono calendario + empresa + ruta + badge día -->
+                        <!-- Header: icono + empresa/ruta + fila de cápsulas (día + estado) -->
                         <div class="schedule-header">
                             <div class="schedule-header-icon">
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
-                            <div class="schedule-header-info">
-                                <span class="schedule-company-name">${route.empresa_nombre || 'Transporte'}</span>
-                                <div class="schedule-route-path-sub">
-                                    <i class="fas fa-map-marker-alt" style="color:#2962FF;font-size:11px;"></i>
-                                    <span>${boardStop}</span>
-                                    <i class="fas fa-arrow-right" style="font-size:10px;color:#bdbdbd;"></i>
-                                    <i class="fas fa-map-marker-alt" style="color:#D32F2F;font-size:11px;"></i>
-                                    <span>${alightStop}</span>
+                            <div class="schedule-header-body">
+                                <div class="schedule-header-info">
+                                    <span class="schedule-company-name">${route.empresa_nombre || 'Transporte'}</span>
+                                    <div class="schedule-route-path-sub">
+                                        <i class="fas fa-map-marker-alt" style="color:#2962FF;font-size:11px;"></i>
+                                        <span>${boardStop}</span>
+                                        <i class="fas fa-arrow-right" style="font-size:10px;color:#bdbdbd;"></i>
+                                        <i class="fas fa-map-marker-alt" style="color:#D32F2F;font-size:11px;"></i>
+                                        <span>${alightStop}</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-header-pills" aria-label="Tipo de día y estado del servicio">
+                                    <span class="schedule-pill schedule-day-badge">${schedule.tipo_dia || 'No especificado'}</span>
+                                    ${renderEstadoAsignacionBadge(schedule.estado)}
                                 </div>
                             </div>
-                            <span class="schedule-day-badge">${schedule.tipo_dia || 'No especificado'}</span>
                         </div>
 
                         <!-- Cuerpo de la tarjeta -->
