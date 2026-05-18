@@ -631,11 +631,20 @@ select:focus {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
+}
+
+/* Primera fila: nombre empresa + badge día alineado a la derecha */
+.schedule-header-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 .schedule-header-info {
     min-width: 0;
+    flex: 1;
 }
 
 /* Fila de cápsulas: mismo estilo que tipo de día, orden día → estado */
@@ -645,6 +654,7 @@ select:focus {
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 /* Base compartida: cápsula tipo “tipo de día” */
@@ -753,6 +763,31 @@ select:focus {
     font-size: 13px;
     color: var(--dark-gray);
     margin-top: 3px;
+}
+
+/* Sub-ruta en header del schedule card */
+.schedule-route-path-sub {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--dark-gray);
+    margin-top: 3px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.schedule-route-path-sub > span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.schedule-route-path-sub > i {
+    flex-shrink: 0;
 }
 
 
@@ -938,7 +973,7 @@ select:focus {
     color: var(--black-color);
 }
 
-/* Paradas con tiempo a la derecha */
+/* Paradas con tiempo debajo */
 .stops-list {
     margin: 4px 0 0 0;
     list-style: none;
@@ -947,9 +982,9 @@ select:focus {
 
 .stops-list li {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
     font-size: 14px;
     color: var(--text-color);
     position: relative;
@@ -964,8 +999,7 @@ select:focus {
     color: #FFA000;
     font-size: 18px;
     line-height: 1;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 0;
 }
 
 .stops-list li strong {
@@ -978,14 +1012,48 @@ select:focus {
     color: var(--dark-gray);
     font-weight: 400;
     flex-shrink: 0;
-    margin-left: 12px;
+    margin-top: 2px;
 }
 
-/* Grid 2 columnas para info de empresa */
+/* Grid info de empresa — 1 columna, icono suelto + label/valor apilados */
 .info-rows-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.info-row > i {
+    flex-shrink: 0;
+    font-size: 18px;
+    color: #2962FF;
+    margin-top: 1px;
+    width: 20px;
+    text-align: center;
+}
+
+.info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.info-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.info-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+    word-break: break-word;
 }
 
 /* Toast notification */
@@ -1063,21 +1131,15 @@ select:focus {
 }
 
 @media (max-width: 600px) {
-    .info-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .info-label {
-        width: 100%;
-        margin-bottom: 5px;
-    }
-
     .schedule-times {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        padding: 0;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 32px;
+        padding-bottom: 16px;
+    }
+
+    .schedule-card-body {
+        padding: 20px 18px;
     }
 
     .route-full-path {
@@ -1087,6 +1149,10 @@ select:focus {
     .route-full-path i {
         margin: 10px 0;
         transform: rotate(90deg);
+    }
+
+    .schedule-route-path-sub > span {
+        max-width: 70px;
     }
 }
 
@@ -1910,7 +1976,7 @@ select:focus {
 .stops-timeline {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0 0;
+    margin: 20px 0 0 0;
     position: relative;
 }
 
@@ -1918,32 +1984,31 @@ select:focus {
 .stops-timeline.is-tramo::before {
     content: '';
     position: absolute;
-    top: -8px; 
-    left: 4px; 
+    top: -8px;
+    left: 4px;
     width: 4px;
-    height: 18px; 
-    background-color: #fdd888; 
+    height: 12px;
+    background-color: #fdd888;
     z-index: 1;
 }
 
-/* Each item */
+/* Each stop item */
 .stops-timeline li {
     position: relative;
-    padding-left: 24px;
-    padding-bottom: 20px;
-    min-height: 24px;
+    padding-left: 22px;
+    padding-bottom: 16px;
 }
 
 .stops-timeline li:last-child {
     padding-bottom: 0;
 }
 
-/* Timeline dot */
+/* Dot — aligned with top of text */
 .stops-timeline li::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 4px;
+    top: 0;
     width: 12px;
     height: 12px;
     border-radius: 50%;
@@ -1953,13 +2018,13 @@ select:focus {
     box-sizing: border-box;
 }
 
-/* Solid dot for first and last stops */
+/* First and last: filled dot */
 .stops-timeline li:first-child::before,
 .stops-timeline li:last-child::before {
     background-color: #f59e0b;
 }
 
-/* Line connecting to the next dot */
+/* Connector — center of dot to center of next dot */
 .stops-timeline li::after {
     content: '';
     position: absolute;
@@ -1967,36 +2032,36 @@ select:focus {
     width: 4px;
     background-color: #fdd888;
     z-index: 1;
-    top: 10px; /* Start from center of current dot */
-    bottom: -10px; /* Reach center of next dot */
+    top: 6px;
+    bottom: -8px;
 }
 
-/* Hide line after the last dot for complete routes */
-.stops-timeline:not(.is-tramo) li:last-child::after {
-    display: none;
+/* No line after last stop — always hidden */
+.stops-timeline li:last-child::after {
+    display: none !important;
 }
 
-/* Show a short line below the last dot for tramos */
+/* Short extension below last dot for tramos */
 .stops-timeline.is-tramo li:last-child::after {
-    display: block;
-    top: 10px;
-    bottom: auto;
-    height: 18px; /* Extend down slightly */
+    display: none !important;
 }
 
-/* Texts */
+/* Stop name — first line */
 .stops-timeline li .stop-name {
-    display: block;
+    display: block !important;
     font-size: 14px;
-    color: #333;
-    font-weight: 400;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.3;
 }
 
+/* Stop time — second line */
 .stops-timeline li .stop-time {
-    display: block;
+    display: block !important;
     font-size: 12px;
-    color: #757575;
+    color: #9ca3af;
     margin-top: 2px;
+    line-height: 1.2;
 }
 
 /* --- Toggle Switch iOS/Material Style --- */

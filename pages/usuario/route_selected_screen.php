@@ -110,15 +110,21 @@ if ($_SESSION['id'] > 0) {
                 <form id="searchForm" class="search-form">
                     <div class="form-group">
                         <label for="origin">Origen</label>
-                        <select id="origin" required>
-                            <option value="">Seleccione el origen</option>
-                        </select>
+                        <div style="position:relative;">
+                            <img src="../../assets/images/icons/icons8-marcador.png" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); width:22px; height:22px; pointer-events:none; z-index:1; filter:grayscale(1) brightness(0.55);">
+                            <select id="origin" required style="padding-left:38px;">
+                                <option value="">Seleccione el origen</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="destination">Destino</label>
-                        <select id="destination" required>
-                            <option value="">Seleccione el destino</option>
-                        </select>
+                        <div style="position:relative;">
+                            <img src="../../assets/images/icons/icons8-marcador.png" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); width:22px; height:22px; pointer-events:none; z-index:1; filter:grayscale(1) brightness(0.55);">
+                            <select id="destination" required style="padding-left:38px;">
+                                <option value="">Seleccione el destino</option>
+                            </select>
+                        </div>
                     </div>
                     <button type="submit" id="searchBtn" class="btn" disabled>
                         <i class="fas fa-search"></i> Buscar
@@ -295,8 +301,8 @@ if ($_SESSION['id'] > 0) {
             let barColor;
             let bgColor = '#e2e8f0';
             let conicPct = pct;
-            if (disp === 0)      { barColor = '#ef4444'; bgColor = '#fee2e2'; conicPct = 100; }
-            else if (pct < 15)   { barColor = '#f97316'; bgColor = '#ffedd5'; }
+            if (disp === 0)      { barColor = '#9e9e9e'; bgColor = '#f5f5f5'; conicPct = 100; }
+            else if (pct < 15)   { barColor = '#ef4444'; bgColor = '#fee2e2'; }
             else if (pct < 50)   { barColor = '#eab308'; bgColor = '#fef9c3'; }
             else                 { barColor = '#689F38'; bgColor = '#e8f5e9'; }
 
@@ -925,11 +931,11 @@ if ($_SESSION['id'] > 0) {
                     const boardMin = isTramo && segmento.length > 0 ? segmento[0].minutos_desde_origen : 0;
                     paradasHTML = segmento.map(p => {
                         const minRel = p.minutos_desde_origen - boardMin;
-                        return `<li><span class="stop-name">${p.nombre}</span>${minRel > 0 ? '<span class="stop-time">+' + minRel + ' min</span>' : ''}</li>`;
+                        return `<li><span class="stop-name">${p.nombre}</span>${minRel > 0 ? '<span class="stop-time">+' + minRel + ' min</span>' : '<span class="stop-time">&nbsp;</span>'}</li>`;
                     }).join('');
                 } else if (paradasRuta.length > 0) {
                     paradasHTML = paradasRuta.map(p =>
-                        `<li><span class="stop-name">${p.nombre}</span>${p.minutos_desde_origen > 0 ? '<span class="stop-time">+' + p.minutos_desde_origen + ' min</span>' : ''}</li>`
+                        `<li><span class="stop-name">${p.nombre}</span>${p.minutos_desde_origen > 0 ? '<span class="stop-time">+' + p.minutos_desde_origen + ' min</span>' : '<span class="stop-time">&nbsp;</span>'}</li>`
                     ).join('');
                 } else {
                     paradasHTML = paradasFallback.map(p => `<li><span class="stop-name">${p}</span></li>`).join('');
@@ -944,8 +950,13 @@ if ($_SESSION['id'] > 0) {
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
                             <div class="schedule-header-body">
-                                <div class="schedule-header-info">
+                                <div class="schedule-header-top-row">
                                     <span class="schedule-company-name">${route.empresa_nombre || 'Transporte'}</span>
+                                    <div class="schedule-header-pills" aria-label="Tipo de día">
+                                        <span class="schedule-pill schedule-day-badge schedule-day-absolute">${schedule.tipo_dia || 'No especificado'}</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-header-info">
                                     <div class="schedule-route-path-sub">
                                         <i class="fas fa-map-marker-alt" style="color:#2962FF;font-size:11px;"></i>
                                         <span>${boardStop}</span>
@@ -956,9 +967,6 @@ if ($_SESSION['id'] > 0) {
                                     <div class="schedule-state-wrap" style="margin-top: 6px;">
                                         ${renderEstadoAsignacionBadge(schedule.estado)}
                                     </div>
-                                </div>
-                                <div class="schedule-header-pills" aria-label="Tipo de día">
-                                    <span class="schedule-pill schedule-day-badge schedule-day-absolute">${schedule.tipo_dia || 'No especificado'}</span>
                                 </div>
                             </div>
                         </div>
