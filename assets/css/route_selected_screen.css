@@ -1998,3 +1998,395 @@ select:focus {
     color: #757575;
     margin-top: 2px;
 }
+
+/* --- Toggle Switch iOS/Material Style --- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+  background-color: #2962FF;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2962FF;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* ==================== */
+/* Estilos para el Modal (Rediseño Moderno) */
+/* ==================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 15, 30, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.22);
+    width: 90%;
+    max-width: 700px;
+    transform: translateY(-22px) scale(.97);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    padding: 30px 30px 10px 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-overlay.active .modal-container {
+    transform: translateY(0) scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    margin-bottom: 5px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.modal-close {
+    background: #f1f3f7;
+    border: none;
+    width: 32px; 
+    height: 32px;
+    border-radius: 50%;
+    font-size: 20px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    cursor: pointer;
+    transition: background .18s, color .18s;
+}
+
+.modal-close:hover {
+    background: #e2e6ef;
+    color: #111;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-bottom: 15px;
+}
+
+.modal-form-group {
+    margin-bottom: 15px;
+}
+
+.modal-form-group label {
+    display: block;
+    font-size: .85rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    letter-spacing: .02em;
+}
+
+.modal-form-group input,
+.modal-form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 18px;
+    font-size: 16px;
+    color: #111827;
+    background: #F9FAFB;
+    transition: border-color .18s, box-shadow .18s, background .18s;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.modal-form-group input:focus,
+.modal-form-group select:focus,
+.modal-form-group textarea:focus {
+    border-color: #2962FF;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(41,98,255,.12);
+}
+
+.modal-footer {
+    padding: 24px 0 20px;
+    border-top: 1px solid #F3F4F6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: transparent;
+}
+
+.modal-btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.modal-btn-cancel {
+    background: transparent;
+    color: #6B7280;
+    border: 1.5px solid #E5E7EB;
+}
+
+.modal-btn-cancel:hover {
+    border-color: #d1d5db;
+    color: #4b5563;
+    background: #f9fafb;
+}
+
+.modal-btn-save {
+    background: linear-gradient(135deg, #2962FF, #1a50e8);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(41,98,255,.32);
+}
+
+.modal-btn-save:hover {
+    opacity: .92;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(41,98,255,.38);
+}
+
+.modal-form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 18px;
+    font-size: 16px;
+    color: #111827;
+    background: #F9FAFB;
+    transition: border-color .18s, box-shadow .18s, background .18s;
+    outline: none;
+    box-sizing: border-box;
+    min-height: 80px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+@media (max-width: 768px) {
+    .modal-body {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==================== */
+/* Material Design Outlined Fields & Toggle */
+/* ==================== */
+.md-outlined-field {
+    position: relative;
+    width: 100%;
+}
+.md-outlined-field input,
+.md-outlined-field select,
+.md-outlined-field textarea {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #333;
+    background: transparent;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.md-outlined-field textarea {
+    padding-top: 14px;
+    min-height: 100px;
+    resize: vertical;
+}
+.md-outlined-field input:focus,
+.md-outlined-field select:focus,
+.md-outlined-field textarea:focus {
+    border-color: #2962FF;
+    border-width: 2px;
+    padding: 13px 15px 13px 43px; /* Adjust padding to prevent jumping when border is 2px */
+}
+.md-outlined-field textarea:focus {
+    padding-top: 13px;
+}
+.md-outlined-field label {
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    background: #fff;
+    padding: 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    pointer-events: none;
+}
+.md-outlined-field .field-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 16px;
+    color: #64748b;
+    font-size: 16px;
+    pointer-events: none;
+}
+.md-outlined-field textarea ~ .field-icon {
+    top: 22px;
+    transform: none;
+}
+.md-outlined-field select {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='%2364748b' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 10px;
+    padding-right: 36px;
+}
+.switch-ios {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    margin: 0;
+}
+.switch-ios input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+    margin: 0;
+}
+.slider-ios {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e2e8f0;
+    transition: .3s;
+    border-radius: 26px;
+    border: 1.5px solid #cbd5e1;
+}
+.slider-ios:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 2px;
+    background-color: #94a3b8;
+    transition: .3s;
+    border-radius: 50%;
+}
+.switch-ios input:checked + .slider-ios {
+    background-color: #2962FF;
+    border-color: #2962FF;
+}
+.switch-ios input:checked + .slider-ios:before {
+    transform: translateX(21px);
+    background-color: white;
+}
+
+/* ==================== */
+/* Report Panel Override */
+/* ==================== */
+#reportModalOverlay {
+    display: block;
+}
+
+#reportModalOverlay .modal-container {
+    position: fixed;
+    top: 0;
+    right: -450px;
+    width: 400px;
+    max-width: 100%;
+    height: 100vh;
+    background-color: #fff;
+    box-shadow: -4px 0 24px rgba(0,0,0,.15);
+    transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 0;
+    transform: none !important;
+    margin: 0;
+    padding: 0;
+}
+
+#reportModalOverlay.active .modal-container {
+    right: 0;
+}
+
+@media (max-width: 480px) {
+    #reportModalOverlay .modal-container {
+        width: 100vw;
+        right: -100vw;
+    }
+}
