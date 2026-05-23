@@ -377,8 +377,15 @@ try {
         $gravedad       = strtolower(trim($data['gravedad']));
         $es_retorno     = isset($data['es_retorno']) ? filter_var($data['es_retorno'], FILTER_VALIDATE_BOOLEAN) : false;
 
-        if ($id_usuario <= 0 && empty($rfc_checador)) {
-            sendResponse(400, ["error" => "id_usuario o rfc_checador es requerido"]);
+        // Si no viene id_usuario en el payload, intentar tomarlo de la sesión
+        if ($id_usuario <= 0 && isset($_SESSION['id']) && intval($_SESSION['id']) > 0) {
+            $id_usuario = intval($_SESSION['id']);
+        }
+
+        // Capturar rfc_empresa de la sesión si el rol es 4 (empresa)
+        $rfc_empresa_sesion = '';
+        if (isset($_SESSION['rol']) && $_SESSION['rol'] == 4 && !empty($_SESSION['rfc_empresa'])) {
+            $rfc_empresa_sesion = trim($_SESSION['rfc_empresa']);
         }
 
         // Validar tipo de incidente
@@ -410,7 +417,7 @@ try {
         $id_ruta       = ($es_retorno && !empty($asig['id_ruta_retorno'])) ? intval($asig['id_ruta_retorno']) : intval($asig['id_ruta']);
 
         if ($id_usuario > 0) {
-            // Verificar que el usuario existe
+            // Verificar que el usuario existe (cualquier rol: admin, empresa, usuario normal)
             $stmt_usr = $conn->prepare("SELECT id FROM usuarios WHERE id = ?");
             if (!$stmt_usr) {
                 sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
@@ -419,10 +426,13 @@ try {
             $stmt_usr->execute();
             $result_usr = $stmt_usr->get_result();
             if ($result_usr->num_rows === 0) {
-                sendResponse(404, ["error" => "Usuario no encontrado"]);
+                // Si la sesión es válida pero no está en usuarios (ej. empresa), insertar sin id
+                $id_usuario = 0;
             }
             $stmt_usr->close();
+        }
 
+        if ($id_usuario > 0) {
             // Insertar el reporte con id_usuario
             $sql_insert = "INSERT INTO reportes
                                (id_vehiculo, rfc_conductor, id_ruta, tipo_incidente,
@@ -433,7 +443,7 @@ try {
                 sendResponse(500, ["error" => "Error al preparar inserción: " . $conn->error]);
             }
             $stmt_insert->bind_param("isissssi", $id_vehiculo, $rfc_conductor, $id_ruta, $tipo_incidente, $fecha_hora, $descripcion, $gravedad, $id_usuario);
-        } else {
+        } elseif (!empty($rfc_checador)) {
             // Verificar que el checador existe
             $stmt_checador = $conn->prepare("SELECT rfc_checador FROM checadores WHERE rfc_checador = ?");
             if (!$stmt_checador) {
@@ -456,7 +466,19 @@ try {
                 sendResponse(500, ["error" => "Error al preparar inserción: " . $conn->error]);
             }
             $stmt_insert->bind_param("isisssss", $id_vehiculo, $rfc_conductor, $id_ruta, $tipo_incidente, $fecha_hora, $descripcion, $gravedad, $rfc_checador);
+        } else {
+            // Empresa: insertar guardando el rfc_empresa de la sesión para trazabilidad
+            $sql_insert = "INSERT INTO reportes
+                               (id_vehiculo, rfc_conductor, id_ruta, tipo_incidente,
+                                fecha_incidente, descripcion, gravedad, rfc_empresa)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt_insert = $conn->prepare($sql_insert);
+            if (!$stmt_insert) {
+                sendResponse(500, ["error" => "Error al preparar inserción: " . $conn->error]);
+            }
+            $stmt_insert->bind_param("isisssss", $id_vehiculo, $rfc_conductor, $id_ruta, $tipo_incidente, $fecha_hora, $descripcion, $gravedad, $rfc_empresa_sesion);
         }
+
 
         if ($stmt_insert->execute()) {
             $id_reporte = $stmt_insert->insert_id;
