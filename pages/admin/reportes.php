@@ -1036,7 +1036,8 @@ if ($conexion->error) {
                         dataContainer.style.display = 'block';
                         document.getElementById('infoVehiculo').textContent = `${data.data.vehiculo_placa} - ${data.data.vehiculo_modelo}`;
                         document.getElementById('infoConductor').textContent = data.data.conductor_nombre;
-                        document.getElementById('infoRuta').textContent = `${data.data.ruta_nombre} (${data.data.origen} - ${data.data.destino})`;
+                        //document.getElementById('infoRuta').textContent = `${data.data.ruta_nombre} (${data.data.origen} - ${data.data.destino})`;
+                        document.getElementById('infoRuta').textContent = data.data.ruta_nombre;
                         currentAsignacionId = data.data.id_asignacion;
                     } else {
                         placaError.style.display = 'block';

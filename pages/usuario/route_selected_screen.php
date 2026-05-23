@@ -457,13 +457,19 @@ if ($_SESSION['id'] > 0) {
                     const asig = window.currentAsignacionData;
                     if (this.checked) {
                         // Si hay ruta de retorno configurada, mostrarla; si no, invertir origen-destino
+                        /*
                         const texto = asig.ruta_retorno_nombre
                             ? `${asig.ruta_retorno_origen} - ${asig.ruta_retorno_destino} (${asig.ruta_retorno_nombre})`
                             : `${asig.destino} - ${asig.origen} (${asig.ruta_nombre})`;
                         document.getElementById('reportCardRuta').textContent = texto;
+                        */
+                       const texto = asig.ruta_retorno_nombre
+                        ? asig.ruta_retorno_nombre
+                        : asig.ruta_nombre;
+                    document.getElementById('reportCardRuta').textContent = texto;
                     } else {
-                        document.getElementById('reportCardRuta').textContent =
-                            `${asig.origen} - ${asig.destino} (${asig.ruta_nombre})`;
+                        //document.getElementById('reportCardRuta').textContent = `${asig.origen} - ${asig.destino} (${asig.ruta_nombre})`;
+                        document.getElementById('reportCardRuta').textContent = asig.ruta_nombre;
                     }
                 });
             }
@@ -1197,12 +1203,19 @@ if ($_SESSION['id'] > 0) {
                         // Mostrar ruta según estado del switch de retorno
                         const isRetorno = document.getElementById('reportEsRetorno').checked;
                         if (isRetorno) {
+                            /*
                             const texto = asig.ruta_retorno_nombre
                                 ? `${asig.ruta_retorno_origen} - ${asig.ruta_retorno_destino} (${asig.ruta_retorno_nombre})`
                                 : `${asig.destino} - ${asig.origen} (${asig.ruta_nombre})`;
                             document.getElementById('reportCardRuta').textContent = texto;
+                            */
+                           const texto = asig.ruta_retorno_nombre
+                                ? asig.ruta_retorno_nombre
+                                : asig.ruta_nombre;
+                            document.getElementById('reportCardRuta').textContent = texto;
                         } else {
-                            document.getElementById('reportCardRuta').textContent = `${asig.origen} - ${asig.destino} (${asig.ruta_nombre})`;
+                            //document.getElementById('reportCardRuta').textContent = `${asig.origen} - ${asig.destino} (${asig.ruta_nombre})`;
+                            document.getElementById('reportCardRuta').textContent = asig.ruta_nombre;
                         }
                         
                         document.getElementById('reportRetornoSection').style.display = 'flex';

@@ -111,7 +111,8 @@ require_once '../../config/sync_session_foto.php';
                             "SELECT id_ruta, nombre, origen, destino FROM rutas" . $where_emp . " ORDER BY nombre ASC"
                         );
                         while ($r = $res->fetch_assoc()) {
-                            $label = htmlspecialchars($r['nombre'] . ' (' . $r['origen'] . ' → ' . $r['destino'] . ')');
+                            //$label = htmlspecialchars($r['nombre'] . ' (' . $r['origen'] . ' → ' . $r['destino'] . ')');
+                            $label = htmlspecialchars($r['nombre']);
                             echo "<option value=\"{$r['id_ruta']}\" data-origen=\"" . htmlspecialchars($r['origen']) . "\" data-destino=\"" . htmlspecialchars($r['destino']) . "\">{$label}</option>";
                         }
                         ?>
