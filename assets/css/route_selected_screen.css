@@ -148,15 +148,16 @@ header {
     color: var(--error-color);
 }
 
-/* Ocultar dropdown en desktop */
-@media (min-width: 769px) {
-    .user-dropdown { display: none; }
-}
+/* Ocultar dropdown viejo en desktop (ya no se usa) */
+.user-dropdown { display: none !important; }
 
-/* Ocultar nav en móvil */
+/* Mobile header: ocultar nav desktop, mostrar acciones simples */
 @media (max-width: 768px) {
     .header-nav { display: none; }
-    .user-dropdown { display: inline-block; }
+    .mobile-header-actions { display: flex; align-items: center; gap: 8px; }
+}
+@media (min-width: 769px) {
+    .mobile-header-actions { display: none; }
 }
 
 .user-btn {
@@ -2481,3 +2482,144 @@ input:checked + .slider:before {
 .fav-panel-card.route-card {
     margin-bottom: 12px;
 }
+
+/* ═══════════════════════════════════════════════════
+   BARRA DE NAVEGACIÓN INFERIOR — solo móvil (≤768px)
+   ═══════════════════════════════════════════════════ */
+.mobile-bottom-nav {
+    display: none; /* oculta en desktop */
+}
+
+@media (max-width: 768px) {
+    /* Mostrar la barra */
+    .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: #ffffff;
+        border-top: 1px solid #e8e8e8;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        z-index: 500;
+        align-items: stretch;
+        padding: 0;
+        padding-bottom: env(safe-area-inset-bottom); /* notch iPhone */
+    }
+
+    /* Agregar padding al body para que el contenido no quede tapado */
+    body {
+        padding-bottom: 64px;
+    }
+
+    /* Cada ítem */
+    .mob-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: #9ca3af;
+        font-size: 10px;
+        font-weight: 500;
+        font-family: 'Roboto', sans-serif;
+        padding: 8px 4px 6px;
+        position: relative;
+        transition: color 0.2s;
+        width: auto;
+        height: auto;
+        border-radius: 0;
+        line-height: 1.2;
+    }
+
+    /* Ícono dentro del ítem */
+    .mob-nav-item > i {
+        font-size: 20px;
+        line-height: 1;
+        transition: transform 0.2s;
+    }
+
+    /* Texto label */
+    .mob-nav-item > span {
+        font-size: 10px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 72px;
+        line-height: 1;
+    }
+
+    /* Indicador azul superior cuando está activo */
+    .mob-nav-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%) scaleX(0);
+        width: 36px;
+        height: 3px;
+        background: var(--primary-color);
+        border-radius: 0 0 3px 3px;
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Estado activo */
+    .mob-nav-item.active {
+        color: var(--primary-color);
+    }
+
+    .mob-nav-item.active::before {
+        transform: translateX(-50%) scaleX(1);
+    }
+
+    .mob-nav-item.active > i {
+        transform: translateY(-1px);
+    }
+
+    /* Efecto ripple al tap */
+    .mob-nav-item:active {
+        background: rgba(41, 98, 255, 0.06);
+    }
+
+    /* Avatar circular de perfil */
+    .mob-nav-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid transparent;
+        transition: border-color 0.2s;
+    }
+
+    .mob-nav-item.active .mob-nav-avatar {
+        border-color: var(--primary-color);
+    }
+
+    /* Letra inicial cuando no hay foto */
+    .mob-nav-avatar-letter {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        line-height: 1;
+        transition: box-shadow 0.2s;
+    }
+
+    .mob-nav-item.active .mob-nav-avatar-letter {
+        box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.35);
+    }
+}
+

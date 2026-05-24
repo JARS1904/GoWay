@@ -72,37 +72,45 @@ if ($_SESSION['id'] > 0) {
                 <?php endif; ?>
             </nav>
 
-            <!-- Menú desplegable solo para móvil -->
-            <div class="user-dropdown">
-                <button class="user-btn">
-                    <i class="fas fa-user-circle"></i>
-                </button>
-                <div class="dropdown-content">
-                    <a href="https://goway.netlify.app" target="_blank">
-                        <i class="fas fa-download"></i> Descargar App
+            <!-- Botón de descarga visible solo en móvil (el resto va a la bottom nav) -->
+            <div class="mobile-header-actions">
+                <a href="https://goway.netlify.app" target="_blank" class="download-btn" style="font-size:13px; padding:7px 14px;">
+                    <i class="fas fa-download"></i> Descargar App
+                </a>
+                <?php if ($_SESSION['rol'] == 3): ?>
+                    <a href="../login.php" class="download-btn" style="font-size:13px; padding:7px 14px;">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
                     </a>
-                    <?php if ($_SESSION['rol'] == 3): ?>
-                        <a href="../login.php">
-                            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-                        </a>
-                    <?php else: ?>
-                        <a href="#" onclick="openFavoritesPanel(); return false;">
-                            <i class="fas fa-heart"></i> Favoritos
-                        </a>
-                        <a href="#" onclick="openReportModal(); return false;">
-                            <i class="fas fa-exclamation-triangle"></i> Reportes
-                        </a>
-                        <a href="#" onclick="toggleNotifications(); return false;">
-                            <i class="far fa-bell"></i> Notificaciones
-                        </a>
-                        <a href="#" onclick="openProfilePanel(); return false;">
-                            <i class="fas fa-user-circle"></i> Mi Perfil
-                        </a>
-                    <?php endif; ?>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
     </header>
+
+    <?php if ($_SESSION['rol'] != 3): ?>
+    <!-- ── Barra de navegación inferior (solo móvil) ───────────────── -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <button class="mob-nav-item" id="mbn-favorites" onclick="openFavoritesPanel(); setMobActive('mbn-favorites')">
+            <i class="fas fa-heart"></i>
+            <span>Favoritos</span>
+        </button>
+        <button class="mob-nav-item" id="mbn-reports" onclick="openReportModal(); setMobActive('mbn-reports')">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Reportes</span>
+        </button>
+        <button class="mob-nav-item" id="mbn-notif" onclick="toggleNotifications(); setMobActive('mbn-notif')">
+            <i class="far fa-bell"></i>
+            <span>Notificaciones</span>
+        </button>
+        <button class="mob-nav-item" id="mbn-profile" onclick="openProfilePanel(); setMobActive('mbn-profile')">
+            <?php if (!empty($_user_foto)): ?>
+                <img src="../../assets/images/profiles/<?php echo htmlspecialchars($_user_foto); ?>" class="mob-nav-avatar" alt="foto">
+            <?php else: ?>
+                <span class="mob-nav-avatar-letter"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></span>
+            <?php endif; ?>
+            <span>Mi Perfil</span>
+        </button>
+    </nav>
+    <?php endif; ?>
 
     <div class="container">
         <!-- Columna izquierda - Búsqueda y resultados -->
