@@ -1350,23 +1350,27 @@ select:focus {
 }
 
 .profile-close-btn {
-    background: none;
+    background: #f1f3f7;
     border: none;
-    cursor: pointer;
-    color: var(--dark-gray);
-    width: auto;
-    height: auto;
-    padding: 6px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
+    font-size: 18px;
+    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
-    font-size: 17px;
-    line-height: 1;
+    color: #555;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    flex-shrink: 0;
+    padding: 0;
 }
 
-.profile-close-btn:hover { background: var(--light-gray); }
+.profile-close-btn:hover {
+    background: #e2e6ef;
+    color: #111;
+}
 
 .profile-avatar-section {
     display: flex;
@@ -1660,16 +1664,26 @@ select:focus {
 }
 
 .close-panel {
-    background: none;
+    background: #f1f3f7;
     border: none;
-    font-size: 24px;
-    color: #6B7280;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
     cursor: pointer;
-    transition: color 0.2s ease;
+    transition: background 0.18s, color 0.18s;
+    flex-shrink: 0;
+    padding: 0;
 }
 
 .close-panel:hover {
-    color: #ef4444;
+    background: #e2e6ef;
+    color: #111;
 }
 
 /* Buscador de Notificaciones */
@@ -2454,4 +2468,16 @@ input:checked + .slider:before {
         width: 100vw;
         right: -100vw;
     }
+}
+
+/* ── route-schedule-block (fila de horarios en route-card) ── */
+.route-schedule-block {
+    margin-bottom: 0;
+}
+
+/* ── Panel de Favoritas: tarjetas usan .route-card, sin estilos extra ── */
+/* Las tarjetas del panel heredan 100% el diseño de .route-card.           */
+/* Solo reducimos el ancho de la tarjeta para adaptarse al panel lateral.  */
+.fav-panel-card.route-card {
+    margin-bottom: 12px;
 }

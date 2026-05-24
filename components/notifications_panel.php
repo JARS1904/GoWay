@@ -19,17 +19,7 @@ $is_empresa = (isset($_SESSION['rol']) && $_SESSION['rol'] == 4 && !empty($_SESS
 $can_send   = ($is_admin || $is_empresa) && empty($hide_send_notification);
 ?>
 <style>
-/* Reset for buttons inside the panel to avoid global CSS collisions */
-.notifications-panel .close-panel {
-    width: auto !important;
-    padding: 0 !important;
-    border: none !important;
-    background: transparent !important;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/* Botones de filtro del panel de notificaciones */
 .notif-filters button.notif-chip {
     width: auto !important;
     border: none !important;
@@ -40,7 +30,7 @@ $can_send   = ($is_admin || $is_empresa) && empty($hide_send_notification);
 <div class="notifications-panel" id="notificationsPanel">
     <div class="notifications-header">
         <h3>Centro de notificaciones</h3>
-        <button class="close-panel" onclick="toggleNotifications()">&times;</button>
+        <button class="modal-close" onclick="toggleNotifications()">&times;</button>
     </div>
     
     <!-- Buscador -->

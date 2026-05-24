@@ -82,6 +82,117 @@ try {
             }
             sendResponse(200, $paradas);
         }
+
+        // ── Obtener detalle completo de una ruta por ID (panel de favoritas) ──
+        if ($_GET['action'] === 'route_detail' && isset($_GET['id_ruta'])) {
+            $id_ruta = (int)$_GET['id_ruta'];
+
+            date_default_timezone_set('America/Mexico_City');
+            $numeroDia = date('N');
+            if ($numeroDia >= 1 && $numeroDia <= 5) {
+                $tipo_dia_actual = 'Lunes a Viernes';
+            } elseif ($numeroDia == 6) {
+                $tipo_dia_actual = 'Sábado';
+            } else {
+                $tipo_dia_actual = 'Domingo';
+            }
+
+            $sql = "SELECT r.id_ruta, r.nombre, r.origen, r.destino, r.rfc_empresa, r.paradas,
+                           r.id_ruta_retorno,
+                           0 AS embarque_minutos, 0 AS bajada_minutos,
+                           NULL AS parada_embarque, NULL AS parada_bajada,
+                           ret.nombre  AS ruta_retorno_nombre,
+                           ret.origen  AS ruta_retorno_origen,
+                           ret.destino AS ruta_retorno_destino,
+                           e.nombre    AS empresa_nombre,
+                           e.telefono  AS empresa_telefono,
+                           e.direccion AS empresa_direccion,
+                           e.email     AS empresa_email
+                    FROM rutas r
+                    JOIN empresas e ON r.rfc_empresa = e.rfc_empresa
+                    LEFT JOIN rutas ret ON r.id_ruta_retorno = ret.id_ruta
+                    WHERE r.id_ruta = ? AND r.activa = 1";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id_ruta);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 0) {
+                sendResponse(404, ["error" => "Ruta no encontrada"]);
+            }
+
+            $row = $result->fetch_assoc();
+            $row['es_tramo'] = 0;
+
+            // Horarios
+            $sql_h = "SELECT h.*,
+                             c.nombre   AS conductor_nombre,
+                             c.licencia AS conductor_licencia,
+                             v.placa    AS vehiculo_placa,
+                             v.modelo   AS vehiculo_modelo,
+                             v.capacidad AS vehiculo_capacidad,
+                             a.id_asignacion,
+                             a.estado AS estado,
+                             a.asientos_disp AS asientos_disponibles
+                      FROM horarios h
+                      LEFT JOIN asignaciones a
+                             ON h.id_horario = a.id_horario
+                            AND h.id_ruta    = a.id_ruta
+                            AND a.activa     = 1
+                            AND a.id_asignacion = (
+                                SELECT id_asignacion FROM asignaciones a2
+                                WHERE a2.id_horario = h.id_horario
+                                  AND a2.id_ruta = h.id_ruta
+                                  AND a2.activa = 1
+                                ORDER BY a2.fecha DESC, a2.id_asignacion DESC
+                                LIMIT 1
+                            )
+                      LEFT JOIN conductores c ON a.rfc_conductor = c.rfc_conductor
+                      LEFT JOIN vehiculos   v ON a.id_vehiculo   = v.id_vehiculo
+                      WHERE h.id_ruta = ? AND h.tipo_dia = ?";
+
+            $stmt_h = $conn->prepare($sql_h);
+            $stmt_h->bind_param("is", $id_ruta, $tipo_dia_actual);
+            $stmt_h->execute();
+            $result_h = $stmt_h->get_result();
+
+            // Paradas estructuradas
+            $stmt_p = $conn->prepare(
+                "SELECT nombre, orden, minutos_desde_origen
+                 FROM   paradas_ruta
+                 WHERE  id_ruta = ?
+                 ORDER  BY orden ASC"
+            );
+            $stmt_p->bind_param("i", $id_ruta);
+            $stmt_p->execute();
+            $paradas_ruta = $stmt_p->get_result()->fetch_all(MYSQLI_ASSOC);
+            $row['paradas_ruta'] = $paradas_ruta;
+
+            $horarios = [];
+            while ($horario = $result_h->fetch_assoc()) {
+                if (!empty($horario['hora_salida'])) {
+                    $horario['paradas_con_hora'] = array_map(function($p) use ($horario) {
+                        return [
+                            'nombre'               => $p['nombre'],
+                            'orden'                => (int)$p['orden'],
+                            'minutos_desde_origen' => (int)$p['minutos_desde_origen'],
+                            'hora_estimada'        => _addMinutes($horario['hora_salida'], (int)$p['minutos_desde_origen']),
+                        ];
+                    }, $paradas_ruta);
+                }
+                $horarios[] = $horario;
+            }
+
+            $row['horarios'] = $horarios;
+            $row['paradas_texto'] = $row['paradas'];
+            $row['paradas'] = array_filter(
+                explode(', ', $row['paradas'] ?? ''),
+                fn($p) => $p !== ''
+            );
+
+            sendResponse(200, [$row]);
+        }
     }
 
     // Manejar solicitud POST para buscar rutas
