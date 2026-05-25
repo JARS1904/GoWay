@@ -3,7 +3,7 @@
 body {
     font-family: 'Segoe UI', system-ui, sans-serif;
     min-height: 100vh;
-    background: linear-gradient(135deg, #c7d8ff 0%, #dce9ff 50%, #eef2ff 100%);
+    background: #fbfbfd;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -149,6 +149,7 @@ nav {
 }
 .rg-panel-feature-icon svg { width: 13px; height: 13px; stroke: #fff; }
 
+
 /* ── Right form panel ──────────────────────────────── */
 .rg-card {
     flex: 1;
@@ -287,9 +288,8 @@ nav {
 /* ── Responsive ──────────────────────────────────── */
 @media (max-width: 720px) {
     .rg-wrap { flex-direction: column; border-radius: 18px; max-width: 480px; }
-    .rg-panel { flex: none; padding: 28px 24px 22px; }
-    .rg-panel-features { display: none; }
-    .rg-card { padding: 28px 22px 24px; max-height: none; }
+    .rg-panel { display: none; }
+    .rg-card { padding: 28px 22px 24px; max-height: none; border-radius: 18px; }
     .rg-grid { grid-template-columns: 1fr; }
     .rg-grid .rg-field-full { grid-column: 1; }
 }

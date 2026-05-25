@@ -10,7 +10,7 @@ include("../controllers/controlador.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - GoWay</title>
     <link rel="icon" href="../assets/images/logo_new.png" type="image/png">
-    <link rel="stylesheet" href="../assets/css/login.css">
+    <link rel="stylesheet" href="../assets/css/login.css?v=<?php echo time(); ?>">
 </head>
 <body>
 

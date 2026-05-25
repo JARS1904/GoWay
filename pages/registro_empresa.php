@@ -6,7 +6,7 @@
     <title>Registro de Empresa - GoWay</title>
     <meta name="description" content="Registra tu empresa en GoWay y empieza a gestionar tu flota de transporte público de manera inteligente.">
     <link rel="icon" href="../assets/images/logo_new.png" type="image/png">
-    <link rel="stylesheet" href="../assets/css/company_registration.css">
+    <link rel="stylesheet" href="../assets/css/company_registration.css?v=<?php echo time(); ?>">
 </head>
 <body>
 

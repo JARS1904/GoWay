@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - GoWay</title>
     <link rel="icon" href="../assets/images/logo_new.png" type="image/png">
-        <link rel="stylesheet" href="../assets/css/user_registration.css">
+    <link rel="stylesheet" href="../assets/css/user_registration.css?v=<?php echo time(); ?>">
 </head>
 <body>
 

@@ -3,7 +3,7 @@
 body {
     font-family: 'Segoe UI', system-ui, sans-serif;
     min-height: 100vh;
-    background: linear-gradient(135deg, #c7d8ff 0%, #dce9ff 50%, #eef2ff 100%);
+    background: #fbfbfd;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -267,10 +267,8 @@ nav {
 /* ── Responsive ─────────────────────────────────── */
 @media (max-width: 680px) {
     .lg-wrap { flex-direction: column; min-height: unset; border-radius: 18px; }
-    .lg-panel { flex: none; padding: 32px 24px 28px; }
-    .lg-panel-img { max-width: 180px; margin-bottom: 0; }
-    .lg-panel-note { display: none; }
-    .lg-card { padding: 32px 24px 28px; }
+    .lg-panel { display: none; }
+    .lg-card { padding: 32px 24px 28px; border-radius: 18px; }
 }
 
 
