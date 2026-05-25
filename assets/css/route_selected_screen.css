@@ -817,16 +817,51 @@ select:focus {
     grid-template-columns: 1fr 1fr;
     gap: 0 32px;
     align-items: start;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    max-height: 2000px;
+    opacity: 1;
+}
+
+.schedule-card-body.schedule-card-collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 30px;
+    overflow: hidden;
+}
+
+/* Header clickeable */
+.schedule-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.schedule-toggle-icon {
+    transition: transform 0.3s;
+    color: #bdbdbd;
+    font-size: 18px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.schedule-card.active .schedule-toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* Contenedor de tiempos - siempre visible */
+.schedule-times-container {
+    padding: 20px 30px;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 /* Fila Salida / Llegada */
 .schedule-times {
-    grid-column: 1 / -1;
     display: flex;
     justify-content: flex-start;
     gap: 48px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #f0f0f0;
     background: transparent;
     margin-bottom: 0;
 }
@@ -1144,6 +1179,7 @@ select:focus {
 
     .schedule-card-body {
         padding: 20px 18px;
+        grid-template-columns: 1fr;
     }
 
     .route-detail-header {
@@ -1285,6 +1321,14 @@ select:focus {
     text-decoration: none;
     transition: all 0.2s;
     width: auto;
+}
+
+.profile-nav-btn-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .profile-nav-btn:hover {
@@ -2555,6 +2599,17 @@ input:checked + .slider:before {
         font-size: 20px;
         line-height: 1;
         transition: transform 0.2s;
+    }
+
+    /* Imagen icono dentro del ítem (notificaciones) */
+    .mob-nav-item-icon {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+        transition: transform 0.2s;
+    }
+    .mob-nav-item.active .mob-nav-item-icon {
+        transform: translateY(-1px);
     }
 
     /* Texto label */

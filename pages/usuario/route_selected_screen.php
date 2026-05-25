@@ -44,11 +44,11 @@ if ($_SESSION['id'] > 0) {
                 <a href="https://goway.netlify.app" target="_blank" class="download-btn">
                     <i class="fas fa-download"></i> Descargar App
                 </a>
-                <?php if ($_SESSION['rol'] == 3): ?>
+                <?php if ($_SESSION['rol'] == 3) { ?>
                     <a href="../login.php" class="download-btn">
                         <i class="fas fa-sign-in-alt"></i> Iniciar sesión
                     </a>
-                <?php else: ?>
+                <?php } else { ?>
                     <button class="profile-nav-btn" onclick="openFavoritesPanel()">
                         <i class="fas fa-heart"></i>
                         Favoritos
@@ -58,18 +58,18 @@ if ($_SESSION['id'] > 0) {
                         Reportes
                     </button>
                     <button class="profile-nav-btn" onclick="toggleNotifications()">
-                        <i class="far fa-bell"></i>
+                        <img src="../../assets/images/icons/icons_notifications.png" alt="Notificaciones" class="profile-nav-btn-icon">
                         Notificaciones
                     </button>
                     <button class="profile-nav-btn" onclick="openProfilePanel()">
-                        <?php if (!empty($_user_foto)): ?>
+                        <?php if (!empty($_user_foto)) { ?>
                             <img src="../../assets/images/profiles/<?php echo htmlspecialchars($_user_foto); ?>" class="profile-nav-mini-avatar profile-nav-mini-img" alt="foto">
-                        <?php else: ?>
+                        <?php } else { ?>
                             <span class="profile-nav-mini-avatar"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></span>
-                        <?php endif; ?>
+                        <?php } ?>
                         Mi Perfil
                     </button>
-                <?php endif; ?>
+                <?php } ?>
             </nav>
 
             <!-- Botón de descarga visible solo en móvil (el resto va a la bottom nav) -->
@@ -77,16 +77,16 @@ if ($_SESSION['id'] > 0) {
                 <a href="https://goway.netlify.app" target="_blank" class="download-btn" style="font-size:13px; padding:7px 14px;">
                     <i class="fas fa-download"></i> Descargar App
                 </a>
-                <?php if ($_SESSION['rol'] == 3): ?>
+                <?php if ($_SESSION['rol'] == 3) { ?>
                     <a href="../login.php" class="download-btn" style="font-size:13px; padding:7px 14px;">
                         <i class="fas fa-sign-in-alt"></i> Entrar
                     </a>
-                <?php endif; ?>
+                <?php } ?>
             </div>
         </div>
     </header>
 
-    <?php if ($_SESSION['rol'] != 3): ?>
+    <?php if ($_SESSION['rol'] != 3) { ?>
     <!-- ── Barra de navegación inferior (solo móvil) ───────────────── -->
     <nav class="mobile-bottom-nav" id="mobileBottomNav">
         <button class="mob-nav-item" id="mbn-favorites" onclick="openFavoritesPanel(); setMobActive('mbn-favorites')">
@@ -98,19 +98,19 @@ if ($_SESSION['id'] > 0) {
             <span>Reportes</span>
         </button>
         <button class="mob-nav-item" id="mbn-notif" onclick="toggleNotifications(); setMobActive('mbn-notif')">
-            <i class="far fa-bell"></i>
+            <img src="../../assets/images/icons/icons_notifications.png" alt="Notificaciones" class="mob-nav-item-icon">
             <span>Notificaciones</span>
         </button>
         <button class="mob-nav-item" id="mbn-profile" onclick="openProfilePanel(); setMobActive('mbn-profile')">
-            <?php if (!empty($_user_foto)): ?>
+            <?php if (!empty($_user_foto)) { ?>
                 <img src="../../assets/images/profiles/<?php echo htmlspecialchars($_user_foto); ?>" class="mob-nav-avatar" alt="foto">
-            <?php else: ?>
+            <?php } else { ?>
                 <span class="mob-nav-avatar-letter"><?php echo htmlspecialchars(strtoupper(mb_substr($_SESSION['nombre'] ?? 'U', 0, 1))); ?></span>
-            <?php endif; ?>
+            <?php } ?>
             <span>Mi Perfil</span>
         </button>
     </nav>
-    <?php endif; ?>
+    <?php } ?>
 
     <div class="container">
         <!-- Columna izquierda - Búsqueda y resultados -->

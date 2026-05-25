@@ -18,7 +18,7 @@
                     <label>Placa del vehículo</label>
                     <div style="position:relative; width: 100%;">
                         <i class="fas fa-car" style="position:absolute; left:12px; top:15px; color:#757575;"></i>
-                        <input type="text" id="reportSearchPlaca" placeholder="Placa del vehículo" style="width: 100%; padding-left:36px;" onkeypress="if(event.key === 'Enter') searchReportAssignment()">
+                        <input type="text" id="reportSearchPlaca" placeholder="Placa del vehículo" style="width: 100%; padding-left:36px;" oninput="this.value = this.value.toUpperCase()" onkeypress="if(event.key === 'Enter') searchReportAssignment()">
                     </div>
                 </div>
                 <button type="button" id="btnSearchReport" class="btn" style="width:auto; flex-shrink:0; border-radius:18px; background:#2962FF; padding:12px 24px; font-weight:500; font-size:16px;" onclick="searchReportAssignment()">Buscar</button>

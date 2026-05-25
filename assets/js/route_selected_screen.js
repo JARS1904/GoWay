@@ -675,7 +675,7 @@ function showRouteDetails(route) {
             <div class="schedule-card">
 
                 <!-- Header: icono + empresa/ruta + fila de cápsulas (día + estado) -->
-                <div class="schedule-header">
+                <div class="schedule-header" style="cursor: pointer;">
                     <div class="schedule-header-icon">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
@@ -699,12 +699,13 @@ function showRouteDetails(route) {
                             </div>
                         </div>
                     </div>
+                    <div class="schedule-toggle-icon" style="margin-left: auto;">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
                 </div>
 
-                <!-- Cuerpo de la tarjeta -->
-                <div class="schedule-card-body">
-
-                    <!-- Salida / Llegada — ocupa las 2 columnas -->
+                <!-- Tiempos siempre visibles -->
+                <div class="schedule-times-container">
                     <div class="schedule-times">
                         <div class="time-group departure">
                             <i class="fas fa-bus"></i>
@@ -721,6 +722,10 @@ function showRouteDetails(route) {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Cuerpo de la tarjeta -->
+                <div class="schedule-card-body schedule-card-collapsed">
 
                     <!-- Columna izquierda: info -->
                     <div class="schedule-left-col">
@@ -786,6 +791,23 @@ function showRouteDetails(route) {
 
     contentHTML += `</div>`; // /route-details
     routeDetailsContainer.innerHTML = contentHTML;
+
+    // ── Event listeners para expandir/contraer horarios ──────────────────
+    const scheduleHeaders = routeDetailsContainer.querySelectorAll('.schedule-header');
+    scheduleHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const card = header.closest('.schedule-card');
+            const body = card.querySelector('.schedule-card-body');
+            
+            if (card.classList.contains('active')) {
+                card.classList.remove('active');
+                body.classList.add('schedule-card-collapsed');
+            } else {
+                card.classList.add('active');
+                body.classList.remove('schedule-card-collapsed');
+            }
+        });
+    });
 }
 
 function showLoading(show, container = document.body) {
