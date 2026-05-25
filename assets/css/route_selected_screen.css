@@ -2691,3 +2691,46 @@ input:checked + .slider:before {
     }
 }
 
+/* Color de iconos del navbar, excepto el perfil */
+.profile-nav-btn i,
+.mob-nav-item i {
+    color: #61666c !important;
+}
+
+/* Filtro aproximado para convertir icono de notificaciones a #61666c */
+.profile-nav-btn-icon,
+.mob-nav-item-icon {
+    filter: invert(42%) sepia(5%) saturate(542%) hue-rotate(174deg) brightness(92%) contrast(85%) !important;
+}
+
+/* Unificar dimensiones y alineación de todos los iconos para que queden parejos */
+.profile-nav-btn > i,
+.profile-nav-btn > .profile-nav-btn-icon,
+.profile-nav-btn > .profile-nav-mini-avatar,
+.mob-nav-item > i,
+.mob-nav-item > .mob-nav-item-icon,
+.mob-nav-item > .mob-nav-avatar,
+.mob-nav-item > .mob-nav-avatar-letter {
+    width: 28px !important;
+    height: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+}
+
+/* Ajuste de fuente para el icono de perfil si es letra */
+.profile-nav-mini-avatar,
+.mob-nav-avatar-letter {
+    font-size: 13px !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+}
+
+/* Reducir ligeramente el área visual de la campanita para que no se vea gigante comparada con fav/reportes */
+.profile-nav-btn > .profile-nav-btn-icon,
+.mob-nav-item > .mob-nav-item-icon {
+    padding: 3px !important;
+}
