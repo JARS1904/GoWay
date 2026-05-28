@@ -98,7 +98,15 @@ $can_send   = ($is_admin || $is_empresa) && empty($hide_send_notification);
                 $ayer_str = date('Y-m-d', strtotime('-1 day'));
 
                 while ($row_notif = $result_notif->fetch_assoc()) {
-                    $target = ($row_notif['id_usuario'] === null) ? 'Todos los usuarios' : htmlspecialchars($row_notif['usuario_nombre']);
+                    if ($row_notif['destinatario_tipo'] === 'checadores') {
+                        $target = ($row_notif['rfc_empresa'] !== null) ? 'Checadores de la empresa' : 'Todos los checadores';
+                    } else {
+                        if ($row_notif['rfc_empresa'] !== null) {
+                            $target = 'Suscriptores de la empresa';
+                        } else {
+                            $target = ($row_notif['id_usuario'] === null) ? 'Todos los usuarios' : htmlspecialchars($row_notif['usuario_nombre']);
+                        }
+                    }
                     $titulo = htmlspecialchars($row_notif['titulo']);
                     $tipo = htmlspecialchars($row_notif['tipo']);
                     
@@ -253,9 +261,11 @@ function applyFilters(search, type) {
             <div class="modal-body">
                 <div>
                     <div class="modal-form-group" <?php echo $is_empresa ? 'style="display:none"' : ''; ?>>
-                        <label>Destinatario (Usuario)</label>
+                        <label>Destinatario</label>
                         <select name="id_usuario">
                             <option value="todos">Todos los usuarios (Global)</option>
+                            <option value="todos_checadores">Todos los checadores (Global)</option>
+                            <optgroup label="Usuarios específicos">
                             <?php
                             if (isset($conn) && !$is_empresa) {
                                 $res_usuarios = $conn->query("SELECT id, nombre, email FROM usuarios ORDER BY nombre ASC");
@@ -266,6 +276,7 @@ function applyFilters(search, type) {
                                 }
                             }
                             ?>
+                            </optgroup>
                         </select>
                     </div>
                     <?php if ($is_empresa): ?>

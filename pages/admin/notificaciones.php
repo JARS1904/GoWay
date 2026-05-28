@@ -77,12 +77,20 @@ require_once '../../config/conexion_bd.php';
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 // Determinar destinatario
-                                if ($row['rfc_empresa'] !== null) {
-                                    $target = '<span style="color:#2962FF;font-weight:600">Suscriptores de la empresa</span>';
-                                } elseif ($row['id_usuario'] === null) {
-                                    $target = '<strong>Todos los usuarios</strong>';
+                                if ($row['destinatario_tipo'] === 'checadores') {
+                                    if ($row['rfc_empresa'] !== null) {
+                                        $target = '<span style="color:#FF6D00;font-weight:600">Checadores de la empresa</span>';
+                                    } else {
+                                        $target = '<strong>Todos los checadores</strong>';
+                                    }
                                 } else {
-                                    $target = htmlspecialchars($row['usuario_nombre'] ?? 'Usuario #'.$row['id_usuario']);
+                                    if ($row['rfc_empresa'] !== null) {
+                                        $target = '<span style="color:#2962FF;font-weight:600">Suscriptores de la empresa</span>';
+                                    } elseif ($row['id_usuario'] === null) {
+                                        $target = '<strong>Todos los usuarios</strong>';
+                                    } else {
+                                        $target = htmlspecialchars($row['usuario_nombre'] ?? 'Usuario #'.$row['id_usuario']);
+                                    }
                                 }
                                 $titulo = htmlspecialchars($row['titulo']);
                                 $tipo = htmlspecialchars($row['tipo']);

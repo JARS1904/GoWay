@@ -17,22 +17,32 @@ $conn = $conexion;
 // Determinar si es Super Admin o Empresa
 $is_empresa = isset($_SESSION['rol']) && $_SESSION['rol'] == 4 && !empty($_SESSION['rfc_empresa']);
 
+$destinatario_tipo = 'usuarios';
+$id_usu = null;
+$rfc_empresa = null;
+
 if ($is_empresa) {
-    // Empresa: siempre envía a sus suscriptores (id_usuario = NULL, rfc_empresa = su RFC)
-    $id_usu     = null;
     $rfc_empresa = $_SESSION['rfc_empresa'];
+    $destinatario_empresa = $_POST['destinatario_empresa'] ?? 'favoritos';
+    if ($destinatario_empresa === 'checadores') {
+        $destinatario_tipo = 'checadores';
+    }
 } else {
-    // Super Admin: puede enviar a un usuario específico o globalmente
+    // Super Admin: puede enviar a un usuario específico o globalmente a usuarios/checadores
     $id_usuario  = $_POST['id_usuario'] ?? 'todos';
-    $id_usu      = ($id_usuario === 'todos' || empty($id_usuario)) ? null : (int)$id_usuario;
-    $rfc_empresa = null; // global
+    
+    if ($id_usuario === 'todos_checadores') {
+        $destinatario_tipo = 'checadores';
+    } else {
+        $id_usu = ($id_usuario === 'todos' || empty($id_usuario)) ? null : (int)$id_usuario;
+    }
 }
 
-$sql  = "INSERT INTO notificaciones (id_usuario, rfc_empresa, titulo, mensaje, tipo) VALUES (?, ?, ?, ?, ?)";
+$sql  = "INSERT INTO notificaciones (id_usuario, rfc_empresa, titulo, mensaje, tipo, destinatario_tipo) VALUES (?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
 
 if ($stmt) {
-    $stmt->bind_param("issss", $id_usu, $rfc_empresa, $titulo, $mensaje, $tipo);
+    $stmt->bind_param("isssss", $id_usu, $rfc_empresa, $titulo, $mensaje, $tipo, $destinatario_tipo);
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Notificación enviada correctamente']);
     } else {

@@ -52,16 +52,18 @@ try {
         // b) Está dirigida directamente a él (id_usuario = ?)
         // c) Viene de una empresa cuya ruta tiene en favoritos (rfc_empresa IN (...))
         $sql = "SELECT n.* FROM notificaciones n
-                WHERE
-                  (n.id_usuario IS NULL AND n.rfc_empresa IS NULL)
-                  OR n.id_usuario = ?
-                  OR (
-                      n.rfc_empresa IS NOT NULL
-                      AND n.rfc_empresa IN (
-                          SELECT r.rfc_empresa
-                          FROM rutas_favoritas rf
-                          JOIN rutas r ON rf.id_ruta = r.id_ruta
-                          WHERE rf.id_usuario = ?
+                WHERE n.destinatario_tipo = 'usuarios'
+                  AND (
+                      (n.id_usuario IS NULL AND n.rfc_empresa IS NULL)
+                      OR n.id_usuario = ?
+                      OR (
+                          n.rfc_empresa IS NOT NULL
+                          AND n.rfc_empresa IN (
+                              SELECT r.rfc_empresa
+                              FROM rutas_favoritas rf
+                              JOIN rutas r ON rf.id_ruta = r.id_ruta
+                              WHERE rf.id_usuario = ?
+                          )
                       )
                   )
                 ORDER BY n.fecha_creacion DESC";
@@ -101,6 +103,7 @@ try {
             // Marcar una específica (cualquiera que le corresponda al usuario)
             $sql = "UPDATE notificaciones SET leido = 1
                     WHERE id_notificacion = ?
+                    AND destinatario_tipo = 'usuarios'
                     AND (
                         (id_usuario IS NULL AND rfc_empresa IS NULL)
                         OR id_usuario = ?
@@ -116,14 +119,17 @@ try {
         } else {
             // Marcar todas las que le corresponden
             $sql = "UPDATE notificaciones SET leido = 1
-                    WHERE (id_usuario IS NULL AND rfc_empresa IS NULL)
-                    OR id_usuario = ?
-                    OR (rfc_empresa IS NOT NULL AND rfc_empresa IN (
-                        SELECT r.rfc_empresa
-                        FROM rutas_favoritas rf
-                        JOIN rutas r ON rf.id_ruta = r.id_ruta
-                        WHERE rf.id_usuario = ?
-                    ))";
+                    WHERE destinatario_tipo = 'usuarios'
+                    AND (
+                        (id_usuario IS NULL AND rfc_empresa IS NULL)
+                        OR id_usuario = ?
+                        OR (rfc_empresa IS NOT NULL AND rfc_empresa IN (
+                            SELECT r.rfc_empresa
+                            FROM rutas_favoritas rf
+                            JOIN rutas r ON rf.id_ruta = r.id_ruta
+                            WHERE rf.id_usuario = ?
+                        ))
+                    )";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ii", $id_usuario, $id_usuario);
         }
