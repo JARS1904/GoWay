@@ -67,9 +67,10 @@ try {
         $row = $conn->query("SELECT SUM(activo=1) AS a, SUM(activo=0) AS i FROM vehiculos v WHERE 1=1 $w_empresa_vehiculos")->fetch_assoc();
         $data['flota_dona'] = ['labels' => ['Activos', 'Inactivos'], 'data' => [(int)$row['a'], (int)$row['i']]];
 
-        $q = $conn->query("SELECT DATE_FORMAT(a.fecha, '%d/%m') AS dia, SUM(a.estado='completado') AS c, SUM(a.estado='cancelado') AS ca, SUM(a.estado='en_ruta') AS er, SUM(a.estado='programado') AS p FROM asignaciones a JOIN rutas r ON a.id_ruta = r.id_ruta WHERE a.fecha >= CURDATE() - INTERVAL 6 DAY $w_empresa_asig GROUP BY a.fecha ORDER BY a.fecha ASC");
-        $d = ['labels' => [], 'completadas' => [], 'canceladas' => [], 'en_ruta' => [], 'programadas' => []];
-        while ($row = $q->fetch_assoc()) { $d['labels'][] = $row['dia']; $d['completadas'][] = (int)$row['c']; $d['canceladas'][] = (int)$row['ca']; $d['en_ruta'][] = (int)$row['er']; $d['programadas'][] = (int)$row['p']; }
+        $q = $conn->query("SELECT IF(a.activa=0, 'Inactiva/Cancelada', a.estado) AS estado_final, COUNT(*) as t FROM asignaciones a JOIN rutas r ON a.id_ruta = r.id_ruta WHERE 1=1 $w_empresa_asig GROUP BY estado_final");
+        $d = ['labels' => [], 'data' => []];
+        $em = ['programado' => 'Programado', 'en_ruta' => 'En Ruta', 'completado' => 'Completado', 'cancelado' => 'Cancelado', 'retrasado' => 'Retrasado', 'Inactiva/Cancelada' => 'Inactiva/Cancelada'];
+        while ($row = $q->fetch_assoc()) { $d['labels'][] = $em[$row['estado_final']] ?? ucfirst($row['estado_final']); $d['data'][] = (int)$row['t']; }
         $data['asig_dias'] = $d;
 
         $q = $conn->query("SELECT rep.estado, COUNT(*) AS t FROM reportes rep $join_rfc WHERE rep.archivado = 0 $w_rfc GROUP BY rep.estado");
@@ -179,7 +180,7 @@ try {
         $data['estado_hoy'] = $d;
 
         // Gráfico 2: Top conductores con más carga (Barras)
-        $q = $conn->query("SELECT c.nombre, COUNT(*) as t FROM asignaciones a JOIN conductores c ON a.rfc_conductor = c.rfc_conductor WHERE a.fecha >= CURDATE() - INTERVAL 7 DAY AND a.activa=1 $w_empresa_conductores GROUP BY a.rfc_conductor ORDER BY t DESC LIMIT 5");
+        $q = $conn->query("SELECT c.nombre, COUNT(*) as t FROM asignaciones a JOIN conductores c ON a.rfc_conductor = c.rfc_conductor WHERE a.activa=1 $w_empresa_conductores GROUP BY a.rfc_conductor ORDER BY t DESC LIMIT 5");
         $d = ['labels' => [], 'data' => []];
         while ($row = $q->fetch_assoc()) {
             $n = explode(' ', $row['nombre']);

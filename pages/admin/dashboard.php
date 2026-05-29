@@ -168,8 +168,8 @@ require_once '../../config/sync_session_foto.php';
                                 <span class="material-icons">directions_bus</span>
                             </div>
                         </div>
-                        <div id="flotaDonaStats" style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;justify-content:center;"></div>
                         <canvas id="chartFlotaDona" height="140"></canvas>
+                        <div id="flotaDonaStats" style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap;justify-content:center;"></div>
                     </div>
 
                     <!-- Asignaciones -->
@@ -177,7 +177,7 @@ require_once '../../config/sync_session_foto.php';
                         <div class="chart-card-header" style="margin-bottom: 10px;">
                             <div class="chart-card-title">
                                 <h4>Asignaciones</h4>
-                                <span>&Uacute;ltimos 7 d&iacute;as</span>
+                                <span>Hist&oacute;rico general</span>
                             </div>
                             <div class="chart-card-icon blue">
                                 <span class="material-icons">calendar_today</span>
@@ -289,16 +289,13 @@ require_once '../../config/sync_session_foto.php';
     }
 
     function renderAsigDias(d) {
-        if (!d.labels || d.labels.length===0) { showEmpty('chartAsigDias','Sin asignaciones en los últimos 7 días'); return; }
+        if (!d.labels || d.labels.length===0) { showEmpty('chartAsigDias','Sin asignaciones registradas'); return; }
+        const colorMap = { 'Programado': '#64748b', 'Completado': GW.green, 'En Ruta': GW.blue, 'Cancelado': GW.red, 'Retrasado': GW.orange, 'Inactiva/Cancelada': GW.red };
+        const colors = d.labels.map(l => colorMap[l] || GW.gray);
         new Chart(document.getElementById('chartAsigDias'), {
-            type:'bar',
-            data:{ labels:d.labels, datasets:[
-                { label:'Completadas', data:d.completadas, backgroundColor:GW.green,  borderRadius:4, stack:'a' },
-                { label:'En Ruta',     data:d.en_ruta,     backgroundColor:GW.blue,   borderRadius:4, stack:'a' },
-                { label:'Programadas', data:d.programadas,  backgroundColor:GW.blue3,  borderRadius:4, stack:'a' },
-                { label:'Canceladas',  data:d.canceladas,   backgroundColor:GW.red2,   borderRadius:4, stack:'a' },
-            ]},
-            options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom', labels:{ font:baseFont, padding:14, boxWidth:12, color:GW.text } }, tooltip:{...baseTooltip,mode:'index',intersect:false} }, scales:{ x:{ stacked:true, grid:{display:false}, ticks:baseTick() }, y:{ stacked:true, grid:baseGrid, ticks:{...baseTick(),stepSize:1}, beginAtZero:true } } }
+            type:'doughnut',
+            data:{ labels:d.labels, datasets:[{ data:d.data, backgroundColor:colors, borderColor:'#fff', borderWidth:3, hoverOffset:6 }] },
+            options:{ cutout:'68%', plugins:{ legend:{ position:'bottom', labels:{ font:baseFont, padding:14, boxWidth:12, color:GW.text } }, tooltip:{...baseTooltip} } }
         });
     }
 

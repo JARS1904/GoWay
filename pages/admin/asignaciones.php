@@ -62,7 +62,7 @@ require_once '../../config/sync_session_foto.php';
         </div>
         <div class="chart-card">
             <div class="chart-card-header">
-                <div class="chart-card-title"><h4>Carga de Conductores</h4><span>Top 5 en los últimos 7 días</span></div>
+                <div class="chart-card-title"><h4>Carga de conductores</h4><span>Top 5 histórico</span></div>
                 <div class="chart-card-icon blue"><span class="material-icons">badge</span></div>
             </div>
             <canvas id="chartConductores" height="160"></canvas>
