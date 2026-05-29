@@ -120,7 +120,7 @@ try {
         $data['kpi'] = $kpi;
 
         // Gráfico 1: Dona de estado
-        $data['estado_vehiculos'] = ['labels' => ['Disponibles', 'En mantenimiento/Inactivos'], 'data' => [$kpi['activos'], $kpi['inactivos']]];
+        $data['estado_vehiculos'] = ['labels' => ['Activos', 'Inactivos'], 'data' => [$kpi['activos'], $kpi['inactivos']]];
 
         // Gráfico 2: Distribución por modelo (Barras)
         $q = $conn->query("SELECT modelo, COUNT(*) AS t FROM vehiculos v WHERE 1=1 $w_empresa_vehiculos GROUP BY modelo ORDER BY t DESC LIMIT 5");

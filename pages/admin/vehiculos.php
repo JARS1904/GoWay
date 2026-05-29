@@ -1,4 +1,4 @@
-﻿<!--Se agreo para el manejo de sesión-->
+<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -54,7 +54,7 @@ require_once '../../config/sync_session_foto.php';
     <div class="charts-grid" id="vehiculosChartsGrid" style="display:none; grid-template-columns: 1fr 2fr;">
         <div class="chart-card">
             <div class="chart-card-header">
-                <div class="chart-card-title"><h4>Estado del Parque</h4><span>Disponibilidad actual</span></div>
+                <div class="chart-card-title"><h4>Estado de la flota</h4><span>Disponibilidad actual</span></div>
                 <div class="chart-card-icon green"><span class="material-icons">directions_bus</span></div>
             </div>
             <canvas id="chartEstadoVehiculos" height="160"></canvas>
@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('vehiculosChartsGrid').style.display = 'grid';
         if(data.estado_vehiculos && data.estado_vehiculos.data.some(v=>v>0)) {
             new Chart(document.getElementById('chartEstadoVehiculos'), {
-                type: 'doughnut', data: { labels: data.estado_vehiculos.labels, datasets: [{ data: data.estado_vehiculos.data, backgroundColor: [GW.green, GW.orange] }] }, options: {plugins: {legend: {position: 'bottom'}}, cutout: '70%'}
+                type: 'doughnut', data: { labels: data.estado_vehiculos.labels, datasets: [{ data: data.estado_vehiculos.data, backgroundColor: [GW.blue, GW.red] }] }, options: {plugins: {legend: {position: 'bottom'}}, cutout: '70%'}
             });
         }
         if(data.modelos && data.modelos.data.length > 0) {

@@ -161,7 +161,7 @@ require_once '../../config/sync_session_foto.php';
                     <div class="chart-card">
                         <div class="chart-card-header" style="margin-bottom: 10px;">
                             <div class="chart-card-title">
-                                <h4>Estado de la Flota</h4>
+                                <h4>Estado de la flota</h4>
                                 <span>Veh&iacute;culos registrados</span>
                             </div>
                             <div class="chart-card-icon green">
@@ -190,7 +190,7 @@ require_once '../../config/sync_session_foto.php';
                     <div class="chart-card">
                         <div class="chart-card-header" style="margin-bottom: 10px;">
                             <div class="chart-card-title">
-                                <h4>Estado de Reportes</h4>
+                                <h4>Estado de reportes</h4>
                                 <span>Sin archivar</span>
                             </div>
                             <div class="chart-card-icon purple">
@@ -283,7 +283,7 @@ require_once '../../config/sync_session_foto.php';
         if (!flota.data || flota.data.every(v => v === 0)) { showEmpty('chartFlotaDona','Sin datos de vehículos'); return; }
         new Chart(document.getElementById('chartFlotaDona'), {
             type:'doughnut',
-            data:{ labels:flota.labels, datasets:[{ data:flota.data, backgroundColor:[GW.blue,'#e2e8f0'], borderColor:['#fff','#fff'], borderWidth:3, hoverOffset:6 }] },
+            data:{ labels:flota.labels, datasets:[{ data:flota.data, backgroundColor:[GW.blue,GW.red], borderColor:['#fff','#fff'], borderWidth:3, hoverOffset:6 }] },
             options:{ cutout:'72%', plugins:{ legend:{ position:'bottom', labels:{ font:baseFont, padding:16, boxWidth:12, color:GW.text } }, tooltip:{...baseTooltip, callbacks:{ label:(ctx)=>` ${ctx.label}: ${ctx.parsed}` }} } }
         });
     }

@@ -1,4 +1,4 @@
-﻿<!--Se agreo para el manejo de sesión-->
+<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -52,14 +52,14 @@ require_once '../../config/sync_session_foto.php';
     <div class="charts-grid" id="horariosChartsGrid" style="display:none; grid-template-columns: 1fr 1fr;">
         <div class="chart-card">
             <div class="chart-card-header">
-                <div class="chart-card-title"><h4>Bandas Horarias</h4><span>Distribución por franja del día</span></div>
+                <div class="chart-card-title"><h4>Bandas horarias</h4><span>Distribución por franja del día</span></div>
                 <div class="chart-card-icon purple"><span class="material-icons">schedule</span></div>
             </div>
             <canvas id="chartFranjas" height="160"></canvas>
         </div>
         <div class="chart-card">
             <div class="chart-card-header">
-                <div class="chart-card-title"><h4>Tipos de Día</h4><span>Configuraciones activas</span></div>
+                <div class="chart-card-title"><h4>Tipos de día</h4><span>Configuraciones activas</span></div>
                 <div class="chart-card-icon blue"><span class="material-icons">event</span></div>
             </div>
             <canvas id="chartTipoDia" height="160"></canvas>
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('horariosChartsGrid').style.display = 'grid';
         if(data.franjas && data.franjas.data.some(v=>v>0)) {
             new Chart(document.getElementById('chartFranjas'), {
-                type: 'pie', data: { labels: data.franjas.labels, datasets: [{ data: data.franjas.data, backgroundColor: [GW.purple, GW.orange, GW.green, GW.blue] }] }, options: {plugins: {legend: {position: 'bottom'}}}
+                type: 'pie', data: { labels: data.franjas.labels, datasets: [{ data: data.franjas.data, backgroundColor: [GW.blue, GW.green, GW.orange, GW.purple] }] }, options: {plugins: {legend: {position: 'bottom'}}}
             });
         }
         if(data.tipo_dia && data.tipo_dia.data.length > 0) {

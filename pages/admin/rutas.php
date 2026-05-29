@@ -1,4 +1,4 @@
-﻿<!--Se agreo para el manejo de sesión-->
+<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -56,14 +56,14 @@ require_once '../../config/sync_session_foto.php';
     <div class="charts-grid" id="rutasChartsGrid" style="display:none; grid-template-columns: 1fr 2fr;">
         <div class="chart-card">
             <div class="chart-card-header">
-                <div class="chart-card-title"><h4>Estado de Rutas</h4><span>Activas vs Inactivas</span></div>
+                <div class="chart-card-title"><h4>Estado de rutas</h4><span>Activas vs Inactivas</span></div>
                 <div class="chart-card-icon blue"><span class="material-icons">route</span></div>
             </div>
             <canvas id="chartEstadoRutas" height="160"></canvas>
         </div>
         <div class="chart-card">
             <div class="chart-card-header">
-                <div class="chart-card-title"><h4>Top Rutas</h4><span>Con más paradas asignadas</span></div>
+                <div class="chart-card-title"><h4>Top rutas</h4><span>Con más paradas asignadas</span></div>
                 <div class="chart-card-icon green"><span class="material-icons">place</span></div>
             </div>
             <canvas id="chartTopParadas" height="160"></canvas>
@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('rutasChartsGrid').style.display = 'grid';
         if(data.estado_rutas && data.estado_rutas.data.some(v=>v>0)) {
             new Chart(document.getElementById('chartEstadoRutas'), {
-                type: 'doughnut', data: { labels: data.estado_rutas.labels, datasets: [{ data: data.estado_rutas.data, backgroundColor: [GW.blue, GW.gray] }] }, options: {...baseOpt, cutout: '70%'}
+                type: 'doughnut', data: { labels: data.estado_rutas.labels, datasets: [{ data: data.estado_rutas.data, backgroundColor: [GW.blue, GW.red] }] }, options: {...baseOpt, cutout: '70%'}
             });
         }
         if(data.top_paradas && data.top_paradas.data.length > 0) {

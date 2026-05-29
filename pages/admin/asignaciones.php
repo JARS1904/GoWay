@@ -1,4 +1,4 @@
-﻿<!--Se agreo para el manejo de sesión-->
+<!--Se agreo para el manejo de sesión-->
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
@@ -55,7 +55,7 @@ require_once '../../config/sync_session_foto.php';
     <div class="charts-grid" id="asignacionesChartsGrid" style="display:none; grid-template-columns: 1fr 2fr;">
         <div class="chart-card">
             <div class="chart-card-header">
-                <div class="chart-card-title"><h4>Estado Operativo</h4><span>Total Histórico</span></div>
+                <div class="chart-card-title"><h4>Estado operativo</h4><span>Total Histórico</span></div>
                 <div class="chart-card-icon orange"><span class="material-icons">assignment</span></div>
             </div>
             <canvas id="chartEstadoHoy" height="160"></canvas>
@@ -469,7 +469,7 @@ require_once '../../config/sync_session_foto.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const GW = { blue:'#0660fe', green:'#10b981', orange:'#f59e0b', red:'#ef4444', gray:'#e2e8f0', purple:'#8b5cf6' };
+    const GW = { blue:'#0660fe', green:'#10b981', orange:'#f59e0b', red:'#ef4444', gray:'#64748b', purple:'#8b5cf6' };
     fetch('../../api/kpis_api.php?seccion=asignaciones').then(r=>r.json()).then(data => {
         if(!data.success) return;
         document.getElementById('asignacionesStatsGrid').style.display = 'grid';
@@ -480,8 +480,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         document.getElementById('asignacionesChartsGrid').style.display = 'grid';
         if(data.estado_hoy && data.estado_hoy.data.some(v=>v>0)) {
+            const estadoColorsMap = { 'Programado': GW.gray, 'Completado': GW.green, 'En Ruta': GW.blue, 'Cancelado': GW.red, 'Retrasado': GW.orange, 'Inactiva/Cancelada': GW.red };
+            const bgColors = data.estado_hoy.labels.map(l => estadoColorsMap[l] || GW.gray);
             new Chart(document.getElementById('chartEstadoHoy'), {
-                type: 'doughnut', data: { labels: data.estado_hoy.labels, datasets: [{ data: data.estado_hoy.data, backgroundColor: [GW.blue, GW.purple, GW.green, GW.red, GW.orange] }] }, options: {plugins: {legend: {position: 'bottom'}}, cutout:'70%'}
+                type: 'doughnut', data: { labels: data.estado_hoy.labels, datasets: [{ data: data.estado_hoy.data, backgroundColor: bgColors }] }, options: {plugins: {legend: {position: 'bottom'}}, cutout:'70%'}
             });
         }
         if(data.top_conductores && data.top_conductores.data.length > 0) {
