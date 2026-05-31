@@ -897,3 +897,16 @@ footer:not(.site-footer) {
     .hero-cta { flex-direction: column; width: 100%; max-width: 300px; margin: 0 auto; }
     .btn-main { width: 100%; }
 }
+
+/* SCROLL REVEAL ANIMATIONS */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}

@@ -63,7 +63,7 @@ if (isset($_SESSION['id'])) {
     </div>
 </section>
 
-<section class="section-empresa-intro" id="empresas">
+<section class="section-empresa-intro reveal-on-scroll" id="empresas">
     <div class="empresa-intro-inner">
 
         <!-- TEXTO -->
@@ -222,7 +222,7 @@ if (isset($_SESSION['id'])) {
 </section>
 
 <!-- SECCIÓN CHECADORES -->
-<section class="section-mobile alt-bg" id="checadores">
+<section class="section-mobile alt-bg reveal-on-scroll" id="checadores">
     <div class="mobile-inner">
 
         <div class="mobile-text-col">
@@ -278,7 +278,7 @@ if (isset($_SESSION['id'])) {
 </section>
 
 <!-- SECCIÓN USUARIOS -->
-<section class="section-mobile" id="usuarios">
+<section class="section-mobile reveal-on-scroll" id="usuarios">
     <div class="mobile-inner reverse">
 
         <div class="mobile-text-col">
@@ -384,6 +384,23 @@ if (isset($_SESSION['id'])) {
     window.addEventListener('scroll', () => {
         nav.classList.toggle('scrolled', window.scrollY > 10);
     });
+
+    // Scroll reveal logic
+    const revealElements = document.querySelectorAll('.reveal-on-scroll');
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                // Dejar de observar una vez que ya apareció
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px"
+    });
+
+    revealElements.forEach(el => revealObserver.observe(el));
 </script>
 </body>
 </html>
