@@ -223,7 +223,7 @@ document.getElementById('empresaRegForm').addEventListener('submit', async funct
     try {
         const fd = new FormData(this);
         fd.append('tel_empresa', document.getElementById('tel_empresa').value);
-        const res  = await fetch('../controllers/insert_empresa.php', { method: 'POST', body: fd });
+        const res  = await fetch('../controllers/insert/insert_empresa.php', { method: 'POST', body: fd });
         const data = await res.json();
 
         if (data.success) {

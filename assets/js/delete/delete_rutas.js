@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const row = this.closest('tr');
             const id_ruta = row.querySelector('td:first-child').getAttribute('data-id') || '';
 
-            if (confirm('¿Estás seguro de que deseas eliminar esta ruta? Se eliminarán todos sus horarios y asignaciones relacionadas.')) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta ruta? No podrás hacerlo si tiene horarios o asignaciones activas.')) {
                 // Deshabilitar botón y mostrar carga
                 const deleteBtn = this;
                 deleteBtn.disabled = true;
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('id_ruta', id_ruta);
 
                 // Enviar con AJAX en lugar de form.submit()
-                fetch('/GoWay/controllers/eliminar_ruta.php', {
+                fetch('/GoWay/controllers/delete/eliminar_ruta.php', {
                     method: 'POST',
                     body: formData
                 })

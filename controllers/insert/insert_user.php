@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../config/conexion_bd.php';
+require_once '../../config/conexion_bd.php';
 require_once __DIR__ . '/upload_foto.php';
 
 $conn = $conexion;
@@ -14,7 +14,7 @@ $nombre   = $_POST['nombre'];
 $email    = $_POST['email'];
 $password_raw = $_POST['password'];
 
-require_once '../config/password_validation.php';
+require_once '../../config/password_validation.php';
 if (!validarContrasenaFuerte($password_raw)) {
     echo json_encode(["success" => false, "message" => "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."]);
     exit();

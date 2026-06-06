@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../config/conexion_bd.php';
+require_once '../../config/conexion_bd.php';
 
 $conn = $conexion;
 if ($conn->connect_error) {

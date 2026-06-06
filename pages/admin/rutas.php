@@ -16,7 +16,7 @@ require_once '../../config/sync_session_foto.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rutas - Transporte Público</title>
-    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="icon" href="../../assets/images/logo_new.png" type="image/png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
@@ -177,7 +177,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Agregar nueva ruta</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../../controllers/insertar_ruta.php" method="POST">
+            <form id="routeForm" action="../../controllers/insert/insertar_ruta.php" method="POST">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>

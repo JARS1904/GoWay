@@ -5,8 +5,8 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 
-require_once '../config/conexion_bd.php';
-require_once '../config/opciones_reportes.php';
+require_once '../../config/conexion_bd.php';
+require_once '../../config/opciones_reportes.php';
 
 // Procesar el formulario cuando se envía
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

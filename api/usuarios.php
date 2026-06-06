@@ -5,7 +5,7 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 require_once '../config/conexion_bd.php';
-require_once '../controllers/upload_foto.php';
+require_once '../controllers/insert/upload_foto.php';
 
 // Crear conexión
 $conn = $conexion;

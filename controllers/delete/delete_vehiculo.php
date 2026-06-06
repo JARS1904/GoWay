@@ -16,21 +16,12 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Iniciar transacción
-$conn->begin_transaction();
-
 try {
-    // 1. Eliminar asignaciones relacionadas
-    $sql1 = "DELETE FROM asignaciones WHERE id_vehiculo = ?";
-    $stmt1 = $conn->prepare($sql1);
-    $stmt1->bind_param("i", $id);
-    $stmt1->execute();
-    
-    // 2. Eliminar el vehículo
-    $sql2 = "DELETE FROM vehiculos WHERE id_vehiculo = ?";
-    $stmt2 = $conn->prepare($sql2);
-    $stmt2->bind_param("i", $id);
-    $stmt2->execute();
+    // Intentar eliminar el vehículo
+    $sql = "DELETE FROM vehiculos WHERE id_vehiculo = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
     
     // Insertar notificación de sistema
     $titulo_notif = "Unidad dada de baja";
@@ -43,19 +34,27 @@ try {
         $stmt_notif->close();
     }
 
-    // Confirmar transacción si todo salió bien
-    $conn->commit();
-
     echo json_encode(['success' => true, 'message' => 'Vehículo eliminado exitosamente']);
     exit;
+} catch (mysqli_sql_exception $e) {
+    if ($e->getCode() == 1451) {
+        http_response_code(400);
+        echo json_encode([
+            "success" => false, 
+            "message" => "No se puede eliminar esta unidad porque tiene asignaciones activas. Por favor, elimine o reasigne dichas asignaciones primero."
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => "Error de base de datos: " . $e->getMessage()]);
+    }
 } catch (Exception $e) {
-    // Revertir en caso de error
-    $conn->rollback();
-    echo json_encode(['success' => false, 'message' => 'Error al eliminar el vehículo: ' . $e->getMessage()]);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error inesperado: ' . $e->getMessage()]);
     exit;
 }
 
-$stmt1->close();
-$stmt2->close();
+if (isset($stmt)) {
+    $stmt->close();
+}
 $conn->close();
 ?>

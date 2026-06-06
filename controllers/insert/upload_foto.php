@@ -25,7 +25,7 @@ function uploadFoto(array $file, string $prefix): ?string {
     $ext = $ext_map[$mime];
     $filename = $prefix . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
 
-    $upload_dir = __DIR__ . '/../assets/images/profiles/';
+    $upload_dir = __DIR__ . '/../../assets/images/profiles/';
     if (!is_dir($upload_dir)) {
         mkdir($upload_dir, 0755, true);
     }

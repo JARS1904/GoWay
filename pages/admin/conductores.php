@@ -131,7 +131,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Agregar nuevo conductor</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../../controllers/insert_conductor.php" method="POST" enctype="multipart/form-data">
+            <form id="routeForm" action="../../controllers/insert/insert_conductor.php" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>
@@ -200,7 +200,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Editar Conductor</h3>
                 <button class="modal-close" id="closeEditConductoresModal">×</button>
             </div>
-            <form id="editVehicleForm" action="actualizar/actu_conductoresSql.php" method="POST" enctype="multipart/form-data">
+            <form id="editVehicleForm" action="../../controllers/update/update_conductor.php" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div>
                         <div class="modal-form-group">

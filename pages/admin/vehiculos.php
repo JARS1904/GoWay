@@ -148,7 +148,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Agregar nuevo Vehiculo</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../../controllers/insert_vehiculos.php" method="POST">
+            <form id="routeForm" action="../../controllers/insert/insert_vehiculos.php" method="POST">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>

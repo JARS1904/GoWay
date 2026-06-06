@@ -129,7 +129,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Agregar nuevo usuario</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../../controllers/insert_user.php" method="POST" enctype="multipart/form-data">
+            <form id="routeForm" action="../../controllers/insert/insert_user.php" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>
@@ -186,7 +186,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Editar usuario</h3>
                 <button class="modal-close" id="closeEditModal">&times;</button>
             </div>
-            <form id="editUserForm" action="actualizar/actu_usuariosSql.php" method="POST" enctype="multipart/form-data">
+            <form id="editUserForm" action="../../controllers/update/update_usuario.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" id="edit_id_usuario" name="id_usuario">
                 <div class="modal-body">
                     <!-- Columna izquierda -->

@@ -2,7 +2,7 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require_once '../config/conexion_bd.php';
+require_once '../../config/conexion_bd.php';
 require_once __DIR__ . '/upload_foto.php';
 
 $conn = $conexion;

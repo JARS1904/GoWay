@@ -122,7 +122,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Agregar nueva empresa</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../../controllers/insert_empresa.php" method="POST">
+            <form id="routeForm" action="../../controllers/insert/insert_empresa.php" method="POST">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>

@@ -129,7 +129,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Agregar nuevo checador</h3>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="routeForm" action="../../controllers/insert_checador.php" method="POST" enctype="multipart/form-data">
+            <form id="routeForm" action="../../controllers/insert/insert_checador.php" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
                     <div>
@@ -200,7 +200,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Editar Checador</h3>
                 <button class="modal-close" id="closeEditChecadoresModal">×</button>
             </div>
-            <form id="editChecadoresForm" action="actualizar/actu_checadoresSql.php" method="POST" enctype="multipart/form-data">
+            <form id="editChecadoresForm" action="../../controllers/update/update_checador.php" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div>
                         <div class="modal-form-group">

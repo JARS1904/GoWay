@@ -48,9 +48,21 @@ try {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Error al eliminar: ' . $stmt->error]);
     }
+} catch (mysqli_sql_exception $e) {
+    // Código de error 1451: Cannot delete or update a parent row: a foreign key constraint fails
+    if ($e->getCode() == 1451) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'No se puede eliminar este horario porque tiene asignaciones activas. Por favor, elimine o modifique dichas asignaciones primero.'
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Error de base de datos: ' . $e->getMessage()]);
+    }
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Operación fallida. Revisa si la tabla notificaciones ya existe o si el horario está ocupado. Error: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Error inesperado: ' . $e->getMessage()]);
 }
 
 $stmt->close();

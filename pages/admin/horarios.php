@@ -149,7 +149,7 @@ require_once '../../config/sync_session_foto.php';
             <h3>Agregar nuevo horarios</h3>
             <button class="modal-close" id="closeModal">&times;</button>
         </div>
-        <form id="routeForm" action="../../controllers/insert_horarios.php" method="POST">
+        <form id="routeForm" action="../../controllers/insert/insert_horarios.php" method="POST">
             <div class="modal-body">
                 <!-- Columna izquierda -->
                 <div>
@@ -215,7 +215,7 @@ require_once '../../config/sync_session_foto.php';
       <h3>Editar horario</h3>
       <button class="modal-close" id="closeEditModal">×</button>
     </div>
-    <form id="editRouteForm" action="actualizar/actu_horariosSql.php" method="POST">
+    <form id="editRouteForm" action="../../controllers/update/update_horario.php" method="POST">
       <input type="hidden" name="id_horario" id="edit_id_horario">
       <div class="modal-body">
         <div>

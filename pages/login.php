@@ -79,7 +79,7 @@ include("../controllers/controlador.php");
         <hr class="lg-divider">
         <button class="lg-admin-btn" onclick="openAdminModal()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7z"/></svg>
-            Acceso Administrador
+            Acceso Empresa / Administrador
         </button>
     </div><!-- /.lg-card -->
 
@@ -98,7 +98,7 @@ include("../controllers/controlador.php");
                 </svg>
             </div>
 
-            <h2 class="adm-title">Panel de Administrador</h2>
+            <h2 class="adm-title">Accede a tu Panel</h2>
             <p class="adm-subtitle">Ingresa tus credenciales para continuar</p>
 
             <form id="adminLoginForm" method="post" action="">

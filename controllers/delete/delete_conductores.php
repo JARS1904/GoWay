@@ -16,41 +16,32 @@ if ($conn->connect_error) {
     exit();
 }
 
-// Iniciar transacción
-$conn->begin_transaction();
-
 try {
-    // 1. Eliminar asignaciones relacionadas
-    $sql1 = "DELETE FROM asignaciones WHERE rfc_conductor = ?";
-    $stmt1 = $conn->prepare($sql1);
-    $stmt1->bind_param("s", $rfc);
-    $stmt1->execute();
-    
-    // 2. Eliminar el conductor
-    $sql2 = "DELETE FROM conductores WHERE rfc_conductor = ?";
-    $stmt2 = $conn->prepare($sql2);
-    $stmt2->bind_param("s", $rfc);
-    $stmt2->execute();
-    
-    // Confirmar transacción
-    $conn->commit();
+    // Intentar eliminar el conductor
+    $sql = "DELETE FROM conductores WHERE rfc_conductor = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $rfc);
+    $stmt->execute();
     
     echo json_encode(["success" => true, "message" => "Conductor eliminado correctamente"]);
-    exit();
+} catch (mysqli_sql_exception $e) {
+    if ($e->getCode() == 1451) {
+        http_response_code(400);
+        echo json_encode([
+            "success" => false, 
+            "message" => "No se puede eliminar este conductor porque tiene asignaciones activas. Por favor, elimine o reasigne dichas asignaciones primero."
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => "Error de base de datos: " . $e->getMessage()]);
+    }
 } catch (Exception $e) {
-    // Revertir en caso de error
-    $conn->rollback();
-    echo json_encode(["success" => false, "message" => "Error al eliminar: " . $e->getMessage()]);
-    exit();
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "Error inesperado: " . $e->getMessage()]);
 }
 
-$stmt1->close();
-$stmt2->close();
-$conn->close();
-?>
+if (isset($stmt)) {
+    $stmt->close();
 }
-
-$stmt1->close();
-$stmt2->close();
 $conn->close();
 ?>

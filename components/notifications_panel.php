@@ -257,7 +257,7 @@ function applyFilters(search, type) {
             <h3>Enviar Notificación</h3>
             <button class="modal-close" id="closeAddNotifModal">&times;</button>
         </div>
-        <form id="notificationForm" action="<?php echo $notif_base; ?>controllers/insert_notificacion.php" method="POST">
+        <form id="notificationForm" action="<?php echo $notif_base; ?>controllers/insert/insert_notificacion.php" method="POST">
             <div class="modal-body">
                 <div>
                     <div class="modal-form-group" <?php echo $is_empresa ? 'style="display:none"' : ''; ?>>

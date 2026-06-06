@@ -205,7 +205,7 @@ require_once '../../config/sync_session_foto.php';
 <script src="../../assets/js/main.js"></script>
 <script>
 const API_PARADAS    = '../../api/routes_api.php';
-const CTRL_INSERT    = '../../controllers/insert_parada.php';
+const CTRL_INSERT    = '../../controllers/insert/insert_parada.php';
 const CTRL_UPDATE    = '../../controllers/update/update_parada.php';
 const CTRL_DELETE    = '../../controllers/delete/delete_parada.php';
 
