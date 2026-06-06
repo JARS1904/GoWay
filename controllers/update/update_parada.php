@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 0);
 header('Content-Type: application/json');
 require_once '../../config/conexion_bd.php';
 
@@ -20,22 +21,29 @@ if ($id_parada <= 0 || $nombre === '') {
     exit;
 }
 
-$stmt = $conn->prepare(
-    "UPDATE paradas_ruta
-     SET    nombre = ?, orden = ?, minutos_desde_origen = ?
-     WHERE  id_parada = ?"
-);
-$stmt->bind_param("siii", $nombre, $orden, $minutos_desde_origen, $id_parada);
+try {
+    $stmt = $conn->prepare(
+        "UPDATE paradas_ruta
+         SET    nombre = ?, orden = ?, minutos_desde_origen = ?
+         WHERE  id_parada = ?"
+    );
+    $stmt->bind_param("siii", $nombre, $orden, $minutos_desde_origen, $id_parada);
 
-if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Parada actualizada exitosamente']);
-} else {
-    $msg = ($conn->errno === 1062)
-        ? 'Ya existe una parada con ese orden en esta ruta'
-        : 'Error al actualizar: ' . $stmt->error;
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Parada actualizada exitosamente']);
+    } else {
+        $msg = ($conn->errno === 1062)
+            ? 'Ya existe una parada con ese orden en esta ruta'
+            : 'Error al actualizar: ' . $stmt->error;
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => $msg]);
+    }
+
+    $stmt->close();
+} catch (Throwable $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $msg]);
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
 
-$stmt->close();
 $conn->close();
+?>

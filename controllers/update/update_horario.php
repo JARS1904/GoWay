@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 0);
 header('Content-Type: application/json');
 require_once '../../config/conexion_bd.php';
 
@@ -22,19 +23,42 @@ if ($id_horario <= 0 || $id_ruta <= 0 || $tipo_dia === '' || $hora_salida === ''
     exit;
 }
 
-$stmt = $conn->prepare(
-    "UPDATE horarios
-     SET    id_ruta = ?, tipo_dia = ?, hora_salida = ?, hora_llegada = ?, frecuencia = ?
-     WHERE  id_horario = ?"
-);
-$stmt->bind_param("issssi", $id_ruta, $tipo_dia, $hora_salida, $hora_llegada, $frecuencia, $id_horario);
+try {
+    $stmt = $conn->prepare(
+        "UPDATE horarios
+         SET    id_ruta = ?, tipo_dia = ?, hora_salida = ?, hora_llegada = ?, frecuencia = ?
+         WHERE  id_horario = ?"
+    );
+    $stmt->bind_param("issssi", $id_ruta, $tipo_dia, $hora_salida, $hora_llegada, $frecuencia, $id_horario);
 
-if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Horario actualizado exitosamente']);
-} else {
+    if ($stmt->execute()) {
+        $conn->query('SET NAMES utf8');
+        $resRuta = $conn->query("SELECT nombre FROM rutas WHERE id_ruta = $id_ruta");
+        $nombreRuta = $resRuta->fetch_assoc()['nombre'];
+        
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Horario actualizado exitosamente',
+            'registroActualizado' => [
+                'id_horario' => $id_horario,
+                'id_ruta' => $id_ruta,
+                'ruta' => $nombreRuta,
+                'tipo_dia' => $tipo_dia,
+                'hora_salida' => $hora_salida,
+                'hora_llegada' => $hora_llegada,
+                'frecuencia' => $frecuencia
+            ]
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $stmt->error]);
+    }
+
+    $stmt->close();
+} catch (Throwable $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $stmt->error]);
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
 
-$stmt->close();
 $conn->close();
+?>

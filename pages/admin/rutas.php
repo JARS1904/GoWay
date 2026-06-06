@@ -313,80 +313,28 @@ require_once '../../config/sync_session_foto.php';
         </div>
     </div>
 
+    <script src="../../assets/js/notifications.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/pagination.js"></script>
     <script>
 
-        // Función para mostrar notificaciones
-        function showNotification(message, type = 'info') {
-            // Crear elemento de notificación
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.textContent = message;
 
-            // Estilos básicos
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 20px;
-                border-radius: 8px;
-                color: white;
-                font-weight: 600;
-                z-index: 10000;
-                animation: slideIn 0.3s ease;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                max-width: 350px;
-                cursor: pointer;
-            `;
 
-            // Colores según tipo
-            if (type === 'success') {
-                notification.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-            } else if (type === 'error') {
-                notification.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-            } else {
-                notification.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+            // Cerrar modal de edición
+        document.getElementById('closeEditModal').addEventListener('click', () => {
+            document.getElementById('editRouteModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelEditModal').addEventListener('click', () => {
+            document.getElementById('editRouteModal').classList.remove('active');
+        });
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('editRouteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
             }
-
-            // Animación
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            if (!document.querySelector('style[data-notification="true"]')) {
-                style.setAttribute('data-notification', 'true');
-                document.head.appendChild(style);
-            }
-
-            // Añadir al documento
-            document.body.appendChild(notification);
-
-            // Auto-eliminar después de 5 segundos
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 5000);
-
-            // Permitir cerrar manualmente
-            notification.addEventListener('click', () => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            });
-        }
+        });
 
         // Verificar si hay mensaje de éxito (desde PHP)
         const urlParams = new URLSearchParams(window.location.search);
@@ -395,12 +343,241 @@ require_once '../../config/sync_session_foto.php';
             // Limpiar URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }
-    </script>
 
-    <script src="../../assets/js/main.js"></script>
-    <script src="../../assets/js/update.js"></script>
-    <script src="../../assets/js/delete/delete_rutas.js"></script>
-    <script src="../../assets/js/pagination.js"></script>
+        // Modal de agregar
+        const btnAdd = document.querySelector('.btn-add');
+        if (btnAdd) {
+            btnAdd.addEventListener('click', () => {
+                document.getElementById('addRouteModal').classList.add('active');
+            });
+        }
+
+        const closeModalBtn = document.getElementById('closeModal');
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => {
+                document.getElementById('addRouteModal').classList.remove('active');
+            });
+        }
+
+        const cancelModalBtn = document.getElementById('cancelModal');
+        if (cancelModalBtn) {
+            cancelModalBtn.addEventListener('click', () => {
+                document.getElementById('addRouteModal').classList.remove('active');
+            });
+        }
+
+        document.getElementById('addRouteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Manejo del formulario de inserción
+        handleInsertForm(document.getElementById('routeForm'), 'Ruta agregada exitosamente', function(data) {
+            if (data.nuevoRegistro) {
+                const tbody = document.querySelector('.data-table tbody');
+                const noData = tbody.querySelector('td[colspan]');
+                if (noData) {
+                    noData.parentElement.remove();
+                }
+                
+                const reg = data.nuevoRegistro;
+                const statusClass = reg.activa == 1 ? 'status-active' : 'status-inactive';
+                const statusText = reg.activa == 1 ? 'Sí' : 'No';
+                
+                // Tratar retorno
+                const selectRetorno = document.getElementById('id_ruta_retorno');
+                let nombreRetorno = '';
+                if (reg.id_ruta_retorno && selectRetorno) {
+                    const option = selectRetorno.querySelector(`option[value="${reg.id_ruta_retorno}"]`);
+                    if (option) {
+                        nombreRetorno = option.textContent;
+                    }
+                }
+                
+                let retornoBadge = '<span style="color:#94a3b8;font-size:12px;">— Sin par</span>';
+                if (nombreRetorno) {
+                    if (nombreRetorno.includes(' - ')) {
+                        const nombreRetornoFormatted = nombreRetorno.replace(' - ', ' ⇄ ');
+                        retornoBadge = `<span style="display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;white-space:normal;line-height:1.2;">${nombreRetornoFormatted}</span>`;
+                    } else {
+                        retornoBadge = `<span style="display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;white-space:normal;line-height:1.2;">⇄ ${nombreRetorno}</span>`;
+                    }
+                }
+
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-id', reg.id_ruta);
+                
+                tr.innerHTML = `
+                    <td data-label="Nombre" data-id="${reg.id_ruta}">${reg.nombre}</td>
+                    <td data-label="Origen">${reg.origen}</td>
+                    <td data-label="Destino">${reg.destino}</td>
+                    <td data-label="Paradas"><a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#fee2e2;color:#b91c1c;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">Sin paradas</a></td>
+                    <td data-label="Ruta de retorno" data-id-retorno="${reg.id_ruta_retorno || ''}">${retornoBadge}</td>
+                    <td data-label="Activa"><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td data-label="RFC de la Empresa">${reg.rfc_empresa}</td>
+                    <td>
+                        <div class="kebab-menu">
+                            <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
+                                <span class="material-icons">more_vert</span>
+                            </button>
+                            <div class="dropdown-content">
+                                <button class="dropdown-item btn-edit">
+                                    <span class="material-icons">edit_square</span> Editar
+                                </button>
+                                <button class="dropdown-item btn-delete">
+                                    <span class="material-icons">delete_outline</span> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                tr.style.transition = 'opacity 0.5s';
+                tr.style.opacity = '0';
+                
+                Array.from(tr.children).forEach(td => {
+                    td.style.transition = 'background-color 0.5s';
+                    td.style.backgroundColor = '#dbeafe'; // Azul
+                });
+                
+                tbody.prepend(tr);
+                
+                setTimeout(() => { tr.style.opacity = '1'; }, 10);
+                setTimeout(() => {
+                    Array.from(tr.children).forEach(td => {
+                        td.style.backgroundColor = '';
+                    });
+                }, 1000);
+
+                if (window.paginationInstance) {
+                    window.paginationInstance.allRows.unshift(tr);
+                    window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                }
+
+                const deleteBtn = tr.querySelector('.btn-delete');
+                if (deleteBtn) {
+                    handleDeleteButton(deleteBtn, '../../controllers/delete/eliminar_ruta.php', 'id_ruta', '¿Estás seguro de que deseas eliminar esta ruta?', handleDeleteSuccess);
+                }
+            }
+        });
+
+        // Usar event delegation para botones de edición
+        const tbody = document.querySelector('tbody');
+        if (tbody) {
+            tbody.addEventListener('click', function(e) {
+                const btn = e.target.closest('.btn-edit');
+                if (btn) {
+                    const row = btn.closest('tr');
+                    const cells = row.querySelectorAll('td');
+                    
+                    document.getElementById('edit_id_ruta').value = cells[0].getAttribute('data-id') || row.getAttribute('data-id');
+                    document.getElementById('edit_nombre').value = cells[0].textContent.trim();
+                    document.getElementById('edit_origen').value = cells[1].textContent.trim();
+                    document.getElementById('edit_destino').value = cells[2].textContent.trim();
+                    
+                    const idRetorno = cells[4].getAttribute('data-id-retorno') || '';
+                    document.getElementById('edit_id_ruta_retorno').value = idRetorno;
+                    
+                    const statusText = cells[5].querySelector('span').textContent.trim();
+                    document.getElementById('edit_activa').value = statusText === 'Sí' ? 1 : 0;
+                    document.getElementById('edit_rfc_empresa').value = cells[6].textContent.trim();
+                    
+                    document.getElementById('editRouteModal').classList.add('active');
+                }
+            });
+        }
+
+        // Manejo del formulario de edición
+        handleUpdateForm(document.getElementById('editRouteForm'), 'Ruta actualizada exitosamente', function(data) {
+            if (data.registroActualizado) {
+                const reg = data.registroActualizado;
+                const tr = document.querySelector(`tr td[data-id="${reg.id_ruta}"]`)?.closest('tr') || document.querySelector(`tr[data-id="${reg.id_ruta}"]`);
+                if (tr) {
+                    const cells = tr.querySelectorAll('td');
+                    
+                    cells[0].textContent = reg.nombre;
+                    cells[1].textContent = reg.origen;
+                    cells[2].textContent = reg.destino;
+                    
+                    cells[4].setAttribute('data-id-retorno', reg.id_ruta_retorno || '');
+                    
+                    const selectRetorno = document.getElementById('edit_id_ruta_retorno');
+                    let nombreRetorno = '';
+                    if (reg.id_ruta_retorno && selectRetorno) {
+                        const option = selectRetorno.querySelector(`option[value="${reg.id_ruta_retorno}"]`);
+                        if (option) {
+                            nombreRetorno = option.textContent;
+                        }
+                    }
+                    
+                    let retornoBadge = '<span style="color:#94a3b8;font-size:12px;">— Sin par</span>';
+                    if (nombreRetorno) {
+                        if (nombreRetorno.includes(' - ')) {
+                            const nombreRetornoFormatted = nombreRetorno.replace(' - ', ' ⇄ ');
+                            retornoBadge = `<span style="display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;white-space:normal;line-height:1.2;">${nombreRetornoFormatted}</span>`;
+                        } else {
+                            retornoBadge = `<span style="display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;white-space:normal;line-height:1.2;">⇄ ${nombreRetorno}</span>`;
+                        }
+                    }
+                    cells[4].innerHTML = retornoBadge;
+                    
+                    const statusClass = reg.activa == 1 ? 'status-active' : 'status-inactive';
+                    const statusText = reg.activa == 1 ? 'Sí' : 'No';
+                    cells[5].innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+                    
+                    cells[6].textContent = reg.rfc_empresa;
+                    
+                    Array.from(tr.children).forEach(td => {
+                        td.style.transition = 'background-color 0.5s';
+                        td.style.backgroundColor = '#dcfce7'; // Verde
+                    });
+                    
+                    setTimeout(() => {
+                        Array.from(tr.children).forEach(td => {
+                            td.style.backgroundColor = '';
+                        });
+                    }, 1000);
+                }
+            }
+        });
+
+        const handleDeleteSuccess = function(data, button) {
+            const row = button.closest('tr');
+            if (row) {
+                row.style.transition = 'opacity 0.5s';
+                row.style.opacity = '0';
+                
+                Array.from(row.children).forEach(td => {
+                    td.style.transition = 'background-color 0.5s';
+                    td.style.backgroundColor = '#fee2e2'; // Rojo
+                });
+                
+                setTimeout(() => {
+                    row.remove();
+                    if (window.paginationInstance) {
+                        window.paginationInstance.allRows = window.paginationInstance.allRows.filter(r => r !== row);
+                        window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                    } else {
+                        const tbody = document.querySelector('.data-table tbody');
+                        const count = tbody.querySelectorAll('tr').length;
+                        if (count === 0) {
+                            tbody.innerHTML = '<tr><td colspan="8">No hay rutas registradas</td></tr>';
+                        }
+                    }
+                }, 500);
+            }
+        };
+
+        // Inicializar botones de eliminación
+        initializeDeleteButtons(
+            '.btn-delete',
+            '../../controllers/delete/eliminar_ruta.php',
+            'id_ruta',
+            '¿Estás seguro de que deseas eliminar esta ruta?',
+            handleDeleteSuccess
+        );
+    </script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
     <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
@@ -427,6 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 type: 'doughnut', data: { labels: data.estado_rutas.labels, datasets: [{ data: data.estado_rutas.data, backgroundColor: [GW.blue, GW.red] }] }, options: {...baseOpt, cutout: '70%'}
             });
         }
+
         if(data.top_paradas && data.top_paradas.data.length > 0) {
             new Chart(document.getElementById('chartTopParadas'), {
                 type: 'bar', data: { labels: data.top_paradas.labels.map(l=>l.substring(0,20)), datasets: [{ label:'Paradas', data: data.top_paradas.data, backgroundColor: GW.green, borderRadius:4 }] }, options: { indexAxis: 'y', plugins:{legend:{display:false}} }

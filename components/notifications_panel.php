@@ -357,7 +357,104 @@ function applyFilters(search, type) {
         // Handler para el formulario usando notifications.js
         const notifForm = document.getElementById('notificationForm');
         if (notifForm && typeof handleInsertForm === 'function') {
-            handleInsertForm(notifForm, '¡Notificación enviada correctamente a los usuarios!');
+            handleInsertForm(notifForm, '¡Notificación enviada correctamente a los usuarios!', function(data) {
+                if (data.nuevoRegistro) {
+                    // Actualizar tabla en notificaciones.php si estamos en esa página
+                    const tableBody = document.querySelector('.data-table tbody');
+                    if (tableBody) {
+                        const noData = tableBody.querySelector('td[colspan]');
+                        if (noData) noData.parentElement.remove();
+
+                        const reg = data.nuevoRegistro;
+                        let targetText = '';
+                        if (reg.destinatario_tipo === 'checadores') {
+                            if (reg.rfc_empresa !== null) {
+                                targetText = '<span style="color:#FF6D00;font-weight:600">Checadores de la empresa</span>';
+                            } else {
+                                targetText = '<strong>Todos los checadores</strong>';
+                            }
+                        } else {
+                            if (reg.rfc_empresa !== null) {
+                                targetText = '<span style="color:#2962FF;font-weight:600">Suscriptores de la empresa</span>';
+                            } else if (reg.id_usuario === null) {
+                                targetText = '<strong>Todos los usuarios</strong>';
+                            } else {
+                                targetText = reg.usuario_nombre ? reg.usuario_nombre : 'Usuario #' + reg.id_usuario;
+                            }
+                        }
+
+                        let icon_svg = '';
+                        let icon_bg_class = '';
+                        let tipo_text = '';
+
+                        switch (reg.tipo) {
+                            case 'Alerta':
+                                icon_bg_class = 'bg-red';
+                                icon_svg = '<span class="material-icons" style="font-size: 18px;">warning</span>';
+                                tipo_text = 'Alerta de Seguridad';
+                                break;
+                            case 'Cierre':
+                                icon_bg_class = 'bg-blue';
+                                icon_svg = '<span class="material-icons" style="font-size: 18px;">block</span>';
+                                tipo_text = 'Cierre Vial';
+                                break;
+                            case 'Trafico':
+                                icon_bg_class = 'bg-orange';
+                                icon_svg = '<span class="material-icons" style="font-size: 18px;">directions_car</span>';
+                                tipo_text = 'Tráfico Pesado';
+                                break;
+                            case 'General':
+                            default:
+                                icon_bg_class = '';
+                                icon_svg = '<span class="material-icons" style="font-size: 18px;">notifications_none</span>';
+                                tipo_text = 'Aviso General';
+                                break;
+                        }
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="notif-icon-circle ${icon_bg_class}" style="width: 32px; height: 32px;">
+                                        ${icon_svg}
+                                    </div>
+                                    <span><strong>${tipo_text}</strong></span>
+                                </div>
+                            </td>
+                            <td>${reg.titulo}</td>
+                            <td>${targetText}</td>
+                            <td>${reg.fecha_creacion || new Date().toISOString().slice(0,19).replace('T', ' ')}</td>
+                        `;
+                        
+                        tr.style.transition = 'opacity 0.5s';
+                        tr.style.opacity = '0';
+
+                        Array.from(tr.children).forEach(td => {
+                            td.style.transition = 'background-color 0.5s';
+                            td.style.backgroundColor = '#dbeafe'; // Azul
+                        });
+
+                        tableBody.prepend(tr);
+
+                        setTimeout(() => { tr.style.opacity = '1'; }, 10);
+                        setTimeout(() => {
+                            Array.from(tr.children).forEach(td => {
+                                td.style.backgroundColor = '';
+                            });
+                        }, 1000);
+
+                        if (window.paginationInstance) {
+                            window.paginationInstance.allRows.unshift(tr);
+                            window.paginationInstance.filterRows('');
+                        }
+                    }
+
+                    // Cerrar el modal y limpiar form
+                    notifForm.reset();
+                    const modal = document.getElementById('addNotificationModal');
+                    if (modal) modal.classList.remove('active');
+                }
+            });
         }
     });
 </script>

@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 0);
 session_start();
 header('Content-Type: application/json');
 require_once '../../config/conexion_bd.php';
@@ -66,7 +67,21 @@ if ($current_vehiculo != $id_vehiculo) {
 }
 
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Asignación actualizada correctamente"]);
+    // Fetch the updated record
+    $sql_updated = "SELECT a.*, v.placa, r.nombre as nombre_ruta, h.tipo_dia, h.hora_salida 
+                  FROM asignaciones a 
+                  LEFT JOIN vehiculos v ON a.id_vehiculo = v.id_vehiculo 
+                  LEFT JOIN rutas r ON a.id_ruta = r.id_ruta
+                  LEFT JOIN horarios h ON a.id_horario = h.id_horario
+                  WHERE a.id_asignacion = ?";
+    $stmt_updated = $conn->prepare($sql_updated);
+    $stmt_updated->bind_param("i", $id_asignacion);
+    $stmt_updated->execute();
+    $result_updated = $stmt_updated->get_result();
+    $registroActualizado = $result_updated->fetch_assoc();
+    $stmt_updated->close();
+
+    echo json_encode(["success" => true, "message" => "Asignación actualizada correctamente", "registroActualizado" => $registroActualizado]);
 } else {
     echo json_encode(["success" => false, "message" => "Error al actualizar la asignación: " . $stmt->error]);
 }

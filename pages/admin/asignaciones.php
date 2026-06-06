@@ -279,7 +279,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Editar Asignación</h3>
                 <button class="modal-close" id="closeEditModal">&times;</button>
             </div>
-            <form id="editAssignForm" action="../../controllers/update_asignacion.php" method="POST">
+            <form id="editAssignForm" action="../../controllers/update/update_asignacion.php" method="POST">
                 <input type="hidden" name="id_asignacion" id="edit_id_asignacion">
                 <div class="modal-body">
                     <!-- Columna izquierda -->
@@ -403,66 +403,235 @@ require_once '../../config/sync_session_foto.php';
     <script src="../../assets/js/pagination.js"></script>
     
     <script>
-        // Manejar cierre de modal de agregar
-        document.getElementById('closeModal').addEventListener('click', () => {
-            document.getElementById('addRouteModal').classList.remove('active');
-        });
-
-        document.getElementById('cancelModal').addEventListener('click', () => {
-            document.getElementById('addRouteModal').classList.remove('active');
-        });
-
-        // Manejo del formulario de inserción
-        handleInsertForm(document.getElementById('routeForm'), 'Asignación agregada correctamente');
-
-        // Cerrar modal al hacer clic fuera
-        document.getElementById('addRouteModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('active');
-            }
-        });
-
-        // Inicializar botones de eliminación
-        initializeDeleteButtons(
-            '.btn-delete',
-            '../../controllers/delete/delete_asignaciones.php',
-            'id_asignacion',
-            '¿Estás seguro de que deseas eliminar esta asignación?'
-        );
-
-        // Edit Modal Logic
-        document.querySelectorAll('.btn-edit').forEach(button => {
-            button.addEventListener('click', () => {
-                document.getElementById('edit_id_asignacion').value = button.dataset.id;
-                document.getElementById('edit_rfc_empresa').value = button.dataset.empresa;
-                document.getElementById('edit_id_ruta').value = button.dataset.ruta;
-                document.getElementById('edit_id_horario').value = button.dataset.horario;
-                document.getElementById('edit_rfc_conductor').value = button.dataset.conductor;
-                document.getElementById('edit_id_vehiculo').value = button.dataset.vehiculo;
-                document.getElementById('edit_fecha').value = button.dataset.fecha;
-                document.getElementById('edit_estado').value = button.dataset.estado;
-                document.getElementById('edit_activa').value = button.dataset.activa;
-                document.getElementById('edit_asientos_disp').value = button.dataset.asientos;
-                document.getElementById('editAssignModal').classList.add('active');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Manejar cierre de modal de agregar
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.getElementById('addRouteModal').classList.remove('active');
             });
-        });
 
-        document.getElementById('closeEditModal').addEventListener('click', () => {
-            document.getElementById('editAssignModal').classList.remove('active');
-        });
+            document.getElementById('cancelModal').addEventListener('click', () => {
+                document.getElementById('addRouteModal').classList.remove('active');
+            });
 
-        document.getElementById('cancelEditModal').addEventListener('click', () => {
-            document.getElementById('editAssignModal').classList.remove('active');
-        });
+            document.getElementById('addRouteModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
 
-        document.getElementById('editAssignModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('active');
+            // Manejo del formulario de inserción
+            handleInsertForm(
+                document.getElementById('routeForm'),
+                'Asignación agregada correctamente',
+                function(data) {
+                    if (data.nuevoRegistro) {
+                        const tbody = document.querySelector('.data-table tbody');
+                        const noData = tbody.querySelector('td[colspan]');
+                        if (noData) {
+                            noData.parentElement.remove();
+                        }
+
+                        const reg = data.nuevoRegistro;
+                        const statusClass = reg.activa == 1 ? 'status-active' : 'status-inactive';
+                        const statusText = reg.activa == 1 ? 'Sí' : 'No';
+                        
+                        // Capitalize estado
+                        let estadoTexto = reg.estado.replace("_", " ");
+                        estadoTexto = estadoTexto.charAt(0).toUpperCase() + estadoTexto.slice(1);
+
+                        const tr = document.createElement('tr');
+                        tr.setAttribute('data-id', reg.id_asignacion);
+                        
+                        tr.innerHTML = `
+                            <td data-label="Empresa" data-id="${reg.id_asignacion}">${reg.rfc_empresa}</td>
+                            <td data-label="Placa">${reg.placa}</td>
+                            <td data-label="Conductor">${reg.rfc_conductor}</td>
+                            <td data-label="Ruta">${reg.nombre_ruta}</td>
+                            <td data-label="Horario">
+                                <strong>ID: ${reg.id_horario}</strong><br>
+                                <span style="font-size: 0.85em; color: #666;">${reg.tipo_dia}</span><br>
+                                <span style="font-size: 0.85em; color: #666;">${reg.hora_salida}</span>
+                            </td>
+                            <td data-label="Fecha">${reg.fecha}</td>
+                            <td data-label="Asientos">${reg.asientos_disp}</td>
+                            <td data-label="Estado">${estadoTexto}</td>
+                            <td data-label="Activa"><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>
+                                <div class="kebab-menu">
+                                    <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
+                                        <span class="material-icons">more_vert</span>
+                                    </button>
+                                    <div class="dropdown-content">
+                                        <button class="dropdown-item btn-edit" data-id="${reg.id_asignacion}" data-empresa="${reg.rfc_empresa}" data-ruta="${reg.id_ruta}" data-horario="${reg.id_horario}" data-conductor="${reg.rfc_conductor}" data-vehiculo="${reg.id_vehiculo}" data-fecha="${reg.fecha}" data-estado="${reg.estado}" data-asientos="${reg.asientos_disp}" data-activa="${reg.activa}">
+                                            <span class="material-icons">edit_square</span> Editar
+                                        </button>
+                                        <button class="dropdown-item btn-delete" data-id="${reg.id_asignacion}">
+                                            <span class="material-icons">delete_outline</span> Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        `;
+
+                        tr.style.transition = 'opacity 0.5s';
+                        tr.style.opacity = '0';
+                        
+                        Array.from(tr.children).forEach(td => {
+                            td.style.transition = 'background-color 0.5s';
+                            td.style.backgroundColor = '#dbeafe'; // Azul
+                        });
+
+                        tbody.prepend(tr);
+
+                        setTimeout(() => { tr.style.opacity = '1'; }, 10);
+                        setTimeout(() => {
+                            Array.from(tr.children).forEach(td => {
+                                td.style.backgroundColor = '';
+                            });
+                        }, 1000);
+
+                        if (window.paginationInstance) {
+                            window.paginationInstance.allRows.unshift(tr);
+                            window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                        }
+
+                        // Initialize delete button for new row
+                        const deleteBtn = tr.querySelector('.btn-delete');
+                        if (deleteBtn) {
+                            handleDeleteButton(deleteBtn, '../../controllers/delete/delete_asignaciones.php', 'id_asignacion', '¿Estás seguro de que deseas eliminar esta asignación?', handleDeleteSuccess);
+                        }
+                    }
+                }
+            );
+
+            // Callback de éxito para eliminar
+            const handleDeleteSuccess = function(data, button) {
+                const row = button.closest('tr');
+                if (row) {
+                    row.style.transition = 'opacity 0.5s';
+                    row.style.opacity = '0';
+                    
+                    Array.from(row.children).forEach(td => {
+                        td.style.transition = 'background-color 0.5s';
+                        td.style.backgroundColor = '#fee2e2'; // Rojo
+                    });
+                    
+                    setTimeout(() => {
+                        row.remove();
+                        if (window.paginationInstance) {
+                            window.paginationInstance.allRows = window.paginationInstance.allRows.filter(r => r !== row);
+                            window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                        } else {
+                            const tbody = document.querySelector('.data-table tbody');
+                            const count = tbody.querySelectorAll('tr').length;
+                            if (count === 0) {
+                                tbody.innerHTML = '<tr><td colspan="10">No hay asignaciones registradas</td></tr>';
+                            }
+                        }
+                    }, 500);
+                }
+            };
+
+            // Inicializar botones de eliminación existentes
+            initializeDeleteButtons(
+                '.btn-delete',
+                '../../controllers/delete/delete_asignaciones.php',
+                'id_asignacion',
+                '¿Estás seguro de que deseas eliminar esta asignación?',
+                handleDeleteSuccess
+            );
+
+            // Edit Modal Logic with event delegation
+            const tbody = document.querySelector('tbody');
+            if (tbody) {
+                tbody.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.btn-edit');
+                    if (btn) {
+                        document.getElementById('edit_id_asignacion').value = btn.dataset.id;
+                        document.getElementById('edit_rfc_empresa').value = btn.dataset.empresa;
+                        document.getElementById('edit_id_ruta').value = btn.dataset.ruta;
+                        document.getElementById('edit_id_horario').value = btn.dataset.horario;
+                        document.getElementById('edit_rfc_conductor').value = btn.dataset.conductor;
+                        document.getElementById('edit_id_vehiculo').value = btn.dataset.vehiculo;
+                        document.getElementById('edit_fecha').value = btn.dataset.fecha;
+                        document.getElementById('edit_estado').value = btn.dataset.estado;
+                        document.getElementById('edit_activa').value = btn.dataset.activa;
+                        document.getElementById('edit_asientos_disp').value = btn.dataset.asientos;
+                        document.getElementById('editAssignModal').classList.add('active');
+                    }
+                });
             }
-        });
 
-        // Use the existing handleInsertForm or generic form handler for updates
-        handleInsertForm(document.getElementById('editAssignForm'), 'Asignación actualizada correctamente');
+            document.getElementById('closeEditModal').addEventListener('click', () => {
+                document.getElementById('editAssignModal').classList.remove('active');
+            });
+
+            document.getElementById('cancelEditModal').addEventListener('click', () => {
+                document.getElementById('editAssignModal').classList.remove('active');
+            });
+
+            document.getElementById('editAssignModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+
+            // Manejar actualización
+            handleUpdateForm(
+                document.getElementById('editAssignForm'),
+                'Asignación actualizada correctamente',
+                function(data) {
+                    if (data.registroActualizado) {
+                        const reg = data.registroActualizado;
+                        const tr = document.querySelector(`tr td[data-id="${reg.id_asignacion}"]`)?.closest('tr');
+                        
+                        if (tr) {
+                            const cells = tr.querySelectorAll('td');
+                            cells[0].textContent = reg.rfc_empresa;
+                            cells[1].textContent = reg.placa;
+                            cells[2].textContent = reg.rfc_conductor;
+                            cells[3].textContent = reg.nombre_ruta;
+                            cells[4].innerHTML = `<strong>ID: ${reg.id_horario}</strong><br><span style="font-size: 0.85em; color: #666;">${reg.tipo_dia}</span><br><span style="font-size: 0.85em; color: #666;">${reg.hora_salida}</span>`;
+                            cells[5].textContent = reg.fecha;
+                            cells[6].textContent = reg.asientos_disp;
+                            
+                            let estadoTexto = reg.estado.replace("_", " ");
+                            estadoTexto = estadoTexto.charAt(0).toUpperCase() + estadoTexto.slice(1);
+                            cells[7].textContent = estadoTexto;
+                            
+                            const statusClass = reg.activa == 1 ? 'status-active' : 'status-inactive';
+                            const statusText = reg.activa == 1 ? 'Sí' : 'No';
+                            cells[8].innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+                            
+                            // Update dataset of edit button
+                            const editBtn = tr.querySelector('.btn-edit');
+                            if (editBtn) {
+                                editBtn.dataset.empresa = reg.rfc_empresa;
+                                editBtn.dataset.ruta = reg.id_ruta;
+                                editBtn.dataset.horario = reg.id_horario;
+                                editBtn.dataset.conductor = reg.rfc_conductor;
+                                editBtn.dataset.vehiculo = reg.id_vehiculo;
+                                editBtn.dataset.fecha = reg.fecha;
+                                editBtn.dataset.estado = reg.estado;
+                                editBtn.dataset.asientos = reg.asientos_disp;
+                                editBtn.dataset.activa = reg.activa;
+                            }
+                            
+                            Array.from(tr.children).forEach(td => {
+                                td.style.transition = 'background-color 0.5s';
+                                td.style.backgroundColor = '#dcfce7'; // Verde
+                            });
+                            
+                            setTimeout(() => {
+                                Array.from(tr.children).forEach(td => {
+                                    td.style.backgroundColor = '';
+                                });
+                            }, 1000);
+                        }
+                    }
+                }
+            );
+        });
     </script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
     <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>

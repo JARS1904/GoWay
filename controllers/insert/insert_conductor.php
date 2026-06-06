@@ -32,7 +32,19 @@ if ($stmt === false) {
 $stmt->bind_param("ssssss", $rfc_conductor, $rfc_empresa, $nombre, $licencia, $telefono, $foto);
 
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Conductor agregado correctamente"]);
+    echo json_encode([
+        "success" => true, 
+        "message" => "Conductor agregado correctamente",
+        "nuevoRegistro" => [
+            "rfc_conductor" => $rfc_conductor,
+            "rfc_empresa" => $rfc_empresa,
+            "nombre" => $nombre,
+            "licencia" => $licencia,
+            "telefono" => $telefono,
+            "foto" => $foto,
+            "activo" => 1
+        ]
+    ]);
 } else {
     echo json_encode(["success" => false, "message" => "Error al insertar: " . $stmt->error]);
 }

@@ -237,7 +237,7 @@ function hideTables() {
     noStopsMsg.style.display = 'none';
 }
 
-async function loadStops(id_ruta) {
+async function loadStops(id_ruta, highlight = null) {
     hideTables();
     loadingStops.style.display = 'block';
 
@@ -253,7 +253,7 @@ async function loadStops(id_ruta) {
         }
 
         stopsTable.style.display  = 'table';
-        renderStops(data);
+        renderStops(data, highlight);
 
     } catch (err) {
         loadingStops.style.display = 'none';
@@ -262,10 +262,10 @@ async function loadStops(id_ruta) {
     }
 }
 
-function renderStops(paradas) {
+function renderStops(paradas, highlight = null) {
     stopsBody.innerHTML = '';
 
-    // ordenar por orden ascendente (ya viene ordenado pero por seguridad)
+    // ordenar por orden ascendente
     paradas.sort((a, b) => a.orden - b.orden);
     const maxOrden = Math.max(...paradas.map(p => p.orden));
 
@@ -278,6 +278,7 @@ function renderStops(paradas) {
         if (isLast)  { nameClass = 'stop-dest';   roleLabel = ' <em style="font-size:11px;color:#7c3aed;">(destino)</em>'; }
 
         const tr = document.createElement('tr');
+        tr.setAttribute('data-id', p.id_parada);
         tr.innerHTML = `
             <td data-label="Orden">
                 <span class="badge-orden">${p.orden}</span>
@@ -304,6 +305,21 @@ function renderStops(paradas) {
                 </div>
             </td>
         `;
+        
+        if (highlight && highlight.id === p.id_parada) {
+            if (highlight.action === 'insert') {
+                tr.style.transition = 'background-color 0.5s, opacity 0.5s';
+                tr.style.backgroundColor = '#dbeafe';
+                tr.style.opacity = '0';
+                setTimeout(() => { tr.style.opacity = '1'; }, 10);
+                setTimeout(() => { tr.style.backgroundColor = ''; }, 1000);
+            } else if (highlight.action === 'update') {
+                tr.style.transition = 'background-color 0.5s';
+                tr.style.backgroundColor = '#dcfce7';
+                setTimeout(() => { tr.style.backgroundColor = ''; }, 1000);
+            }
+        }
+        
         stopsBody.appendChild(tr);
     });
 }
@@ -382,8 +398,12 @@ document.getElementById('stopForm').addEventListener('submit', async e => {
 
         if (data.success) {
             document.getElementById('stopModal').classList.remove('active');
-            showNotification(data.message, 'success');
-            setTimeout(() => loadStops(currentRouteId), 800);
+            
+            // Notificación con color estilo notifications.js
+            showNotification(data.message, isEdit ? 'success' : 'info');
+            
+            let targetId = isEdit ? parseInt(document.getElementById('f_id_parada').value) : data.id_parada;
+            setTimeout(() => loadStops(currentRouteId, { action: isEdit ? 'update' : 'insert', id: targetId }), 100);
         } else {
             showNotification(data.message || 'Error al guardar', 'error');
         }
@@ -409,8 +429,20 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async () =
 
         if (data.success) {
             document.getElementById('deleteStopModal').classList.remove('active');
-            showNotification(data.message, 'success');
-            setTimeout(() => loadStops(currentRouteId), 800);
+            showNotification(data.message, 'error'); // error style for deletion match
+            
+            // Animar la fila borrada
+            const tr = document.querySelector(`tr[data-id="${deleteTargetId}"]`);
+            if (tr) {
+                tr.style.transition = 'background-color 0.5s, opacity 0.5s';
+                tr.style.backgroundColor = '#fee2e2';
+                tr.style.opacity = '0';
+                setTimeout(() => {
+                    loadStops(currentRouteId);
+                }, 500);
+            } else {
+                setTimeout(() => loadStops(currentRouteId), 100);
+            }
         } else {
             showNotification(data.message || 'Error al eliminar', 'error');
         }

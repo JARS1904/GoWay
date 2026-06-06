@@ -555,10 +555,47 @@ if ($conexion->error) {
                 // Mostrar notificación
                 showNotification(data.message || 'Reporte guardado exitosamente', 'info');
 
-                // Recargar la página después de generar el reporte
-                setTimeout(() => {
-                    location.reload();
-                }, 2000);
+                if (data.nuevoRegistro) {
+                    const reg = data.nuevoRegistro;
+                    let tipoTexto = reg.tipo_incidente.replace("_", " ");
+                    tipoTexto = tipoTexto.charAt(0).toUpperCase() + tipoTexto.slice(1);
+                    const newReport = {
+                        id: parseInt(reg.id),
+                        id_vehiculo: parseInt(reg.id_vehiculo),
+                        rfc_conductor: reg.rfc_conductor,
+                        id_ruta: parseInt(reg.id_ruta),
+                        vehiculo: reg.vehiculo_placa + " - " + reg.vehiculo_modelo,
+                        conductor: reg.conductor_nombre,
+                        ruta: reg.ruta_nombre,
+                        tipo: reg.tipo_incidente,
+                        tipoTexto: tipoTexto,
+                        fecha: reg.fecha_incidente,
+                        descripcion: reg.descripcion,
+                        gravedad: reg.gravedad,
+                        status: reg.estado,
+                        archivado: parseInt(reg.archivado || 0)
+                    };
+                    reportes.unshift(newReport);
+                    
+                    const currentFilter = document.getElementById('filterStatus').value;
+                    if (currentFilter === 'todos') {
+                        loadReports(reportes.filter(r => r.archivado === 0));
+                    } else {
+                        filterReports();
+                    }
+                    updateStats(reportes);
+
+                    setTimeout(() => {
+                        const newCard = document.querySelector(`.report-card [onclick="deleteReport(${reg.id})"]`)?.closest('.report-card');
+                        if (newCard) {
+                            newCard.style.transition = 'background-color 0.5s';
+                            newCard.style.backgroundColor = '#dbeafe'; // Azul
+                            setTimeout(() => {
+                                newCard.style.backgroundColor = '';
+                            }, 1000);
+                        }
+                    }, 50);
+                }
             } else {
                 showNotification(data.error || data.message || 'Error al guardar el reporte', 'error');
             }
@@ -626,9 +663,127 @@ if ($conexion->error) {
     }
 
     function editReport(id) {
-        alert(`Editando reporte ${id}`);
-        // Implementar edición del reporte
+        const report = reportes.find(r => r.id === id);
+        if (report) {
+            document.getElementById('edit_id').value = report.id;
+            document.getElementById('edit_vehiculo').value = report.id_vehiculo;
+            document.getElementById('edit_conductor').value = report.rfc_conductor;
+            document.getElementById('edit_ruta').value = report.id_ruta;
+            document.getElementById('edit_tipoIncidente').value = report.tipo;
+            
+            // Format datetime-local from YYYY-MM-DD HH:MM:SS to YYYY-MM-DDTHH:MM
+            let fechaFormatted = report.fecha;
+            if (fechaFormatted && fechaFormatted.includes(' ')) {
+                fechaFormatted = fechaFormatted.replace(' ', 'T');
+                // Trim seconds if present
+                if ((fechaFormatted.match(/:/g) || []).length > 1) {
+                    fechaFormatted = fechaFormatted.substring(0, fechaFormatted.lastIndexOf(':'));
+                }
+            }
+            document.getElementById('edit_fechaIncidente').value = fechaFormatted;
+            
+            document.getElementById('edit_descripcion').value = report.descripcion;
+            document.getElementById('edit_gravedad').value = report.gravedad;
+            document.getElementById('edit_estado').value = report.status;
+            
+            document.getElementById('editModal').classList.add('active');
+        }
     }
+    
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('active');
+    }
+
+    document.getElementById('editClose').addEventListener('click', closeEditModal);
+    document.getElementById('editCancel').addEventListener('click', closeEditModal);
+
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('editSave');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando...';
+
+        const formData = new FormData(this);
+        
+        // Ensure date format has seconds for MySQL
+        let fecha = formData.get('fechaIncidente');
+        if (fecha && fecha.length === 16) {
+            fecha += ':00';
+            fecha = fecha.replace('T', ' ');
+            formData.set('fechaIncidente', fecha);
+        }
+
+        fetch('../../controllers/update/update_reportes.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+
+            if (data.success) {
+                closeEditModal();
+                showNotification(data.message, 'success');
+                
+                if (data.registroActualizado) {
+                    const reg = data.registroActualizado;
+                    const reportIndex = reportes.findIndex(r => r.id === parseInt(reg.id));
+                    if (reportIndex !== -1) {
+                        let tipoTexto = reg.tipo_incidente.replace("_", " ");
+                        tipoTexto = tipoTexto.charAt(0).toUpperCase() + tipoTexto.slice(1);
+                        
+                        reportes[reportIndex] = {
+                            id: parseInt(reg.id),
+                            id_vehiculo: parseInt(reg.id_vehiculo),
+                            rfc_conductor: reg.rfc_conductor,
+                            id_ruta: parseInt(reg.id_ruta),
+                            vehiculo: reg.vehiculo_placa + " - " + reg.vehiculo_modelo,
+                            conductor: reg.conductor_nombre,
+                            ruta: reg.ruta_nombre,
+                            tipo: reg.tipo_incidente,
+                            tipoTexto: tipoTexto,
+                            fecha: reg.fecha_incidente,
+                            descripcion: reg.descripcion,
+                            gravedad: reg.gravedad,
+                            status: reg.estado,
+                            archivado: parseInt(reg.archivado || 0)
+                        };
+                        
+                        const currentFilter = document.getElementById('filterStatus').value;
+                        if (currentFilter === 'todos') {
+                            loadReports(reportes.filter(r => r.archivado === 0));
+                        } else {
+                            filterReports();
+                        }
+                        updateStats(reportes);
+                        
+                        // Flash effect
+                        setTimeout(() => {
+                            const editedCard = document.querySelector(`.report-card [onclick="deleteReport(${reg.id})"]`)?.closest('.report-card');
+                            if (editedCard) {
+                                editedCard.style.transition = 'background-color 0.5s';
+                                editedCard.style.backgroundColor = '#dcfce7'; // Verde
+                                setTimeout(() => {
+                                    editedCard.style.backgroundColor = '';
+                                }, 1000);
+                            }
+                        }, 50);
+                    }
+                }
+            } else {
+                showNotification(data.message || 'Error al actualizar', 'error');
+            }
+        })
+        .catch(error => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            console.error('Error:', error);
+            showNotification('Error de conexión', 'error');
+        });
+    });
 
     /**
      * Función para eliminar un reporte
@@ -656,7 +811,8 @@ if ($conexion->error) {
 
         if (reportCard) {
             // Efecto visual de eliminación
-            reportCard.style.transition = 'all 0.3s ease';
+            reportCard.style.transition = 'all 0.5s ease';
+            reportCard.style.backgroundColor = '#fee2e2'; // Rojo
             reportCard.style.opacity = '0.5';
             reportCard.style.transform = 'scale(0.98)';
         }

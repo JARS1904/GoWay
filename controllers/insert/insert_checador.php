@@ -39,7 +39,18 @@ if ($stmt === false) {
 $stmt->bind_param("ssssss", $rfc_checador, $rfc_empresa, $nombre, $usuario, $contrasena, $foto);
 
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Checador agregado correctamente"]);
+    echo json_encode([
+        "success" => true, 
+        "message" => "Checador agregado correctamente",
+        "nuevoRegistro" => [
+            "rfc_checador" => $rfc_checador,
+            "rfc_empresa" => $rfc_empresa,
+            "nombre" => $nombre,
+            "usuario" => $usuario,
+            "foto" => $foto,
+            "activo" => 1
+        ]
+    ]);
 } else {
     echo json_encode(["success" => false, "message" => "Error al insertar: " . $stmt->error]);
 }

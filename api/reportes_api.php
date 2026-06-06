@@ -484,10 +484,28 @@ try {
             $id_reporte = $stmt_insert->insert_id;
             $stmt_insert->close();
 
+            // Fetch the newly inserted record to return it dynamically
+            $sql_nuevo = "SELECT r.*,
+                                 v.placa as vehiculo_placa, v.modelo as vehiculo_modelo,
+                                 c.nombre as conductor_nombre,
+                                 ru.nombre as ruta_nombre
+                          FROM reportes r
+                          LEFT JOIN vehiculos v ON r.id_vehiculo = v.id_vehiculo
+                          LEFT JOIN conductores c ON r.rfc_conductor = c.rfc_conductor
+                          LEFT JOIN rutas ru ON r.id_ruta = ru.id_ruta
+                          WHERE r.id = ?";
+            $stmt_nuevo = $conn->prepare($sql_nuevo);
+            $stmt_nuevo->bind_param("i", $id_reporte);
+            $stmt_nuevo->execute();
+            $result_nuevo = $stmt_nuevo->get_result();
+            $nuevoRegistro = $result_nuevo->fetch_assoc();
+            $stmt_nuevo->close();
+
             sendResponse(201, [
                 "success"    => true,
                 "message"    => "Reporte creado exitosamente",
-                "id_reporte" => $id_reporte
+                "id_reporte" => $id_reporte,
+                "nuevoRegistro" => $nuevoRegistro
             ]);
         } else {
             throw new Exception("Error al insertar el reporte: " . $stmt_insert->error);

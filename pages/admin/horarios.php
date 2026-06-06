@@ -276,21 +276,194 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inserción
     handleInsertForm(
         document.getElementById('routeForm'),
-        'Horario agregado exitosamente'
+        'Horario agregado exitosamente',
+        function(data) {
+            if (data.nuevoRegistro) {
+                const tbody = document.querySelector('.data-table tbody');
+                const noData = tbody.querySelector('td[colspan]');
+                if (noData) {
+                    noData.parentElement.remove();
+                }
+                
+                const reg = data.nuevoRegistro;
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-id', reg.id_horario);
+                tr.setAttribute('data-id-ruta', reg.id_ruta);
+                tr.setAttribute('data-dia', reg.tipo_dia);
+                tr.setAttribute('data-salida', reg.hora_salida);
+                tr.setAttribute('data-llegada', reg.hora_llegada);
+                tr.setAttribute('data-frecuencia', reg.frecuencia || '—');
+                
+                tr.innerHTML = `
+                    <td data-label="Ruta">${reg.ruta}</td>
+                    <td data-label="Día">${reg.tipo_dia}</td>
+                    <td data-label="Hora salida">${reg.hora_salida}</td>
+                    <td data-label="Hora llegada">${reg.hora_llegada}</td>
+                    <td data-label="Frecuencia">${reg.frecuencia || '—'}</td>
+                    <td>
+                        <div class="kebab-menu">
+                            <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
+                                <span class="material-icons">more_vert</span>
+                            </button>
+                            <div class="dropdown-content">
+                                <button class="dropdown-item btn-edit" data-id="${reg.id_horario}">
+                                    <span class="material-icons">edit</span> Editar
+                                </button>
+                                <button class="dropdown-item btn-delete" data-id="${reg.id_horario}">
+                                    <span class="material-icons">delete</span> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                tr.style.transition = 'opacity 0.5s';
+                tr.style.opacity = '0';
+                
+                Array.from(tr.children).forEach(td => {
+                    td.style.transition = 'background-color 0.5s';
+                    td.style.backgroundColor = '#dbeafe'; // Azul
+                });
+                
+                tbody.prepend(tr);
+                
+                setTimeout(() => { tr.style.opacity = '1'; }, 10);
+                setTimeout(() => {
+                    Array.from(tr.children).forEach(td => {
+                        td.style.backgroundColor = '';
+                    });
+                }, 1000);
+
+                if (window.paginationInstance) {
+                    window.paginationInstance.allRows.unshift(tr);
+                    window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                }
+                
+                // Re-bind events to new buttons
+                const btnEdit = tr.querySelector('.btn-edit');
+                if (btnEdit) {
+                    btnEdit.addEventListener('click', function() {
+                        const row = this.closest('tr');
+                        document.getElementById('edit_id_horario').value  = row.dataset.id;
+                        document.getElementById('edit_id_ruta').value     = row.dataset.idRuta;
+                        document.getElementById('edit_tipo_dia').value  = row.dataset.dia;
+                        document.getElementById('edit_hora_salida').value = row.dataset.salida;
+                        document.getElementById('edit_hora_llegada').value = row.dataset.llegada;
+                        document.getElementById('edit_frecuencia').value  = row.dataset.frecuencia;
+                        document.getElementById('editRouteModal').classList.add('active');
+                    });
+                }
+                
+                const btnDelete = tr.querySelector('.btn-delete');
+                if (btnDelete) {
+                    handleDeleteButton(
+                        btnDelete,
+                        '../../controllers/delete/delete_horarios.php',
+                        'id_horario',
+                        '¿Estás seguro de que deseas eliminar este horario?',
+                        function(data, button) {
+                            const rowToRemove = button.closest('tr');
+                            if (rowToRemove) {
+                                rowToRemove.style.transition = 'opacity 0.5s';
+                                rowToRemove.style.opacity = '0';
+                                Array.from(rowToRemove.children).forEach(td => {
+                                    td.style.transition = 'background-color 0.5s';
+                                    td.style.backgroundColor = '#fee2e2';
+                                });
+                                setTimeout(() => {
+                                    rowToRemove.remove();
+                                    if (window.paginationInstance) {
+                                        window.paginationInstance.allRows = window.paginationInstance.allRows.filter(r => r !== rowToRemove);
+                                        window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                                    } else {
+                                        const tb = document.querySelector('.data-table tbody');
+                                        if (tb && tb.children.length === 0) {
+                                            tb.innerHTML = '<tr><td colspan="6">No hay horarios registrados</td></tr>';
+                                        }
+                                    }
+                                }, 500);
+                            }
+                        }
+                    );
+                }
+                
+                document.getElementById('addRouteModal').classList.remove('active');
+            }
+        }
     );
 
     // Actualización
     handleUpdateForm(
         document.getElementById('editRouteForm'),
-        'Horario actualizado exitosamente'
+        'Horario actualizado exitosamente',
+        function(data) {
+            if (data.registroActualizado) {
+                const reg = data.registroActualizado;
+                const tr = document.querySelector(`tr td[data-id="${reg.id_horario}"]`)?.closest('tr') || document.querySelector(`tr[data-id="${reg.id_horario}"]`);
+                
+                if (tr) {
+                    const cells = tr.querySelectorAll('td');
+                    cells[0].textContent = reg.ruta;
+                    cells[1].textContent = reg.tipo_dia;
+                    cells[2].textContent = reg.hora_salida;
+                    cells[3].textContent = reg.hora_llegada;
+                    cells[4].textContent = reg.frecuencia || '—';
+                    
+                    // Update dataset
+                    tr.setAttribute('data-id-ruta', reg.id_ruta);
+                    tr.setAttribute('data-dia', reg.tipo_dia);
+                    tr.setAttribute('data-salida', reg.hora_salida);
+                    tr.setAttribute('data-llegada', reg.hora_llegada);
+                    tr.setAttribute('data-frecuencia', reg.frecuencia || '—');
+                    
+                    Array.from(tr.children).forEach(td => {
+                        td.style.transition = 'background-color 0.5s';
+                        td.style.backgroundColor = '#dcfce7'; // Verde
+                    });
+                    
+                    setTimeout(() => {
+                        Array.from(tr.children).forEach(td => {
+                            td.style.backgroundColor = '';
+                        });
+                    }, 1000);
+                    
+                    document.getElementById('editRouteModal').classList.remove('active');
+                }
+            }
+        }
     );
 
     // Eliminación
     initializeDeleteButtons(
         '.btn-delete',
-        '/GoWay/controllers/delete/delete_horarios.php',
+        '../../controllers/delete/delete_horarios.php',
         'id_horario',
-        '¿Estás seguro de que deseas eliminar este horario?'
+        '¿Estás seguro de que deseas eliminar este horario?',
+        function(data, button) {
+            const tr = button.closest('tr');
+            if (tr) {
+                tr.style.transition = 'opacity 0.5s';
+                tr.style.opacity = '0';
+                
+                Array.from(tr.children).forEach(td => {
+                    td.style.transition = 'background-color 0.5s';
+                    td.style.backgroundColor = '#fee2e2'; // Rojo
+                });
+                
+                setTimeout(() => {
+                    tr.remove();
+                    if (window.paginationInstance) {
+                        window.paginationInstance.allRows = window.paginationInstance.allRows.filter(r => r !== tr);
+                        window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                    } else {
+                        const tbody = document.querySelector('.data-table tbody');
+                        if (tbody && tbody.children.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6">No hay horarios registrados</td></tr>';
+                        }
+                    }
+                }, 500);
+            }
+        }
     );
 
     // Editar: leer datos del data-* del tr
@@ -299,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const row = this.closest('tr');
             document.getElementById('edit_id_horario').value  = row.dataset.id;
             document.getElementById('edit_id_ruta').value     = row.dataset.idRuta;
-            document.getElementById('edit_tipo_dia').value  = row.dataset.tipoDia;
+            document.getElementById('edit_tipo_dia').value  = row.dataset.dia;
             document.getElementById('edit_hora_salida').value = row.dataset.salida;
             document.getElementById('edit_hora_llegada').value = row.dataset.llegada;
             document.getElementById('edit_frecuencia').value  = row.dataset.frecuencia;

@@ -27,7 +27,19 @@ $capacidad = $_POST['capacidad'];
 $activo = $_POST['activo'];
 
 if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Vehículo guardado exitosamente']);
+    $id_vehiculo = $conn->insert_id;
+    echo json_encode([
+        'success' => true, 
+        'message' => 'Vehículo guardado exitosamente',
+        'nuevoRegistro' => [
+            'id_vehiculo' => $id_vehiculo,
+            'placa' => $placa,
+            'modelo' => $modelo,
+            'capacidad' => $capacidad,
+            'rfc_empresa' => $rfc_empresa,
+            'activo' => $activo
+        ]
+    ]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Error al guardar: ' . $stmt->error]);
 }

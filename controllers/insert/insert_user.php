@@ -28,7 +28,18 @@ $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password, rol, foto
 $stmt->bind_param("sssss", $nombre, $email, $password, $rol, $foto);
 
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Usuario agregado correctamente"]);
+    $id = $conn->insert_id;
+    echo json_encode([
+        "success" => true, 
+        "message" => "Usuario agregado correctamente",
+        "nuevoRegistro" => [
+            "id" => $id,
+            "nombre" => $nombre,
+            "email" => $email,
+            "rol" => $rol,
+            "foto" => $foto
+        ]
+    ]);
 } else {
     echo json_encode(["success" => false, "message" => "Error al insertar: " . $stmt->error]);
 }

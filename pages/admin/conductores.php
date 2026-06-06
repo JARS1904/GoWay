@@ -83,7 +83,7 @@ require_once '../../config/sync_session_foto.php';
                                     ? '<img src="../../assets/images/profiles/' . htmlspecialchars($row["foto"]) . '" class="avatar-img" alt="foto">'
                                     : '<div class="avatar-initials">' . $initial . '</div>';
                                 
-                                echo '<tr>
+                                echo '<tr data-id="'.$row["rfc_conductor"].'">
                                         <td data-label="RFC del Conductor" data-id="'.$row["rfc_conductor"].'">' . htmlspecialchars($row["rfc_conductor"]) . '</td>
                                         <td data-label="RFC de la Empresa">'.htmlspecialchars($row["rfc_empresa"]).'</td>
                                         <td data-label="Nombre" data-nombre="' . $nombre_esc . '"><div class="avatar-cell">' . $avatar . '<span>' . $nombre_esc . '</span></div></td>
@@ -283,7 +283,70 @@ require_once '../../config/sync_session_foto.php';
         });
 
         // Manejo del formulario de inserción
-        handleInsertForm(document.getElementById('routeForm'), 'Conductor agregado correctamente');
+        handleInsertForm(document.getElementById('routeForm'), 'Conductor agregado correctamente', function(data) {
+            if (data.nuevoRegistro) {
+                const tbody = document.querySelector('.data-table tbody');
+                if (tbody.querySelector('td[colspan]')) {
+                    tbody.innerHTML = '';
+                }
+                
+                const reg = data.nuevoRegistro;
+                const statusClass = reg.activo == 1 ? 'status-active' : 'status-inactive';
+                const statusText = reg.activo == 1 ? 'Sí' : 'No';
+                
+                // Avatar html
+                const initial = reg.nombre.charAt(0).toUpperCase();
+                const avatarHtml = reg.foto && reg.foto !== '' 
+                    ? `<img src="../../assets/images/profiles/${reg.foto}" class="avatar-img" alt="foto">`
+                    : `<div class="avatar-initials">${initial}</div>`;
+                
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-id', reg.rfc_conductor);
+                tr.style.transition = 'background-color 0.5s, opacity 0.5s';
+                tr.style.backgroundColor = '#dbeafe';
+                tr.style.opacity = '0';
+                
+                tr.innerHTML = `
+                    <td data-label="RFC del Conductor" data-id="${reg.rfc_conductor}">${reg.rfc_conductor}</td>
+                    <td data-label="RFC de la Empresa">${reg.rfc_empresa}</td>
+                    <td data-label="Nombre" data-nombre="${reg.nombre}"><div class="avatar-cell">${avatarHtml}<span>${reg.nombre}</span></div></td>
+                    <td data-label="Licencia">${reg.licencia}</td>
+                    <td data-label="Teléfono">${reg.telefono}</td>
+                    <td data-label="Activo"><span class="${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="kebab-menu">
+                            <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
+                                <span class="material-icons">more_vert</span>
+                            </button>
+                            <div class="dropdown-content">
+                                <button class="dropdown-item btn-edit">
+                                    <span class="material-icons">edit_square</span> Editar
+                                </button>
+                                <button class="dropdown-item btn-delete">
+                                    <span class="material-icons">delete_outline</span> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.prepend(tr);
+                
+                setTimeout(() => { tr.style.opacity = '1'; }, 10);
+                setTimeout(() => { tr.style.backgroundColor = ''; }, 1000);
+
+                const countEl = document.getElementById('toolbarCount');
+                if (countEl) {
+                    const count = tbody.querySelectorAll('tr').length;
+                    countEl.textContent = `${count} registro${count !== 1 ? 's' : ''}`;
+                }
+
+                const deleteBtn = tr.querySelector('.btn-delete');
+                if (deleteBtn) {
+                    handleDeleteButton(deleteBtn, '../../controllers/delete/delete_conductores.php', 'rfc_conductor', '¿Estás seguro de que deseas eliminar este conductor?', handleDeleteSuccess);
+                }
+            }
+        });
 
         // Cerrar modal al hacer clic fuera
         document.getElementById('addRouteModal').addEventListener('click', function(e) {
@@ -332,14 +395,70 @@ require_once '../../config/sync_session_foto.php';
         });
 
         // Manejo del formulario de edición
-        handleUpdateForm(document.getElementById('editVehicleForm'), 'Conductor actualizado correctamente');
+        handleUpdateForm(document.getElementById('editVehicleForm'), 'Conductor actualizado correctamente', function(data) {
+            if (data.registroActualizado) {
+                const reg = data.registroActualizado;
+                const tr = document.querySelector(`tr[data-id="${reg.rfc_conductor}"]`);
+                if (tr) {
+                    const cells = tr.querySelectorAll('td');
+                    cells[0].textContent = reg.rfc_conductor;
+                    cells[1].textContent = reg.rfc_empresa;
+                    
+                    // Actualizar nombre y mantener avatar original o actualizarlo si se subió foto
+                    cells[2].dataset.nombre = reg.nombre;
+                    if (reg.foto && reg.foto !== '') {
+                        cells[2].innerHTML = `<div class="avatar-cell"><img src="../../assets/images/profiles/${reg.foto}" class="avatar-img" alt="foto"><span>${reg.nombre}</span></div>`;
+                    } else {
+                        // Mantener el avatar actual pero cambiar el span del nombre
+                        const currentAvatarHtml = cells[2].querySelector('.avatar-cell').innerHTML.split('<span>')[0];
+                        cells[2].innerHTML = `<div class="avatar-cell">${currentAvatarHtml}<span>${reg.nombre}</span></div>`;
+                    }
+                    
+                    cells[3].textContent = reg.licencia;
+                    cells[4].textContent = reg.telefono;
+                    
+                    const statusClass = reg.activo == 1 ? 'status-active' : 'status-inactive';
+                    const statusText = reg.activo == 1 ? 'Sí' : 'No';
+                    cells[5].innerHTML = `<span class="${statusClass}">${statusText}</span>`;
+                    
+                    tr.style.transition = 'background-color 0.5s';
+                    tr.style.backgroundColor = '#dcfce7';
+                    setTimeout(() => { tr.style.backgroundColor = ''; }, 1000);
+                }
+            }
+        });
+
+        const handleDeleteSuccess = function(data, button) {
+            const row = button.closest('tr');
+            if (row) {
+                row.style.transition = 'background-color 0.5s, opacity 0.5s';
+                row.style.backgroundColor = '#fee2e2';
+                row.style.opacity = '0';
+                
+                setTimeout(() => {
+                    row.remove();
+                    const countEl = document.getElementById('toolbarCount');
+                    if (countEl) {
+                        const tbody = document.querySelector('.data-table tbody');
+                        const count = tbody.querySelectorAll('tr').length;
+                        if (count === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7">No hay conductores registrados</td></tr>';
+                            countEl.textContent = '0 registros';
+                        } else {
+                            countEl.textContent = `${count} registro${count !== 1 ? 's' : ''}`;
+                        }
+                    }
+                }, 500);
+            }
+        };
 
         // Inicializar botones de eliminación
         initializeDeleteButtons(
             '.btn-delete',
             '../../controllers/delete/delete_conductores.php',
             'rfc_conductor',
-            '¿Estás seguro de que deseas eliminar este conductor?'
+            '¿Estás seguro de que deseas eliminar este conductor?',
+            handleDeleteSuccess
         );
 
         document.querySelectorAll('.input-foto').forEach(function(input) {

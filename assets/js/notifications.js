@@ -79,8 +79,9 @@ function showNotification(message, type = 'info') {
  * Función para manejar inserción con AJAX
  * @param {HTMLFormElement} formElement - El formulario a enviar
  * @param {string} successMessage - Mensaje de éxito personalizado
+ * @param {function} onSuccessCallback - Callback opcional para manejar actualización del DOM en lugar de recargar
  */
-function handleInsertForm(formElement, successMessage = 'Registro agregado exitosamente') {
+function handleInsertForm(formElement, successMessage = 'Registro agregado exitosamente', onSuccessCallback = null) {
     if (!formElement) return;
 
     formElement.addEventListener('submit', function(e) {
@@ -115,10 +116,14 @@ function handleInsertForm(formElement, successMessage = 'Registro agregado exito
                 // Notificación AZUL para inserción
                 showNotification(data.message || successMessage, 'info');
 
-                // Recargar después de 3 segundos
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
+                if (onSuccessCallback) {
+                    onSuccessCallback(data);
+                } else {
+                    // Recargar después de 3 segundos
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                }
             } else {
                 showNotification(data.message || 'Error al guardar', 'error');
             }
@@ -136,8 +141,9 @@ function handleInsertForm(formElement, successMessage = 'Registro agregado exito
  * Función para manejar actualización con AJAX
  * @param {HTMLFormElement} formElement - El formulario a enviar
  * @param {string} successMessage - Mensaje de éxito personalizado
+ * @param {function} onSuccessCallback - Callback opcional para manejar actualización del DOM en lugar de recargar
  */
-function handleUpdateForm(formElement, successMessage = 'Registro actualizado exitosamente') {
+function handleUpdateForm(formElement, successMessage = 'Registro actualizado exitosamente', onSuccessCallback = null) {
     if (!formElement) return;
 
     formElement.addEventListener('submit', function(e) {
@@ -174,10 +180,14 @@ function handleUpdateForm(formElement, successMessage = 'Registro actualizado ex
                 // Notificación VERDE para actualización
                 showNotification(data.message || successMessage, 'success');
 
-                // Recargar después de 3 segundos
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
+                if (onSuccessCallback) {
+                    onSuccessCallback(data);
+                } else {
+                    // Recargar después de 3 segundos
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                }
             } else {
                 showNotification(data.message || 'Error al actualizar', 'error');
             }
@@ -197,8 +207,9 @@ function handleUpdateForm(formElement, successMessage = 'Registro actualizado ex
  * @param {string} deleteEndpoint - URL del controlador de eliminación
  * @param {string} idParamName - Nombre del parámetro del ID (ej: 'id_ruta', 'id_horario')
  * @param {string} confirmMessage - Mensaje de confirmación personalizado
+ * @param {function} onSuccessCallback - Callback opcional para manejar actualización del DOM en lugar de recargar
  */
-function handleDeleteButton(deleteButton, deleteEndpoint, idParamName, confirmMessage = '¿Estás seguro?') {
+function handleDeleteButton(deleteButton, deleteEndpoint, idParamName, confirmMessage = '¿Estás seguro?', onSuccessCallback = null) {
     deleteButton.addEventListener('click', function() {
         if (!confirm(confirmMessage)) {
             return;
@@ -234,10 +245,14 @@ function handleDeleteButton(deleteButton, deleteEndpoint, idParamName, confirmMe
                 // Notificación ROJA para eliminación
                 showNotification(data.message || 'Registro eliminado exitosamente', 'error');
 
-                // Recargar después de 3 segundos
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
+                if (onSuccessCallback) {
+                    onSuccessCallback(data, deleteButton);
+                } else {
+                    // Recargar después de 3 segundos
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                }
             } else {
                 showNotification(data.message || 'Error al eliminar', 'error');
             }
@@ -258,9 +273,10 @@ function handleDeleteButton(deleteButton, deleteEndpoint, idParamName, confirmMe
  * @param {string} deleteEndpoint - URL del controlador
  * @param {string} idParamName - Nombre del parámetro del ID
  * @param {string} confirmMessage - Mensaje de confirmación
+ * @param {function} onSuccessCallback - Callback opcional para manejar actualización del DOM en lugar de recargar
  */
-function initializeDeleteButtons(buttonSelector, deleteEndpoint, idParamName, confirmMessage = '¿Estás seguro?') {
+function initializeDeleteButtons(buttonSelector, deleteEndpoint, idParamName, confirmMessage = '¿Estás seguro?', onSuccessCallback = null) {
     document.querySelectorAll(buttonSelector).forEach(button => {
-        handleDeleteButton(button, deleteEndpoint, idParamName, confirmMessage);
+        handleDeleteButton(button, deleteEndpoint, idParamName, confirmMessage, onSuccessCallback);
     });
 }

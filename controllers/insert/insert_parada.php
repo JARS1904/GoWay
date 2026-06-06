@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 0);
 header('Content-Type: application/json');
 require_once '../../config/conexion_bd.php';
 
@@ -20,22 +21,29 @@ if ($id_ruta <= 0 || $nombre === '') {
     exit;
 }
 
-$stmt = $conn->prepare(
-    "INSERT INTO paradas_ruta (id_ruta, nombre, orden, minutos_desde_origen)
-     VALUES (?, ?, ?, ?)"
-);
-$stmt->bind_param("isii", $id_ruta, $nombre, $orden, $minutos_desde_origen);
+try {
+    $stmt = $conn->prepare(
+        "INSERT INTO paradas_ruta (id_ruta, nombre, orden, minutos_desde_origen)
+         VALUES (?, ?, ?, ?)"
+    );
+    $stmt->bind_param("isii", $id_ruta, $nombre, $orden, $minutos_desde_origen);
 
-if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Parada agregada exitosamente', 'id_parada' => $stmt->insert_id]);
-} else {
-    // Código 1062 = entrada duplicada (id_ruta + orden ya existe)
-    $msg = ($conn->errno === 1062)
-        ? 'Ya existe una parada con ese orden en esta ruta'
-        : 'Error al insertar: ' . $stmt->error;
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Parada agregada exitosamente', 'id_parada' => $stmt->insert_id]);
+    } else {
+        // Código 1062 = entrada duplicada (id_ruta + orden ya existe)
+        $msg = ($conn->errno === 1062)
+            ? 'Ya existe una parada con ese orden en esta ruta'
+            : 'Error al insertar: ' . $stmt->error;
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => $msg]);
+    }
+
+    $stmt->close();
+} catch (Throwable $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $msg]);
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
 
-$stmt->close();
 $conn->close();
+?>

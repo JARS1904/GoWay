@@ -74,7 +74,7 @@ require_once '../../config/sync_session_foto.php';
                                 $statusClass = $row["activo"] ? 'status-active' : 'status-inactive';
                                 $statusText = $row["activo"] ? 'Sí' : 'No';
                                 
-                                echo '<tr>
+                                echo '<tr data-id="'.$row["rfc_empresa"].'">
                                         <td data-label="RFC de la Empresa" data-id="'.$row["rfc_empresa"].'">'.$row["rfc_empresa"].'</td>
                                         <td data-label="Nombre">'.$row["nombre"].'</td>
                                         <td data-label="Dirección">'.$row["direccion"].'</td>
@@ -173,7 +173,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Editar Empresa</h3>
                 <button class="modal-close" id="closeEditEmpresasModal">×</button>
             </div>
-            <form id="editEmpresasForm" action="actualizar/actu_empresasSql.php" method="POST">
+            <form id="editEmpresasForm" action="../../controllers/update/update_empresa.php" method="POST">
                 <div class="modal-body">
                     <div>
                         <div class="modal-form-group">
@@ -238,7 +238,81 @@ require_once '../../config/sync_session_foto.php';
         });
 
         // Manejo del formulario de inserción
-        handleInsertForm(document.getElementById('routeForm'), 'Empresa agregada correctamente');
+        handleInsertForm(document.getElementById('routeForm'), 'Empresa agregada correctamente', function(data) {
+            if (data.nuevoRegistro) {
+                const tbody = document.querySelector('.data-table tbody');
+                const noData = tbody.querySelector('td[colspan]');
+                if (noData) {
+                    noData.parentElement.remove();
+                }
+                
+                const reg = data.nuevoRegistro;
+                const statusClass = reg.activo == 1 ? 'status-active' : 'status-inactive';
+                const statusText = reg.activo == 1 ? 'Sí' : 'No';
+                
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-id', reg.rfc_empresa);
+                
+                tr.innerHTML = `
+                    <td data-label="RFC de la Empresa" data-id="${reg.rfc_empresa}">${reg.rfc_empresa}</td>
+                    <td data-label="Nombre">${reg.nombre}</td>
+                    <td data-label="Dirección">${reg.direccion}</td>
+                    <td data-label="Teléfono">${reg.telefono}</td>
+                    <td data-label="Email">${reg.email}</td>
+                    <td data-label="Activa"><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="kebab-menu">
+                            <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
+                                <span class="material-icons">more_vert</span>
+                            </button>
+                            <div class="dropdown-content">
+                                <button class="dropdown-item btn-edit">
+                                    <span class="material-icons">edit_square</span> Editar
+                                </button>
+                                <button class="dropdown-item btn-delete">
+                                    <span class="material-icons">delete_outline</span> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                tr.style.transition = 'opacity 0.5s';
+                tr.style.opacity = '0';
+                
+                Array.from(tr.children).forEach(td => {
+                    td.style.transition = 'background-color 0.5s';
+                    td.style.backgroundColor = '#dbeafe'; // Azul
+                });
+                
+                tbody.prepend(tr);
+                
+                setTimeout(() => { tr.style.opacity = '1'; }, 10);
+                setTimeout(() => {
+                    Array.from(tr.children).forEach(td => {
+                        td.style.backgroundColor = '';
+                    });
+                }, 1000);
+
+                if (window.paginationInstance) {
+                    window.paginationInstance.allRows.unshift(tr);
+                    window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                }
+
+                // Actualizar cuenta si existe el toolbar
+                const countEl = document.getElementById('toolbarCount');
+                if (countEl && !window.paginationInstance) {
+                    const count = tbody.querySelectorAll('tr').length;
+                    countEl.textContent = `${count} registro${count !== 1 ? 's' : ''}`;
+                }
+
+                // Reinicializar botones del nuevo elemento
+                const deleteBtn = tr.querySelector('.btn-delete');
+                if (deleteBtn) {
+                    handleDeleteButton(deleteBtn, '../../controllers/delete/delete_empresas.php', 'rfc_empresa', '¿Estás seguro de que deseas eliminar esta empresa?', handleDeleteSuccess);
+                }
+            }
+        });
 
         // Cerrar modal al hacer clic fuera
         document.getElementById('addRouteModal').addEventListener('click', function(e) {
@@ -287,14 +361,76 @@ require_once '../../config/sync_session_foto.php';
         });
 
         // Manejo del formulario de edición
-        handleUpdateForm(document.getElementById('editEmpresasForm'), 'Empresa actualizada correctamente');
+        handleUpdateForm(document.getElementById('editEmpresasForm'), 'Empresa actualizada correctamente', function(data) {
+            if (data.registroActualizado) {
+                const reg = data.registroActualizado;
+                // Buscar la fila por el ID original del form antes de que cambie
+                const tr = document.querySelector(`tr[data-id="${reg.rfc_empresa}"]`);
+                if (tr) {
+                    const cells = tr.querySelectorAll('td');
+                    cells[0].textContent = reg.rfc_empresa;
+                    cells[1].textContent = reg.nombre;
+                    cells[2].textContent = reg.direccion;
+                    cells[3].textContent = reg.telefono;
+                    cells[4].textContent = reg.email;
+                    
+                    const statusClass = reg.activo == 1 ? 'status-active' : 'status-inactive';
+                    const statusText = reg.activo == 1 ? 'Sí' : 'No';
+                    cells[5].innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+                    
+                    Array.from(tr.children).forEach(td => {
+                        td.style.transition = 'background-color 0.5s';
+                        td.style.backgroundColor = '#dcfce7'; // Verde
+                    });
+                    
+                    setTimeout(() => {
+                        Array.from(tr.children).forEach(td => {
+                            td.style.backgroundColor = '';
+                        });
+                    }, 1000);
+                }
+            }
+        });
+
+        // Callback de éxito para eliminar
+        const handleDeleteSuccess = function(data, button) {
+            const row = button.closest('tr');
+            if (row) {
+                row.style.transition = 'opacity 0.5s';
+                row.style.opacity = '0';
+                
+                Array.from(row.children).forEach(td => {
+                    td.style.transition = 'background-color 0.5s';
+                    td.style.backgroundColor = '#fee2e2'; // Rojo
+                });
+                
+                setTimeout(() => {
+                    row.remove();
+                    if (window.paginationInstance) {
+                        window.paginationInstance.allRows = window.paginationInstance.allRows.filter(r => r !== row);
+                        window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                    } else {
+                        const countEl = document.getElementById('toolbarCount');
+                        const tbody = document.querySelector('.data-table tbody');
+                        const count = tbody.querySelectorAll('tr').length;
+                        if (count === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7">No hay empresas registradas</td></tr>';
+                            if (countEl) countEl.textContent = '0 registros';
+                        } else {
+                            if (countEl) countEl.textContent = `${count} registro${count !== 1 ? 's' : ''}`;
+                        }
+                    }
+                }, 500); // Mismo tiempo que la animación
+            }
+        };
 
         // Inicializar botones de eliminación
         initializeDeleteButtons(
             '.btn-delete',
             '../../controllers/delete/delete_empresas.php',
             'rfc_empresa',
-            '¿Estás seguro de que deseas eliminar esta empresa?'
+            '¿Estás seguro de que deseas eliminar esta empresa?',
+            handleDeleteSuccess
         );
     </script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>

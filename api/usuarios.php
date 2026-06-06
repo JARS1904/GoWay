@@ -13,6 +13,11 @@ $conn = $conexion;
 // Obtener método de la solicitud
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Interceptar method override para PUT enviado desde Flutter
+if ($method === 'POST' && isset($_POST['_method']) && strtoupper($_POST['_method']) === 'PUT') {
+    $method = 'PUT';
+}
+
 switch ($method) {
     case 'GET':
         // Obtener usuarios (excluyendo contraseñas por seguridad)

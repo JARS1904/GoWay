@@ -47,7 +47,18 @@ $stmt = $conn->prepare("INSERT INTO empresas (rfc_empresa, nombre, direccion, te
 $stmt->bind_param("ssssss", $rfc_empresa, $nombre, $direccion, $telefono, $email, $password_hash);
 
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Empresa registrada exitosamente."]);
+    echo json_encode([
+        "success" => true, 
+        "message" => "Empresa registrada exitosamente.",
+        "nuevoRegistro" => [
+            "rfc_empresa" => $rfc_empresa,
+            "nombre" => $nombre,
+            "direccion" => $direccion,
+            "telefono" => $telefono,
+            "email" => $email,
+            "activo" => 1 // Por defecto, una empresa nueva está activa
+        ]
+    ]);
 } else {
     echo json_encode(["success" => false, "message" => "Error al guardar: " . $stmt->error]);
 }

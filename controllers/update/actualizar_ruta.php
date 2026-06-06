@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 0);
 session_start();
 // actualizar_ruta.php
 header('Content-Type: application/json');
@@ -23,7 +24,7 @@ $id_ruta_retorno = isset($_POST['id_ruta_retorno']) && $_POST['id_ruta_retorno']
 $activa = isset($_POST['activa']) ? (int)$_POST['activa'] : 0;
 $rfc_empresa = isset($_POST['rfc_empresa']) ? trim($_POST['rfc_empresa']) : '';
 if (isset($_SESSION['rol']) && $_SESSION['rol'] == 4) {
-    $rfc_empresa = $_SESSION['rfc_empresa'];
+    $rfc_empresa = $_SESSION['rfc_empresa'] ?? '';
 }
 
 // Validar datos
@@ -33,38 +34,60 @@ if (empty($id_ruta) || empty($nombre) || empty($origen) || empty($destino) || em
     exit;
 }
 
-// Preparar la consulta SQL
-$sql = "UPDATE rutas SET 
-        rfc_empresa = ?,
-        nombre = ?,
-        origen = ?,
-        destino = ?,
-        id_ruta_retorno = ?,
-        activa = ?
-        WHERE id_ruta = ?";
+try {
+    // Preparar la consulta SQL
+    $sql = "UPDATE rutas SET 
+            rfc_empresa = ?,
+            nombre = ?,
+            origen = ?,
+            destino = ?,
+            id_ruta_retorno = ?,
+            activa = ?
+            WHERE id_ruta = ?";
 
-// Preparar statement
-$stmt = $conn->prepare($sql);
+    // Preparar statement
+    $stmt = $conn->prepare($sql);
 
-if ($stmt === false) {
+    if ($stmt === false) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Error en la preparación: ' . $conn->error]);
+        exit;
+    }
+
+    // Vincular parámetros
+    $stmt->bind_param("ssssiii", $rfc_empresa, $nombre, $origen, $destino, $id_ruta_retorno, $activa, $id_ruta);
+
+    // Ejecutar consulta
+    if ($stmt->execute()) {
+        http_response_code(200);
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Ruta actualizada exitosamente',
+            'registroActualizado' => [
+                'id_ruta' => $id_ruta,
+                'nombre' => $nombre,
+                'origen' => $origen,
+                'destino' => $destino,
+                'id_ruta_retorno' => $id_ruta_retorno,
+                'rfc_empresa' => $rfc_empresa,
+                'activa' => $activa
+            ]
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $stmt->error]);
+    }
+
+    // Cerrar conexiones
+    $stmt->close();
+} catch (Throwable $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error en la preparación: ' . $conn->error]);
-    exit;
+    $errorMsg = $e->getMessage();
+    if (strpos($errorMsg, 'foreign key constraint fails') !== false) {
+        $errorMsg = 'No se puede asignar esa ruta de retorno porque ya está asignada o hay un conflicto de relación.';
+    }
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $errorMsg]);
 }
 
-// Vincular parámetros
-$stmt->bind_param("ssssiii", $rfc_empresa, $nombre, $origen, $destino, $id_ruta_retorno, $activa, $id_ruta);
-
-// Ejecutar consulta
-if ($stmt->execute()) {
-    http_response_code(200);
-    echo json_encode(['success' => true, 'message' => 'Ruta actualizada exitosamente']);
-} else {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $stmt->error]);
-}
-
-// Cerrar conexiones
-$stmt->close();
 $conn->close();
 ?>

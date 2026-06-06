@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 header('Content-Type: application/json');
@@ -16,14 +15,20 @@ if ($conn->connect_error) {
 }
 
 // Recoger datos del formulario
-$id_vehiculo = $_POST['id_vehiculo'];
-$placa = $_POST['placa'];
-$modelo = $_POST['modelo'];
-$capacidad = $_POST['capacidad'];
-$activo = $_POST['activo'];
-$rfc_empresa = $_POST['rfc_empresa'];
+$id_vehiculo = $_POST['id_vehiculo'] ?? '';
+$placa = $_POST['placa'] ?? '';
+$modelo = $_POST['modelo'] ?? '';
+$capacidad = isset($_POST['capacidad']) ? (int)$_POST['capacidad'] : 0;
+$activo = isset($_POST['activo']) ? (int)$_POST['activo'] : 1;
+$rfc_empresa = $_POST['rfc_empresa'] ?? '';
+
 if (isset($_SESSION['rol']) && $_SESSION['rol'] == 4) {
-    $rfc_empresa = $_SESSION['rfc_empresa'];
+    $rfc_empresa = $_SESSION['rfc_empresa'] ?? '';
+}
+
+if (empty($id_vehiculo)) {
+    echo json_encode(['success' => false, 'message' => 'ID de vehículo no proporcionado.']);
+    exit;
 }
 
 // Preparar la consulta SQL
@@ -48,7 +53,18 @@ $stmt->bind_param("ssiisi", $placa, $modelo, $capacidad, $activo, $rfc_empresa, 
 
 // Ejecutar consulta
 if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Vehículo actualizado exitosamente']);
+    echo json_encode([
+        'success' => true, 
+        'message' => 'Vehículo actualizado exitosamente',
+        'registroActualizado' => [
+            'id_vehiculo' => $id_vehiculo,
+            'placa' => $placa,
+            'modelo' => $modelo,
+            'capacidad' => $capacidad,
+            'rfc_empresa' => $rfc_empresa,
+            'activo' => $activo
+        ]
+    ]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Error: ' . $conn->error]);
 }
@@ -57,4 +73,3 @@ if ($stmt->execute()) {
 $stmt->close();
 $conn->close();
 ?>
-

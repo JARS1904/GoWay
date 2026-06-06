@@ -69,7 +69,21 @@ if ($stmt === false) {
 $stmt->bind_param($types, ...$params);
 
 if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Checador actualizado correctamente']);
+    $response = [
+        'success' => true, 
+        'message' => 'Checador actualizado correctamente',
+        'registroActualizado' => [
+            'rfc_checador' => $rfc_checador,
+            'rfc_empresa' => $rfc_empresa,
+            'nombre' => $nombre,
+            'usuario' => $usuario,
+            'activo' => $activo
+        ]
+    ];
+    if (isset($foto)) {
+        $response['registroActualizado']['foto'] = $foto;
+    }
+    echo json_encode($response);
 } else {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $stmt->error]);

@@ -3211,3 +3211,42 @@ body {
         display: none;
     }
 }
+
+/* ====================================================
+   Animaciones Dinámicas para Inserción y Eliminación (AJAX)
+   ==================================================== */
+.fade-in {
+    animation: fadeInOpacity 0.5s ease-out forwards;
+}
+
+.fade-in td {
+    animation: fadeInColor 1.5s ease-out forwards;
+}
+
+.fade-out {
+    animation: fadeOutOpacity 0.5s ease-in forwards;
+}
+
+.fade-out td {
+    animation: fadeOutColor 0.5s ease-in forwards;
+}
+
+@keyframes fadeInOpacity {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOutOpacity {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes fadeInColor {
+    0% { background-color: #dbeafe !important; } /* Azul claro */
+    100% { background-color: transparent !important; }
+}
+
+@keyframes fadeOutColor {
+    0% { background-color: transparent !important; }
+    100% { background-color: #fee2e2 !important; } /* Rojo claro */
+}

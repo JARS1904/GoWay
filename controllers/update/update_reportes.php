@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 0);
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 require_once '../../config/conexion_bd.php';
@@ -76,7 +77,24 @@ try {
     );
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Reporte actualizado exitosamente']);
+        // Obtener el registro actualizado completo
+        $sql_updated = "SELECT r.*,
+                               v.placa as vehiculo_placa, v.modelo as vehiculo_modelo,
+                               c.nombre as conductor_nombre,
+                               ru.nombre as ruta_nombre
+                        FROM reportes r
+                        LEFT JOIN vehiculos v ON r.id_vehiculo = v.id_vehiculo
+                        LEFT JOIN conductores c ON r.rfc_conductor = c.rfc_conductor
+                        LEFT JOIN rutas ru ON r.id_ruta = ru.id_ruta
+                        WHERE r.id = ?";
+        $stmt_updated = $conexion->prepare($sql_updated);
+        $stmt_updated->bind_param("i", $id);
+        $stmt_updated->execute();
+        $result_updated = $stmt_updated->get_result();
+        $registroActualizado = $result_updated->fetch_assoc();
+        $stmt_updated->close();
+
+        echo json_encode(['success' => true, 'message' => 'Reporte actualizado exitosamente', 'registroActualizado' => $registroActualizado]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $stmt->error]);
     }
@@ -87,3 +105,4 @@ try {
 }
 
 $conexion->close();
+?>

@@ -100,7 +100,7 @@ require_once '../../config/sync_session_foto.php';
                             $statusClass = $row["activo"] ? 'status-active' : 'status-inactive';
                             $statusText = $row["activo"] ? 'Sí' : 'No';
                             
-                            echo '<tr>
+                                echo '<tr data-id="'.$row["id_vehiculo"].'">
                                     <td data-label="Número de placa" data-id="'.$row["id_vehiculo"].'">' . $row["placa"] . '</td>
                                     <td data-label="Modelo">' . $row["modelo"] . '</td>
                                     <td data-label="Capacidad">' . $row["capacidad"] . '</td>
@@ -268,21 +268,191 @@ require_once '../../config/sync_session_foto.php';
         document.addEventListener('DOMContentLoaded', function() {
             handleInsertForm(
                 document.getElementById('routeForm'),
-                'Vehículo agregado exitosamente'
+                'Vehículo agregado exitosamente',
+                function(data) {
+                    if (data.nuevoRegistro) {
+                        const tbody = document.querySelector('.data-table tbody');
+                        const noData = tbody.querySelector('td[colspan]');
+                        if (noData) {
+                            noData.parentElement.remove();
+                        }
+                        
+                        const reg = data.nuevoRegistro;
+                        const statusClass = reg.activo == 1 ? 'status-active' : 'status-inactive';
+                        const statusText = reg.activo == 1 ? 'Sí' : 'No';
+                        
+                        const tr = document.createElement('tr');
+                        tr.setAttribute('data-id', reg.id_vehiculo);
+                        
+                        tr.innerHTML = `
+                            <td data-label="Número de placa" data-id="${reg.id_vehiculo}">${reg.placa}</td>
+                            <td data-label="Modelo">${reg.modelo}</td>
+                            <td data-label="Capacidad">${reg.capacidad}</td>
+                            <td data-label="RFC de la Empresa">${reg.rfc_empresa}</td>
+                            <td data-label="Estado"><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>
+                                <div class="kebab-menu">
+                                    <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
+                                        <span class="material-icons">more_vert</span>
+                                    </button>
+                                    <div class="dropdown-content">
+                                        <button class="dropdown-item btn-edit">
+                                            <span class="material-icons">edit_square</span> Editar
+                                        </button>
+                                        <button class="dropdown-item btn-delete">
+                                            <span class="material-icons">delete_outline</span> Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        `;
+                        
+                        tr.style.transition = 'opacity 0.5s';
+                        tr.style.opacity = '0';
+                        
+                        Array.from(tr.children).forEach(td => {
+                            td.style.transition = 'background-color 0.5s';
+                            td.style.backgroundColor = '#dbeafe'; // Azul
+                        });
+                        
+                        tbody.prepend(tr);
+                        
+                        setTimeout(() => { tr.style.opacity = '1'; }, 10);
+                        setTimeout(() => {
+                            Array.from(tr.children).forEach(td => {
+                                td.style.backgroundColor = '';
+                            });
+                        }, 1000);
+
+                        if (window.paginationInstance) {
+                            window.paginationInstance.allRows.unshift(tr);
+                            window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                        }
+
+                        const countEl = document.getElementById('toolbarCount');
+                        if (countEl && !window.paginationInstance) {
+                            const count = tbody.querySelectorAll('tr').length;
+                            countEl.textContent = `${count} registro${count !== 1 ? 's' : ''}`;
+                        }
+
+                        const deleteBtn = tr.querySelector('.btn-delete');
+                        if (deleteBtn) {
+                            handleDeleteButton(deleteBtn, '/GoWay/controllers/delete/delete_vehiculo.php', 'id_vehiculo', '¿Estás seguro de que deseas eliminar este vehículo?', handleDeleteSuccess);
+                        }
+                    }
+                }
             );
 
             // Manejar actualización de vehículos
             handleUpdateForm(
                 document.getElementById('editVehicleForm'),
-                'Vehículo actualizado exitosamente'
+                'Vehículo actualizado exitosamente',
+                function(data) {
+                    if (data.registroActualizado) {
+                        const reg = data.registroActualizado;
+                        const tr = document.querySelector(`tr[data-id="${reg.id_vehiculo}"]`);
+                        if (tr) {
+                            const cells = tr.querySelectorAll('td');
+                            cells[0].textContent = reg.placa;
+                            cells[1].textContent = reg.modelo;
+                            cells[2].textContent = reg.capacidad;
+                            cells[3].textContent = reg.rfc_empresa;
+                            
+                            const statusClass = reg.activo == 1 ? 'status-active' : 'status-inactive';
+                            const statusText = reg.activo == 1 ? 'Sí' : 'No';
+                            cells[4].innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+                            
+                            Array.from(tr.children).forEach(td => {
+                                td.style.transition = 'background-color 0.5s';
+                                td.style.backgroundColor = '#dcfce7'; // Verde
+                            });
+                            
+                            setTimeout(() => {
+                                Array.from(tr.children).forEach(td => {
+                                    td.style.backgroundColor = '';
+                                });
+                            }, 1000);
+                        }
+                    }
+                }
             );
+
+            const handleDeleteSuccess = function(data, button) {
+                const row = button.closest('tr');
+                if (row) {
+                    row.style.transition = 'opacity 0.5s';
+                    row.style.opacity = '0';
+                    
+                    Array.from(row.children).forEach(td => {
+                        td.style.transition = 'background-color 0.5s';
+                        td.style.backgroundColor = '#fee2e2'; // Rojo
+                    });
+                    
+                    setTimeout(() => {
+                        row.remove();
+                        if (window.paginationInstance) {
+                            window.paginationInstance.allRows = window.paginationInstance.allRows.filter(r => r !== row);
+                            window.paginationInstance.filterRows(document.getElementById('searchInput')?.value || '');
+                        } else {
+                            const countEl = document.getElementById('toolbarCount');
+                            const tbody = document.querySelector('.data-table tbody');
+                            const count = tbody.querySelectorAll('tr').length;
+                            if (count === 0) {
+                                tbody.innerHTML = '<tr><td colspan="6">No hay vehículos registrados</td></tr>';
+                                if (countEl) countEl.textContent = '0 registros';
+                            } else {
+                                if (countEl) countEl.textContent = `${count} registro${count !== 1 ? 's' : ''}`;
+                            }
+                        }
+                    }, 500);
+                }
+            };
+
+            // Usar event delegation para botones de edición
+            const tbody = document.querySelector('tbody');
+            if (tbody) {
+                tbody.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.btn-edit');
+                    if (btn) {
+                        const row = btn.closest('tr');
+                        const cells = row.querySelectorAll('td');
+                        
+                        document.getElementById('edit_id_vehiculo').value = cells[0].getAttribute('data-id') || row.getAttribute('data-id');
+                        document.getElementById('edit_placa').value = cells[0].textContent.trim();
+                        document.getElementById('edit_modelo').value = cells[1].textContent.trim();
+                        document.getElementById('edit_capacidad').value = cells[2].textContent.trim();
+                        document.getElementById('edit_rfc_empresa').value = cells[3].textContent.trim();
+                        
+                        const statusText = cells[4].querySelector('span').textContent.trim();
+                        document.getElementById('edit_activo').value = statusText === 'Sí' ? 1 : 0;
+                        
+                        document.getElementById('editVehicleModal').classList.add('active');
+                    }
+                });
+            }
+
+            // Cerrar modal de edición
+            document.getElementById('closeEditVehicleModal').addEventListener('click', () => {
+                document.getElementById('editVehicleModal').classList.remove('active');
+            });
+
+            document.getElementById('cancelEditVehicleModal').addEventListener('click', () => {
+                document.getElementById('editVehicleModal').classList.remove('active');
+            });
+
+            document.getElementById('editVehicleModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
 
             // Manejar eliminación de vehículos
             initializeDeleteButtons(
                 '.btn-delete',
                 '/GoWay/controllers/delete/delete_vehiculo.php',
                 'id_vehiculo',
-                '¿Estás seguro de que deseas eliminar este vehículo?'
+                '¿Estás seguro de que deseas eliminar este vehículo?',
+                handleDeleteSuccess
             );
 
             // Modal para agregar
@@ -308,7 +478,6 @@ require_once '../../config/sync_session_foto.php';
 
     <script src="../../assets/js/notifications.js"></script>
     <script src="../../assets/js/main.js"></script>
-    <script src="../../assets/js/update/actu_vehiculo.js"></script>
     <script src="../../assets/js/pagination.js"></script>
     <?php require_once __DIR__ . '/../../components/notifications_panel.php'; ?>
     <?php require_once __DIR__ . '/../../components/logout_modal.php'; ?>

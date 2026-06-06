@@ -55,7 +55,22 @@ if ($stmt === false) {
 $stmt->bind_param($types, ...$params);
 
 if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Conductor actualizado correctamente']);
+    $response = [
+        'success' => true, 
+        'message' => 'Conductor actualizado correctamente',
+        'registroActualizado' => [
+            'rfc_conductor' => $rfc_conductor,
+            'rfc_empresa' => $rfc_empresa,
+            'nombre' => $nombre,
+            'licencia' => $licencia,
+            'telefono' => $telefono,
+            'activo' => $activo
+        ]
+    ];
+    if (isset($foto)) {
+        $response['registroActualizado']['foto'] = $foto;
+    }
+    echo json_encode($response);
 } else {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $stmt->error]);
