@@ -14,6 +14,8 @@ $id_parada            = isset($_POST['id_parada'])           ? (int)trim($_POST[
 $nombre               = isset($_POST['nombre'])              ? trim($_POST['nombre'])                          : '';
 $orden                = isset($_POST['orden'])               ? (int)trim($_POST['orden'])                      : 0;
 $minutos_desde_origen = isset($_POST['minutos_desde_origen'])? (int)trim($_POST['minutos_desde_origen'])       : 0;
+$latitud              = (isset($_POST['latitud']) && $_POST['latitud'] !== '') ? (float)trim($_POST['latitud']) : null;
+$longitud             = (isset($_POST['longitud']) && $_POST['longitud'] !== '') ? (float)trim($_POST['longitud']) : null;
 
 if ($id_parada <= 0 || $nombre === '') {
     http_response_code(400);
@@ -24,10 +26,10 @@ if ($id_parada <= 0 || $nombre === '') {
 try {
     $stmt = $conn->prepare(
         "UPDATE paradas_ruta
-         SET    nombre = ?, orden = ?, minutos_desde_origen = ?
+         SET    nombre = ?, orden = ?, minutos_desde_origen = ?, latitud = ?, longitud = ?
          WHERE  id_parada = ?"
     );
-    $stmt->bind_param("siii", $nombre, $orden, $minutos_desde_origen, $id_parada);
+    $stmt->bind_param("siiddi", $nombre, $orden, $minutos_desde_origen, $latitud, $longitud, $id_parada);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Parada actualizada exitosamente']);

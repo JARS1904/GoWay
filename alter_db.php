@@ -18,4 +18,10 @@ if ($check2->num_rows == 0) {
     $conexion->query("ALTER TABLE notificaciones ADD COLUMN rfc_checador VARCHAR(13) DEFAULT NULL AFTER id_usuario");
     echo "Columna rfc_checador agregada.\n";
 }
+$check3 = $conexion->query("SHOW COLUMNS FROM paradas_ruta LIKE 'latitud'");
+if ($check3->num_rows == 0) {
+    $conexion->query("ALTER TABLE paradas_ruta ADD COLUMN latitud DECIMAL(10,8) DEFAULT NULL");
+    $conexion->query("ALTER TABLE paradas_ruta ADD COLUMN longitud DECIMAL(11,8) DEFAULT NULL");
+    echo "Columnas latitud y longitud agregadas a paradas_ruta.\n";
+}
 ?>

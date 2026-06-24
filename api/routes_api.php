@@ -68,7 +68,7 @@ try {
         if ($_GET['action'] === 'paradas' && isset($_GET['id_ruta'])) {
             $id_ruta = (int)$_GET['id_ruta'];
             $stmt = $conn->prepare(
-                "SELECT id_parada, id_ruta, nombre, orden, minutos_desde_origen
+                "SELECT id_parada, id_ruta, nombre, orden, minutos_desde_origen, latitud, longitud
                  FROM   paradas_ruta
                  WHERE  id_ruta = ?
                  ORDER  BY orden ASC"
@@ -160,7 +160,7 @@ try {
 
             // Paradas estructuradas
             $stmt_p = $conn->prepare(
-                "SELECT nombre, orden, minutos_desde_origen
+                "SELECT nombre, orden, minutos_desde_origen, latitud, longitud
                  FROM   paradas_ruta
                  WHERE  id_ruta = ?
                  ORDER  BY orden ASC"
@@ -309,7 +309,7 @@ try {
 
                 // Paradas estructuradas (con orden y tiempos) — se obtienen UNA vez por ruta
                 $stmt_p = $conn->prepare(
-                    "SELECT nombre, orden, minutos_desde_origen
+                    "SELECT nombre, orden, minutos_desde_origen, latitud, longitud
                      FROM   paradas_ruta
                      WHERE  id_ruta = ?
                      ORDER  BY orden ASC"

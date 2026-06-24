@@ -14,6 +14,8 @@ $id_ruta              = isset($_POST['id_ruta'])             ? (int)trim($_POST[
 $nombre               = isset($_POST['nombre'])              ? trim($_POST['nombre'])                          : '';
 $orden                = isset($_POST['orden'])               ? (int)trim($_POST['orden'])                      : 0;
 $minutos_desde_origen = isset($_POST['minutos_desde_origen'])? (int)trim($_POST['minutos_desde_origen'])       : 0;
+$latitud              = (isset($_POST['latitud']) && $_POST['latitud'] !== '') ? (float)trim($_POST['latitud']) : null;
+$longitud             = (isset($_POST['longitud']) && $_POST['longitud'] !== '') ? (float)trim($_POST['longitud']) : null;
 
 if ($id_ruta <= 0 || $nombre === '') {
     http_response_code(400);
@@ -23,10 +25,10 @@ if ($id_ruta <= 0 || $nombre === '') {
 
 try {
     $stmt = $conn->prepare(
-        "INSERT INTO paradas_ruta (id_ruta, nombre, orden, minutos_desde_origen)
-         VALUES (?, ?, ?, ?)"
+        "INSERT INTO paradas_ruta (id_ruta, nombre, orden, minutos_desde_origen, latitud, longitud)
+         VALUES (?, ?, ?, ?, ?, ?)"
     );
-    $stmt->bind_param("isii", $id_ruta, $nombre, $orden, $minutos_desde_origen);
+    $stmt->bind_param("isiidd", $id_ruta, $nombre, $orden, $minutos_desde_origen, $latitud, $longitud);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Parada agregada exitosamente', 'id_parada' => $stmt->insert_id]);

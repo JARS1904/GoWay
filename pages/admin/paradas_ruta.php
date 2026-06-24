@@ -76,7 +76,15 @@ require_once '../../config/sync_session_foto.php';
             }
         }
     </style>
+    
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <style>
+        #map { height: 400px; width: 100%; margin-top: 16px; border-radius: 8px; border: 1px solid #e2e8f0; display: none; z-index: 1; }
+        .return-stop-icon { filter: grayscale(100%) opacity(0.6); }
+    </style>
+
 </head>
 <body>
 <div class="container">
@@ -108,12 +116,12 @@ require_once '../../config/sync_session_foto.php';
                         <?php
                         $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
                         $res = $conexion->query(
-                            "SELECT id_ruta, nombre, origen, destino FROM rutas" . $where_emp . " ORDER BY nombre ASC"
+                            "SELECT id_ruta, nombre, origen, destino, id_ruta_retorno FROM rutas" . $where_emp . " ORDER BY nombre ASC"
                         );
                         while ($r = $res->fetch_assoc()) {
-                            //$label = htmlspecialchars($r['nombre'] . ' (' . $r['origen'] . ' → ' . $r['destino'] . ')');
                             $label = htmlspecialchars($r['nombre']);
-                            echo "<option value=\"{$r['id_ruta']}\" data-origen=\"" . htmlspecialchars($r['origen']) . "\" data-destino=\"" . htmlspecialchars($r['destino']) . "\">{$label}</option>";
+                            $id_retorno = $r['id_ruta_retorno'] ? $r['id_ruta_retorno'] : '';
+                            echo "<option value=\"{$r['id_ruta']}\" data-retorno=\"{$id_retorno}\" data-origen=\"" . htmlspecialchars($r['origen']) . "\" data-destino=\"" . htmlspecialchars($r['destino']) . "\">{$label}</option>";
                         }
                         ?>
                     </select>
@@ -121,7 +129,15 @@ require_once '../../config/sync_session_foto.php';
                 </div>
             </div>
 
+            
+            <div class="route-controls" style="margin-top: 10px;">
+                <label style="font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="chkShowReturn" checked> Mostrar paradas de ruta de retorno como guía
+                </label>
+            </div>
+            <div id="map"></div>
             <div id="loadingStops">Cargando paradas…</div>
+
 
             <div class="stops-table-wrap">
                 <table class="data-table" id="stopsTable" style="display:none;">
@@ -156,6 +172,9 @@ require_once '../../config/sync_session_foto.php';
         <form id="stopForm">
             <input type="hidden" id="f_id_parada"  name="id_parada">
             <input type="hidden" id="f_id_ruta"    name="id_ruta">
+            <input type="hidden" id="f_latitud"    name="latitud">
+            <input type="hidden" id="f_longitud"   name="longitud">
+            <div id="coordDisplay" style="font-size:12px; color:#64748b; text-align:center; margin-bottom:10px;">No hay coordenadas seleccionadas. Clic en el mapa para ubicar.</div>
             <div class="modal-body" style="display:block;">
                 <div class="modal-form-group">
                     <label for="f_nombre">Nombre de la parada</label>
@@ -201,6 +220,8 @@ require_once '../../config/sync_session_foto.php';
     </div>
 </div>
 
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="../../assets/js/notifications.js"></script>
 <script src="../../assets/js/main.js"></script>
 <script>
@@ -217,6 +238,78 @@ const btnAddStop     = document.getElementById('btnAddStop');
 const stopsTable     = document.getElementById('stopsTable');
 const stopsBody      = document.getElementById('stopsBody');
 const noStopsMsg     = document.getElementById('noStopsMsg');
+
+let map, routeMarkers, returnMarkers;
+const customMarkerIcon = L.icon({
+    iconUrl: '../../assets/images/icons/icons8-place-marker.png',
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40]
+});
+document.addEventListener("DOMContentLoaded", () => {
+    map = L.map('map').setView([18.1729, -93.1090], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Buscar calle o lugar..." })
+        .on('markgeocode', function(e) { map.fitBounds(e.geocode.bbox); })
+        .addTo(map);
+        
+    routeMarkers = L.featureGroup().addTo(map);
+    returnMarkers = L.featureGroup().addTo(map);
+    
+    map.on('click', function(e) {
+        if(!currentRouteId) return;
+        document.getElementById('f_latitud').value = e.latlng.lat.toFixed(8);
+        document.getElementById('f_longitud').value = e.latlng.lng.toFixed(8);
+        document.getElementById('coordDisplay').innerHTML = `Lat: ${e.latlng.lat.toFixed(5)}, Lon: ${e.latlng.lng.toFixed(5)}`;
+        
+        document.getElementById('stopModalTitle').textContent = 'Agregar parada (Desde Mapa)';
+        document.getElementById('f_id_parada').value  = '';
+        document.getElementById('f_id_ruta').value    = currentRouteId;
+        document.getElementById('f_nombre').value     = '';
+        document.getElementById('f_orden').value      = '';
+        document.getElementById('f_minutos').value    = '';
+        document.getElementById('stopModal').classList.add('active');
+    });
+});
+
+document.getElementById('chkShowReturn').addEventListener('change', (e) => {
+    if(e.target.checked) map.addLayer(returnMarkers);
+    else map.removeLayer(returnMarkers);
+});
+
+async function updateStopCoordinates(id_parada, latlng, p) {
+    const fd = new FormData();
+    fd.append('id_parada', id_parada);
+    fd.append('nombre', p.nombre);
+    fd.append('orden', p.orden);
+    fd.append('minutos_desde_origen', p.minutos_desde_origen);
+    fd.append('latitud', latlng.lat.toFixed(8));
+    fd.append('longitud', latlng.lng.toFixed(8));
+    
+    try {
+        const res = await fetch(CTRL_UPDATE, { method: 'POST', body: fd });
+        const data = await res.json();
+        if(data.success) { showNotification('Coordenadas actualizadas', 'success'); }
+        else { showNotification(data.message, 'error'); loadStops(currentRouteId); }
+    } catch(err) { showNotification('Error de conexión', 'error'); loadStops(currentRouteId); }
+}
+
+async function loadReturnStops(id_retorno) {
+    returnMarkers.clearLayers();
+    if(!id_retorno) return;
+    try {
+        const res  = await fetch(`${API_PARADAS}?action=paradas&id_ruta=${id_retorno}`);
+        const data = await res.json();
+        if(Array.isArray(data)) {
+            data.forEach(p => {
+                if(p.latitud && p.longitud) {
+                    L.marker([p.latitud, p.longitud], {icon: customMarkerIcon}).bindPopup(`<b>Retorno:</b> ${p.nombre}`).addTo(returnMarkers);
+                }
+            });
+        }
+    } catch(err) {}
+}
+
 const loadingStops   = document.getElementById('loadingStops');
 
 // ── Cargar paradas al cambiar la ruta seleccionada ──
@@ -234,6 +327,7 @@ routeSelect.addEventListener('change', () => {
 
 function hideTables() {
     stopsTable.style.display = 'none';
+document.getElementById('map').style.display = currentRouteId ? 'block' : 'none'; if(currentRouteId && typeof map !== 'undefined') { setTimeout(() => map.invalidateSize(), 300); }
     noStopsMsg.style.display = 'none';
 }
 
@@ -254,6 +348,9 @@ async function loadStops(id_ruta, highlight = null) {
 
         stopsTable.style.display  = 'table';
         renderStops(data, highlight);
+        const opt = routeSelect.options[routeSelect.selectedIndex];
+        const idRetorno = opt.getAttribute('data-retorno');
+        loadReturnStops(idRetorno);
 
     } catch (err) {
         loadingStops.style.display = 'none';
@@ -269,7 +366,16 @@ function renderStops(paradas, highlight = null) {
     paradas.sort((a, b) => a.orden - b.orden);
     const maxOrden = Math.max(...paradas.map(p => p.orden));
 
+    
+    routeMarkers.clearLayers();
     paradas.forEach(p => {
+        if(p.latitud && p.longitud) {
+            let m = L.marker([p.latitud, p.longitud], {icon: customMarkerIcon, draggable: true}).bindPopup(`<b>${p.orden}</b>: ${p.nombre}`).addTo(routeMarkers);
+            m.on('dragend', function(e) {
+                updateStopCoordinates(p.id_parada, m.getLatLng(), p);
+            });
+        }
+
         const isFirst = p.orden === 0;
         const isLast  = p.orden === maxOrden && paradas.length > 1;
         let nameClass = '';
@@ -295,7 +401,7 @@ function renderStops(paradas, highlight = null) {
                         <span class="material-icons">more_vert</span>
                     </button>
                     <div class="dropdown-content">
-                        <button class="dropdown-item btn-edit" onclick="openEditModal(${p.id_parada}, '${escAttr(p.nombre)}', ${p.orden}, ${p.minutos_desde_origen})">
+                        <button class="dropdown-item btn-edit" onclick="openEditModal(${p.id_parada}, '${escAttr(p.nombre)}', ${p.orden}, ${p.minutos_desde_origen}, '${p.latitud||''}', '${p.longitud||''}')">
                             <span class="material-icons">edit_square</span> Editar
                         </button>
                         <button class="dropdown-item btn-delete" onclick="openDeleteModal(${p.id_parada}, '${escAttr(p.nombre)}')">
@@ -322,6 +428,7 @@ function renderStops(paradas, highlight = null) {
         
         stopsBody.appendChild(tr);
     });
+    if(routeMarkers.getLayers().length > 0) { setTimeout(() => map.fitBounds(routeMarkers.getBounds().pad(0.1)), 100); }
 }
 
 // ── Escape helpers (seguridad XSS) ──
@@ -340,17 +447,23 @@ btnAddStop.addEventListener('click', () => {
     document.getElementById('f_nombre').value     = '';
     document.getElementById('f_orden').value      = '';
     document.getElementById('f_minutos').value    = '';
+    document.getElementById('f_latitud').value    = '';
+    document.getElementById('f_longitud').value   = '';
+    document.getElementById('coordDisplay').innerHTML = 'No hay coordenadas seleccionadas.';
     document.getElementById('stopModal').classList.add('active');
 });
 
 // ── Modal Editar ──
-function openEditModal(id_parada, nombre, orden, minutos) {
+function openEditModal(id_parada, nombre, orden, minutos, lat, lon) {
     document.getElementById('stopModalTitle').textContent = 'Editar parada';
     document.getElementById('f_id_parada').value  = id_parada;
     document.getElementById('f_id_ruta').value    = currentRouteId;
     document.getElementById('f_nombre').value     = nombre;
     document.getElementById('f_orden').value      = orden;
     document.getElementById('f_minutos').value    = minutos;
+    document.getElementById('f_latitud').value    = lat || '';
+    document.getElementById('f_longitud').value   = lon || '';
+    document.getElementById('coordDisplay').innerHTML = (lat && lon) ? `Lat: ${lat}, Lon: ${lon}` : 'Sin coordenadas';
     document.getElementById('stopModal').classList.add('active');
 }
 

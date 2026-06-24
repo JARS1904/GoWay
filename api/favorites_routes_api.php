@@ -104,7 +104,7 @@ try {
 
             // Paradas estructuradas (con orden y tiempos)
             $stmt_p = $conn->prepare(
-                "SELECT nombre, orden, minutos_desde_origen
+                "SELECT nombre, orden, minutos_desde_origen, latitud, longitud
                  FROM   paradas_ruta
                  WHERE  id_ruta = ?
                  ORDER  BY orden ASC"
