@@ -70,7 +70,7 @@
         // Deshabilitar botón de PDF mientras carga
         document.getElementById('btnDownloadPdf').disabled = true;
 
-        const fetchSummary = fetch('../../api/reportes_api.php?action=get_summary').then(r => r.json());
+        const fetchSummary = fetch('../../api/usuario/reportes_api.php?action=get_summary').then(r => r.json());
         const fetchKPIsDashboard = fetch('../../api/kpis_api.php?seccion=dashboard').then(r => r.json());
         const fetchKPIsRutas = fetch('../../api/kpis_api.php?seccion=rutas').then(r => r.json());
         const fetchKPIsHorarios = fetch('../../api/kpis_api.php?seccion=horarios').then(r => r.json());

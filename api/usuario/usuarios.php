@@ -4,8 +4,8 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-require_once '../config/conexion_bd.php';
-require_once '../controllers/insert/upload_foto.php';
+require_once '../../config/conexion_bd.php';
+require_once '../../controllers/insert/upload_foto.php';
 
 // Crear conexión
 $conn = $conexion;
@@ -59,7 +59,7 @@ switch ($method) {
         $email  = $data['email'];
 
         // Validar fortaleza de la contraseña
-        require_once '../config/password_validation.php';
+        require_once '../../config/password_validation.php';
         if (!validarContrasenaFuerte($data['password'])) {
             http_response_code(422);
             echo json_encode(["error" => "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."]);

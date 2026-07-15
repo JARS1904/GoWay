@@ -457,7 +457,7 @@ if ($conexion->error) {
                 return;
             }
 
-            fetch(`../../api/reportes_api.php?action=get_assignment_data&placa=${encodeURIComponent(placaVal)}`)
+            fetch(`../../api/usuario/reportes_api.php?action=get_assignment_data&placa=${encodeURIComponent(placaVal)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -531,7 +531,7 @@ if ($conexion->error) {
             gravedad: document.getElementById('gravedad').value
         };
 
-        fetch('../../api/reportes_api.php', {
+        fetch('../../api/usuario/reportes_api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

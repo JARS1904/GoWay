@@ -47,7 +47,7 @@
             </div>`;
 
         try {
-            const res = await fetch(`${typeof FAVORITES_URL !== 'undefined' ? FAVORITES_URL : '../../api/favorites_routes_api.php'}?action=get_favorites&id_usuario=${typeof ID_USUARIO !== 'undefined' ? ID_USUARIO : <?php echo $_SESSION['id'] ?? 0; ?>}`, {
+            const res = await fetch(`${typeof FAVORITES_URL !== 'undefined' ? FAVORITES_URL : '../../api/usuario/favorites_routes_api.php'}?action=get_favorites&id_usuario=${typeof ID_USUARIO !== 'undefined' ? ID_USUARIO : <?php echo $_SESSION['id'] ?? 0; ?>}`, {
                 headers: { 'Accept': 'application/json' }
             });
             const data = await res.json();
@@ -140,7 +140,7 @@
         // 3. Como último recurso, pedir a la API (ahora existe route_detail)
         if (!route) {
             try {
-                const res = await fetch(`${typeof API_URL !== 'undefined' ? API_URL : '../../api/routes_api.php'}?action=route_detail&id_ruta=${routeId}`, {
+                const res = await fetch(`${typeof API_URL !== 'undefined' ? API_URL : '../../api/usuario/routes_api.php'}?action=route_detail&id_ruta=${routeId}`, {
                     headers: { 'Accept': 'application/json' }
                 });
                 if (res.ok) {
@@ -164,7 +164,7 @@
     // Elimina una ruta de favoritas directamente desde el panel
     async function removeFavoriteFromPanel(routeId, btnElement) {
         try {
-            const response = await fetch(typeof FAVORITES_URL !== 'undefined' ? FAVORITES_URL : '../../api/favorites_routes_api.php', {
+            const response = await fetch(typeof FAVORITES_URL !== 'undefined' ? FAVORITES_URL : '../../api/usuario/favorites_routes_api.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ action: 'remove_favorite', id_usuario: typeof ID_USUARIO !== 'undefined' ? ID_USUARIO : <?php echo $_SESSION['id'] ?? 0; ?>, id_ruta: routeId })

@@ -10,7 +10,7 @@ function sendResponse($statusCode, $data) {
     exit;
 }
 
-require_once '../config/conexion_bd.php';
+require_once '../../config/conexion_bd.php';
 
 try {
     $conn = $conexion;

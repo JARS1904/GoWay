@@ -23,8 +23,8 @@ function sendResponse($statusCode, $data) {
     exit;
 }
 
-require_once '../config/conexion_bd.php';
-require_once '../config/opciones_reportes.php';
+require_once '../../config/conexion_bd.php';
+require_once '../../config/opciones_reportes.php';
 
 try {
     $conn = $conexion;
@@ -259,29 +259,78 @@ try {
                 $param_val = $rfc_checador;
             }
 
-            $sql_rep = "SELECT
-                            rep.tipo_incidente,
-                            rep.fecha_incidente,
-                            rep.descripcion,
-                            rep.gravedad,
-                            v.placa         AS vehiculo_placa,
-                            v.modelo        AS vehiculo_modelo,
-                            c.nombre        AS conductor_nombre,
-                            r.nombre        AS ruta_nombre,
-                            r.origen,
-                            r.destino
-                        FROM reportes rep
-                        JOIN vehiculos   v ON rep.id_vehiculo  = v.id_vehiculo
-                        JOIN conductores c ON rep.rfc_conductor = c.rfc_conductor
-                        JOIN rutas       r ON rep.id_ruta       = r.id_ruta
-                        WHERE $condicion
-                        ORDER BY rep.fecha_incidente DESC";
-
-            $stmt_rep = $conn->prepare($sql_rep);
-            if (!$stmt_rep) {
-                sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+            // 1) Obtener el total exacto de reportes en la base de datos
+            $sql_count = "SELECT COUNT(*) AS total FROM reportes rep WHERE $condicion";
+            $stmt_count = $conn->prepare($sql_count);
+            if (!$stmt_count) {
+                sendResponse(500, ["error" => "Error al preparar conteo: " . $conn->error]);
             }
-            $stmt_rep->bind_param($param_type, $param_val);
+            $stmt_count->bind_param($param_type, $param_val);
+            $stmt_count->execute();
+            $total_records = (int) ($stmt_count->get_result()->fetch_assoc()['total'] ?? 0);
+            $stmt_count->close();
+
+            // 2) Parámetros de paginación (por defecto página 1, 10 registros por página)
+            $page  = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+
+            if ($limit > 0) {
+                $offset = ($page - 1) * $limit;
+                $total_pages = (int) ceil($total_records / $limit);
+
+                $sql_rep = "SELECT
+                                rep.tipo_incidente,
+                                rep.fecha_incidente,
+                                rep.descripcion,
+                                rep.gravedad,
+                                v.placa         AS vehiculo_placa,
+                                v.modelo        AS vehiculo_modelo,
+                                c.nombre        AS conductor_nombre,
+                                r.nombre        AS ruta_nombre,
+                                r.origen,
+                                r.destino
+                            FROM reportes rep
+                            JOIN vehiculos   v ON rep.id_vehiculo  = v.id_vehiculo
+                            JOIN conductores c ON rep.rfc_conductor = c.rfc_conductor
+                            JOIN rutas       r ON rep.id_ruta       = r.id_ruta
+                            WHERE $condicion
+                            ORDER BY rep.fecha_incidente DESC
+                            LIMIT ? OFFSET ?";
+
+                $stmt_rep = $conn->prepare($sql_rep);
+                if (!$stmt_rep) {
+                    sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+                }
+                $bind_types = $param_type . "ii";
+                $stmt_rep->bind_param($bind_types, $param_val, $limit, $offset);
+            } else {
+                // Si limit <= 0, devolver todos los reportes sin límite
+                $total_pages = 1;
+                $sql_rep = "SELECT
+                                rep.tipo_incidente,
+                                rep.fecha_incidente,
+                                rep.descripcion,
+                                rep.gravedad,
+                                v.placa         AS vehiculo_placa,
+                                v.modelo        AS vehiculo_modelo,
+                                c.nombre        AS conductor_nombre,
+                                r.nombre        AS ruta_nombre,
+                                r.origen,
+                                r.destino
+                            FROM reportes rep
+                            JOIN vehiculos   v ON rep.id_vehiculo  = v.id_vehiculo
+                            JOIN conductores c ON rep.rfc_conductor = c.rfc_conductor
+                            JOIN rutas       r ON rep.id_ruta       = r.id_ruta
+                            WHERE $condicion
+                            ORDER BY rep.fecha_incidente DESC";
+
+                $stmt_rep = $conn->prepare($sql_rep);
+                if (!$stmt_rep) {
+                    sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+                }
+                $stmt_rep->bind_param($param_type, $param_val);
+            }
+
             $stmt_rep->execute();
             $result_rep = $stmt_rep->get_result();
 
@@ -292,9 +341,12 @@ try {
             $stmt_rep->close();
 
             sendResponse(200, [
-                "success"  => true,
-                "total"    => count($reportes),
-                "reportes" => $reportes
+                "success"     => true,
+                "total"       => $total_records,
+                "page"        => $page,
+                "limit"       => $limit,
+                "total_pages" => $total_pages,
+                "reportes"    => $reportes
             ]);
         }
 

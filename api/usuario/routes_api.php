@@ -24,7 +24,7 @@ function _addMinutes(string $timeStr, int $minutes): string {
     return sprintf('%02d:%02d', intdiv($totalMinutes, 60) % 24, $totalMinutes % 60);
 }
 
-require_once '../config/conexion_bd.php';
+require_once '../../config/conexion_bd.php';
 
 try {
     $conn = $conexion;
@@ -62,6 +62,48 @@ try {
             }
 
             sendResponse(200, $locations);
+        }
+
+        // ── Obtener lista general de rutas (con paginación) ──
+        if ($_GET['action'] === 'get_routes') {
+            $sql_count = "SELECT COUNT(*) AS total FROM rutas WHERE activa = 1";
+            $res_count = $conn->query($sql_count);
+            $total_records = (int) ($res_count->fetch_assoc()['total'] ?? 0);
+
+            $page  = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+
+            if ($limit > 0) {
+                $offset = ($page - 1) * $limit;
+                $total_pages = (int) ceil($total_records / $limit);
+                $sql = "SELECT * FROM rutas WHERE activa = 1 ORDER BY id_ruta ASC LIMIT ? OFFSET ?";
+                $stmt = $conn->prepare($sql);
+                if (!$stmt) {
+                    sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+                }
+                $stmt->bind_param("ii", $limit, $offset);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $stmt->close();
+            } else {
+                $total_pages = 1;
+                $sql = "SELECT * FROM rutas WHERE activa = 1 ORDER BY id_ruta ASC";
+                $result = $conn->query($sql);
+            }
+
+            $rutas = [];
+            while ($row = $result->fetch_assoc()) {
+                $rutas[] = $row;
+            }
+
+            sendResponse(200, [
+                "success"     => true,
+                "total"       => $total_records,
+                "page"        => $page,
+                "limit"       => $limit,
+                "total_pages" => $total_pages,
+                "rutas"       => $rutas
+            ]);
         }
 
         // ── Obtener paradas de una ruta específica (para panel de admin) ──
@@ -264,8 +306,48 @@ try {
                          OR (bo.id_parada IS NOT NULL AND bd.id_parada IS NOT NULL AND bo.orden < bd.orden)
                            )";
 
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssss", $origin, $destination, $origin, $destination);
+            // 1) Conteo exacto de rutas únicas encontradas
+            $sql_count = "SELECT COUNT(DISTINCT r.id_ruta) AS total
+                          FROM rutas r
+                          LEFT JOIN paradas_ruta bo ON bo.id_ruta = r.id_ruta AND bo.nombre = ?
+                          LEFT JOIN paradas_ruta bd ON bd.id_ruta = r.id_ruta AND bd.nombre = ?
+                          WHERE r.activa = 1
+                            AND (
+                                  (r.origen = ? AND r.destino = ?)
+                               OR (bo.id_parada IS NOT NULL AND bd.id_parada IS NOT NULL AND bo.orden < bd.orden)
+                                 )";
+            $stmt_count = $conn->prepare($sql_count);
+            if (!$stmt_count) {
+                sendResponse(500, ["error" => "Error al preparar conteo: " . $conn->error]);
+            }
+            $stmt_count->bind_param("ssss", $origin, $destination, $origin, $destination);
+            $stmt_count->execute();
+            $total_records = (int) ($stmt_count->get_result()->fetch_assoc()['total'] ?? 0);
+            $stmt_count->close();
+
+            // 2) Parámetros de paginación (por defecto página 1, limit 10; si limit <= 0 devuelve todo)
+            $page  = isset($data['page']) ? max(1, intval($data['page'])) : (isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1);
+            $limit = isset($data['limit']) ? intval($data['limit']) : (isset($_GET['limit']) ? intval($_GET['limit']) : 10);
+
+            if ($limit > 0) {
+                $offset = ($page - 1) * $limit;
+                $total_pages = (int) ceil($total_records / $limit);
+                $sql .= " ORDER BY r.id_ruta ASC LIMIT ? OFFSET ?";
+                $stmt = $conn->prepare($sql);
+                if (!$stmt) {
+                    sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+                }
+                $stmt->bind_param("ssssii", $origin, $destination, $origin, $destination, $limit, $offset);
+            } else {
+                $total_pages = 1;
+                $sql .= " ORDER BY r.id_ruta ASC";
+                $stmt = $conn->prepare($sql);
+                if (!$stmt) {
+                    sendResponse(500, ["error" => "Error al preparar consulta: " . $conn->error]);
+                }
+                $stmt->bind_param("ssss", $origin, $destination, $origin, $destination);
+            }
+
             $stmt->execute();
             $result = $stmt->get_result();
 
@@ -370,7 +452,16 @@ try {
                 $routes[] = $row;
             }
 
-            sendResponse(200, $routes);
+            $stmt->close();
+
+            sendResponse(200, [
+                "success"     => true,
+                "total"       => $total_records,
+                "page"        => $page,
+                "limit"       => $limit,
+                "total_pages" => $total_pages,
+                "rutas"       => $routes
+            ]);
         }
     }
 

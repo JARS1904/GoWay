@@ -180,8 +180,8 @@ if ($_SESSION['id'] > 0) {
     <script>
         // Configuración de API
         const API_BASE_URL = window.location.origin;
-        const API_URL = `${API_BASE_URL}/GoWay/api/routes_api.php`;
-        const FAVORITES_URL = `${API_BASE_URL}/GoWay/api/favorites_routes_api.php`;
+        const API_URL = `${API_BASE_URL}/GoWay/api/usuario/routes_api.php`;
+        const FAVORITES_URL = `${API_BASE_URL}/GoWay/api/usuario/favorites_routes_api.php`;
         const ID_USUARIO = <?php echo isset($_SESSION['id']) ? $_SESSION['id'] : 0; ?>;
     </script>
     

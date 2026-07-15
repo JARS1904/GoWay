@@ -116,7 +116,7 @@
         
         const tipoSelect = document.getElementById('reportTipoIncidente');
         if (tipoSelect.options.length <= 1) {
-            fetch('../../api/reportes_api.php?action=get_options')
+            fetch('../../api/usuario/reportes_api.php?action=get_options')
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
@@ -149,7 +149,7 @@
         const originalText = btn.innerText;
         btn.innerText = '...';
         
-        fetch(`../../api/reportes_api.php?action=get_assignment_data&placa=${encodeURIComponent(placa)}`)
+        fetch(`../../api/usuario/reportes_api.php?action=get_assignment_data&placa=${encodeURIComponent(placa)}`)
             .then(res => res.json())
             .then(data => {
                 btn.innerText = originalText;
@@ -210,7 +210,7 @@
             return;
         }
         
-        fetch('../../api/reportes_api.php', {
+        fetch('../../api/usuario/reportes_api.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
