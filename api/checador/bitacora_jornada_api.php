@@ -91,6 +91,29 @@ try {
 
     $whereClause = implode(" AND ", $conditions);
 
+    // Conteo total de registros
+    $sql_count = "SELECT COUNT(*) AS total
+                  FROM asignaciones a
+                  JOIN vehiculos v ON a.id_vehiculo = v.id_vehiculo
+                  LEFT JOIN horarios h ON a.id_horario = h.id_horario
+                  WHERE $whereClause";
+    $stmt_count = $conn->prepare($sql_count);
+    if ($stmt_count) {
+        if (!empty($params)) {
+            $stmt_count->bind_param($types, ...$params);
+        }
+        $stmt_count->execute();
+        $total_records = (int)($stmt_count->get_result()->fetch_assoc()['total'] ?? 0);
+        $stmt_count->close();
+    } else {
+        $total_records = 0;
+    }
+
+    // Parámetros de paginación opcionales (por defecto devuelve todos si limit <= 0)
+    $page  = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+    $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 0;
+    $total_pages = ($limit > 0 && $total_records > 0) ? (int)ceil($total_records / $limit) : 1;
+
     $sql = "SELECT
                 a.id_asignacion,
                 v.id_vehiculo AS num_unidad,
@@ -114,6 +137,14 @@ try {
             LEFT JOIN conductores c ON a.rfc_conductor = c.rfc_conductor
             WHERE $whereClause
             ORDER BY h.hora_salida ASC, a.id_asignacion DESC";
+
+    if ($limit > 0) {
+        $offset = ($page - 1) * $limit;
+        $sql .= " LIMIT ? OFFSET ?";
+        $params[] = $limit;
+        $params[] = $offset;
+        $types   .= "ii";
+    }
 
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
@@ -159,8 +190,12 @@ try {
     $stmt->close();
 
     sendResponse(200, [
-        "success" => true,
-        "data"    => $data
+        "success"       => true,
+        "page"          => $page,
+        "limit"         => $limit,
+        "total_records" => $total_records,
+        "total_pages"   => $total_pages,
+        "data"          => $data
     ]);
 
 } catch (Exception $e) {

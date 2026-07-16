@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (typeof showNotification === 'function') {
                             showNotification(data.message || 'Ruta agregada exitosamente', 'info');
                         }
+                        setTimeout(() => { if (typeof window.reloadKPIs === 'function') window.reloadKPIs(); }, 150);
 
                         // Recargar tabla después de 3 segundos (más tiempo para ver la notificación)
                         setTimeout(() => {

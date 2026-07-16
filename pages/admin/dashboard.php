@@ -262,15 +262,18 @@ require_once '../../config/sync_session_foto.php';
         canvas.parentElement.appendChild(d);
     }
 
-    fetch('../../api/kpis_api.php')
-        .then(r => r.json())
-        .then(data => {
-            if (!data.success) return;
-            renderFlotaDona(data.flota_dona, data.kpi.vehiculos);
-            renderAsigDias(data.asig_dias);
-            renderRepEstado(data.rep_estados);
-        })
-        .catch(err => console.error('KPI API error:', err));
+    window.reloadKPIs = function() {
+        fetch('../../api/kpis_api.php?_t=' + Date.now(), { cache: 'no-store' })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) return;
+                renderFlotaDona(data.flota_dona, data.kpi.vehiculos);
+                renderAsigDias(data.asig_dias);
+                renderRepEstado(data.rep_estados);
+            })
+            .catch(err => console.error('KPI API error:', err));
+    };
+    window.reloadKPIs();
 
     function renderFlotaDona(flota, kpiVeh) {
         const statsDiv = document.getElementById('flotaDonaStats');
@@ -281,6 +284,7 @@ require_once '../../config/sync_session_foto.php';
                 <div class="chart-stat-item"><span class="stat-val">${kpiVeh.total}</span><span class="stat-lbl">Total</span></div>`;
         }
         if (!flota.data || flota.data.every(v => v === 0)) { showEmpty('chartFlotaDona','Sin datos de vehículos'); return; }
+        Chart.getChart('chartFlotaDona')?.destroy();
         new Chart(document.getElementById('chartFlotaDona'), {
             type:'doughnut',
             data:{ labels:flota.labels, datasets:[{ data:flota.data, backgroundColor:[GW.blue,GW.red], borderColor:['#fff','#fff'], borderWidth:3, hoverOffset:6 }] },
@@ -292,6 +296,7 @@ require_once '../../config/sync_session_foto.php';
         if (!d.labels || d.labels.length===0) { showEmpty('chartAsigDias','Sin asignaciones registradas'); return; }
         const colorMap = { 'Programado': '#64748b', 'Completado': GW.green, 'En Ruta': GW.blue, 'Cancelado': GW.red, 'Retrasado': GW.orange, 'Inactiva/Cancelada': GW.red };
         const colors = d.labels.map(l => colorMap[l] || GW.gray);
+        Chart.getChart('chartAsigDias')?.destroy();
         new Chart(document.getElementById('chartAsigDias'), {
             type:'doughnut',
             data:{ labels:d.labels, datasets:[{ data:d.data, backgroundColor:colors, borderColor:'#fff', borderWidth:3, hoverOffset:6 }] },
@@ -303,6 +308,7 @@ require_once '../../config/sync_session_foto.php';
         if (!d.labels || d.labels.length===0) { showEmpty('chartRepEstado','Sin reportes registrados'); return; }
         const colorMap = { 'Pendiente':GW.orange, 'En Proceso':GW.blue, 'Resuelto':GW.green };
         const colors = d.labels.map(l => colorMap[l] || GW.gray);
+        Chart.getChart('chartRepEstado')?.destroy();
         new Chart(document.getElementById('chartRepEstado'), {
             type:'doughnut',
             data:{ labels:d.labels, datasets:[{ data:d.data, backgroundColor:colors, borderColor:'#fff', borderWidth:3, hoverOffset:6 }] },

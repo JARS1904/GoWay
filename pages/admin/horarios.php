@@ -461,6 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             tbody.innerHTML = '<tr><td colspan="6">No hay horarios registrados</td></tr>';
                         }
                     }
+                    if (typeof window.reloadKPIs === 'function') window.reloadKPIs();
                 }, 500);
             }
         }
@@ -495,26 +496,31 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const GW = { blue:'#0660fe', green:'#10b981', orange:'#f59e0b', purple:'#8b5cf6', red:'#ef4444' };
-    fetch('../../api/kpis_api.php?seccion=horarios').then(r=>r.json()).then(data => {
-        if(!data.success) return;
-        document.getElementById('horariosStatsGrid').style.display = 'grid';
-        document.getElementById('horariosStatsGrid').innerHTML = `
-            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">schedule</span></div><div class="stat-card-content"><h3>Servicios Diarios</h3><p class="stat-number">${data.kpi.total}</p><span class="stat-label">Registrados</span></div></div>
-            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">route</span></div><div class="stat-card-content"><h3>Rutas Cubiertas</h3><p class="stat-number">${data.kpi.rutas_cubiertas}</p><span class="stat-label">Con horario asignado</span></div></div>
-            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#8b5cf6;">av_timer</span></div><div class="stat-card-content"><h3>Con Frecuencia</h3><p class="stat-number">${data.kpi.con_frecuencia}</p><span class="stat-label">Definida</span></div></div>
-        `;
-        document.getElementById('horariosChartsGrid').style.display = 'grid';
-        if(data.franjas && data.franjas.data.some(v=>v>0)) {
-            new Chart(document.getElementById('chartFranjas'), {
-                type: 'pie', data: { labels: data.franjas.labels, datasets: [{ data: data.franjas.data, backgroundColor: [GW.blue, GW.green, GW.orange, GW.purple] }] }, options: {plugins: {legend: {position: 'bottom'}}}
-            });
-        }
-        if(data.tipo_dia && data.tipo_dia.data.length > 0) {
-            new Chart(document.getElementById('chartTipoDia'), {
-                type: 'bar', data: { labels: data.tipo_dia.labels, datasets: [{ label:'Horarios', data: data.tipo_dia.data, backgroundColor: GW.blue, borderRadius:4 }] }, options: { plugins:{legend:{display:false}} }
-            });
-        }
-    });
+    window.reloadKPIs = function() {
+        fetch('../../api/kpis_api.php?seccion=horarios&_t=' + Date.now(), { cache: 'no-store' }).then(r=>r.json()).then(data => {
+            if(!data.success) return;
+            document.getElementById('horariosStatsGrid').style.display = 'grid';
+            document.getElementById('horariosStatsGrid').innerHTML = `
+                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">schedule</span></div><div class="stat-card-content"><h3>Servicios Diarios</h3><p class="stat-number">${data.kpi.total}</p><span class="stat-label">Registrados</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">route</span></div><div class="stat-card-content"><h3>Rutas Cubiertas</h3><p class="stat-number">${data.kpi.rutas_cubiertas}</p><span class="stat-label">Con horario asignado</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#8b5cf6;">av_timer</span></div><div class="stat-card-content"><h3>Con Frecuencia</h3><p class="stat-number">${data.kpi.con_frecuencia}</p><span class="stat-label">Definida</span></div></div>
+            `;
+            document.getElementById('horariosChartsGrid').style.display = 'grid';
+            if(data.franjas && data.franjas.data.some(v=>v>0)) {
+                Chart.getChart('chartFranjas')?.destroy();
+                new Chart(document.getElementById('chartFranjas'), {
+                    type: 'pie', data: { labels: data.franjas.labels, datasets: [{ data: data.franjas.data, backgroundColor: [GW.blue, GW.green, GW.orange, GW.purple] }] }, options: {plugins: {legend: {position: 'bottom'}}}
+                });
+            }
+            if(data.tipo_dia && data.tipo_dia.data.length > 0) {
+                Chart.getChart('chartTipoDia')?.destroy();
+                new Chart(document.getElementById('chartTipoDia'), {
+                    type: 'bar', data: { labels: data.tipo_dia.labels, datasets: [{ label:'Horarios', data: data.tipo_dia.data, backgroundColor: GW.blue, borderRadius:4 }] }, options: { plugins:{legend:{display:false}} }
+                });
+            }
+        });
+    };
+    window.reloadKPIs();
 });
 </script>
 </body>

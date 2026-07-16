@@ -47,10 +47,36 @@ try {
             sendResponse(400, ["error" => "RFC de checador requerido"]);
         }
 
-        // Un checador recibe notificaciones si:
-        // a) Es global del Super Admin (rfc_empresa IS NULL y para checadores)
-        // b) Viene de la empresa a la que pertenece el checador
-        // c) Está dirigida directamente a él
+        // Conteo total y no leídas exactas en la base de datos
+        $sql_count = "SELECT COUNT(*) AS total, SUM(CASE WHEN leido = 0 THEN 1 ELSE 0 END) AS unread
+                      FROM notificaciones n
+                      WHERE n.destinatario_tipo = 'checadores'
+                      AND (
+                          (n.rfc_empresa IS NULL AND n.rfc_checador IS NULL)
+                          OR n.rfc_checador = ?
+                          OR (
+                              n.rfc_empresa IS NOT NULL
+                              AND n.rfc_empresa = (
+                                  SELECT rfc_empresa FROM checadores WHERE rfc_checador = ? LIMIT 1
+                              )
+                          )
+                      )";
+        $stmt_count = $conn->prepare($sql_count);
+        $total_records = 0;
+        $unread_count  = 0;
+        if ($stmt_count) {
+            $stmt_count->bind_param("ss", $rfc_checador, $rfc_checador);
+            $stmt_count->execute();
+            $row_count = $stmt_count->get_result()->fetch_assoc();
+            $total_records = (int)($row_count['total'] ?? 0);
+            $unread_count  = (int)($row_count['unread'] ?? 0);
+            $stmt_count->close();
+        }
+
+        $page  = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 0;
+        $total_pages = ($limit > 0 && $total_records > 0) ? (int)ceil($total_records / $limit) : 1;
+
         $sql = "SELECT n.* FROM notificaciones n
                 WHERE n.destinatario_tipo = 'checadores'
                 AND (
@@ -65,23 +91,30 @@ try {
                 )
                 ORDER BY n.fecha_creacion DESC";
 
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $rfc_checador, $rfc_checador);
+        if ($limit > 0) {
+            $offset = ($page - 1) * $limit;
+            $sql .= " LIMIT ? OFFSET ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssii", $rfc_checador, $rfc_checador, $limit, $offset);
+        } else {
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $rfc_checador, $rfc_checador);
+        }
+
         $stmt->execute();
         $result = $stmt->get_result();
 
         $notificaciones = [];
-        $unread_count   = 0;
-
         while ($row = $result->fetch_assoc()) {
             $notificaciones[] = $row;
-            if ($row['leido'] == 0) {
-                $unread_count++;
-            }
         }
 
         sendResponse(200, [
             "success"        => true,
+            "page"           => $page,
+            "limit"          => $limit,
+            "total_records"  => $total_records,
+            "total_pages"    => $total_pages,
             "notificaciones" => $notificaciones,
             "unread_count"   => $unread_count
         ]);

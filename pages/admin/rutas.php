@@ -565,6 +565,7 @@ require_once '../../config/sync_session_foto.php';
                             tbody.innerHTML = '<tr><td colspan="8">No hay rutas registradas</td></tr>';
                         }
                     }
+                    if (typeof window.reloadKPIs === 'function') window.reloadKPIs();
                 }, 500);
             }
         };
@@ -586,31 +587,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const GW = { blue:'#0660fe', green:'#10b981', orange:'#f59e0b', red:'#ef4444', text:'#1a1c23', gray:'#e2e8f0', sub:'#94a3b8' };
     const baseOpt = { plugins: { legend: { position: 'bottom', labels: {font:{family:"'Inter',sans-serif", size:12}} } } };
 
-    fetch('../../api/kpis_api.php?seccion=rutas').then(r=>r.json()).then(data => {
-        if(!data.success) return;
-        
-        // 1. Render Stats
-        document.getElementById('rutasStatsGrid').style.display = 'grid';
-        document.getElementById('rutasStatsGrid').innerHTML = `
-            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">route</span></div><div class="stat-card-content"><h3>Rutas Activas</h3><p class="stat-number">${data.kpi.activas}</p><span class="stat-label">De ${data.kpi.total} totales</span></div></div>
-            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">place</span></div><div class="stat-card-content"><h3>Paradas Totales</h3><p class="stat-number">${data.kpi.paradas}</p><span class="stat-label">En el sistema</span></div></div>
-            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#f59e0b;">loop</span></div><div class="stat-card-content"><h3>Rutas con Retorno</h3><p class="stat-number">${data.kpi.con_retorno}</p><span class="stat-label">Configuradas</span></div></div>
-        `;
+    window.reloadKPIs = function() {
+        fetch('../../api/kpis_api.php?seccion=rutas&_t=' + Date.now(), { cache: 'no-store' }).then(r=>r.json()).then(data => {
+            if(!data.success) return;
+            
+            // 1. Render Stats
+            document.getElementById('rutasStatsGrid').style.display = 'grid';
+            document.getElementById('rutasStatsGrid').innerHTML = `
+                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">route</span></div><div class="stat-card-content"><h3>Rutas Activas</h3><p class="stat-number">${data.kpi.activas}</p><span class="stat-label">De ${data.kpi.total} totales</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">place</span></div><div class="stat-card-content"><h3>Paradas Totales</h3><p class="stat-number">${data.kpi.paradas}</p><span class="stat-label">En el sistema</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#f59e0b;">loop</span></div><div class="stat-card-content"><h3>Rutas con Retorno</h3><p class="stat-number">${data.kpi.con_retorno}</p><span class="stat-label">Configuradas</span></div></div>
+            `;
 
-        // 2. Render Charts
-        document.getElementById('rutasChartsGrid').style.display = 'grid';
-        if(data.estado_rutas && data.estado_rutas.data.some(v=>v>0)) {
-            new Chart(document.getElementById('chartEstadoRutas'), {
-                type: 'doughnut', data: { labels: data.estado_rutas.labels, datasets: [{ data: data.estado_rutas.data, backgroundColor: [GW.blue, GW.red] }] }, options: {...baseOpt, cutout: '70%'}
-            });
-        }
+            // 2. Render Charts
+            document.getElementById('rutasChartsGrid').style.display = 'grid';
+            if(data.estado_rutas && data.estado_rutas.data.some(v=>v>0)) {
+                Chart.getChart('chartEstadoRutas')?.destroy();
+                new Chart(document.getElementById('chartEstadoRutas'), {
+                    type: 'doughnut', data: { labels: data.estado_rutas.labels, datasets: [{ data: data.estado_rutas.data, backgroundColor: [GW.blue, GW.red] }] }, options: {...baseOpt, cutout: '70%'}
+                });
+            }
 
-        if(data.top_paradas && data.top_paradas.data.length > 0) {
-            new Chart(document.getElementById('chartTopParadas'), {
-                type: 'bar', data: { labels: data.top_paradas.labels.map(l=>l.substring(0,20)), datasets: [{ label:'Paradas', data: data.top_paradas.data, backgroundColor: GW.green, borderRadius:4 }] }, options: { indexAxis: 'y', plugins:{legend:{display:false}} }
-            });
-        }
-    });
+            if(data.top_paradas && data.top_paradas.data.length > 0) {
+                Chart.getChart('chartTopParadas')?.destroy();
+                new Chart(document.getElementById('chartTopParadas'), {
+                    type: 'bar', data: { labels: data.top_paradas.labels.map(l=>l.substring(0,20)), datasets: [{ label:'Paradas', data: data.top_paradas.data, backgroundColor: GW.green, borderRadius:4 }] }, options: { indexAxis: 'y', plugins:{legend:{display:false}} }
+                });
+            }
+        });
+    };
+
+    window.reloadKPIs();
 });
 </script>
 </body>

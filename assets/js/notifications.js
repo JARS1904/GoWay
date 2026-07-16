@@ -107,14 +107,25 @@ function handleInsertForm(formElement, successMessage = 'Registro agregado exito
                 // Limpiar formulario
                 formElement.reset();
                 
-                // Cerrar modal si existe
-                const modal = document.getElementById('addRouteModal');
+                // Cerrar modal si existe (buscando contenedor padre o por ID)
+                const parentModal = formElement.closest('.modal-overlay');
+                if (parentModal) {
+                    parentModal.classList.remove('active');
+                }
+                const modal = document.getElementById('addRouteModal') ||
+                             document.getElementById('addAssignModal') ||
+                             document.getElementById('addVehicleModal') ||
+                             document.getElementById('addEmpresasModal') ||
+                             document.getElementById('addConductoresModal') ||
+                             document.getElementById('addChecadoresModal') ||
+                             document.getElementById('addUserModal');
                 if (modal) {
                     modal.classList.remove('active');
                 }
                 
                 // Notificación AZUL para inserción
                 showNotification(data.message || successMessage, 'info');
+                setTimeout(() => { if (typeof window.reloadKPIs === 'function') window.reloadKPIs(); }, 150);
 
                 if (onSuccessCallback) {
                     onSuccessCallback(data);
@@ -166,8 +177,13 @@ function handleUpdateForm(formElement, successMessage = 'Registro actualizado ex
             submitBtn.textContent = originalText;
 
             if (data.success) {
-                // Cerrar modal si existe
+                // Cerrar modal si existe (buscando contenedor padre o por ID)
+                const parentModal = formElement.closest('.modal-overlay');
+                if (parentModal) {
+                    parentModal.classList.remove('active');
+                }
                 const modal = document.getElementById('editRouteModal') || 
+                             document.getElementById('editAssignModal') ||
                              document.getElementById('editVehicleModal') ||
                              document.getElementById('editEmpresasModal') ||
                              document.getElementById('editConductoresModal') ||
@@ -179,6 +195,7 @@ function handleUpdateForm(formElement, successMessage = 'Registro actualizado ex
                 
                 // Notificación VERDE para actualización
                 showNotification(data.message || successMessage, 'success');
+                setTimeout(() => { if (typeof window.reloadKPIs === 'function') window.reloadKPIs(); }, 150);
 
                 if (onSuccessCallback) {
                     onSuccessCallback(data);
@@ -244,6 +261,7 @@ function handleDeleteButton(deleteButton, deleteEndpoint, idParamName, confirmMe
             if (data.success) {
                 // Notificación ROJA para eliminación
                 showNotification(data.message || 'Registro eliminado exitosamente', 'error');
+                setTimeout(() => { if (typeof window.reloadKPIs === 'function') window.reloadKPIs(); }, 150);
 
                 if (onSuccessCallback) {
                     onSuccessCallback(data, deleteButton);

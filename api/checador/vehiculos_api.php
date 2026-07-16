@@ -129,7 +129,22 @@ try {
                 "data"    => $vehiculo
             ]);
         } else {
-            // ── Si no se envió placa, retornar TODOS los vehículos de la empresa y todos los horarios del día ──
+            // ── Si no se envió placa, retornar TODOS los vehículos de la empresa (o paginados si limit > 0) ──
+            $sql_count = "SELECT COUNT(*) AS total FROM vehiculos WHERE rfc_empresa = ? AND activo = 1";
+            $stmt_count = $conn->prepare($sql_count);
+            if ($stmt_count) {
+                $stmt_count->bind_param("s", $rfc_empresa_checador);
+                $stmt_count->execute();
+                $total_records = (int)($stmt_count->get_result()->fetch_assoc()['total'] ?? 0);
+                $stmt_count->close();
+            } else {
+                $total_records = 0;
+            }
+
+            $page  = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+            $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 0;
+            $total_pages = ($limit > 0 && $total_records > 0) ? (int)ceil($total_records / $limit) : 1;
+
             $sql_v = "SELECT
                           v.id_vehiculo,
                           v.placa,
@@ -141,9 +156,19 @@ try {
                       LEFT JOIN empresas e ON v.rfc_empresa = e.rfc_empresa
                       WHERE v.rfc_empresa = ? AND v.activo = 1
                       ORDER BY v.placa ASC";
-            $stmt_v = $conn->prepare($sql_v);
-            if (!$stmt_v) sendResponse(500, ["error" => "Error preparando consulta de vehículos: " . $conn->error]);
-            $stmt_v->bind_param("s", $rfc_empresa_checador);
+
+            if ($limit > 0) {
+                $offset = ($page - 1) * $limit;
+                $sql_v .= " LIMIT ? OFFSET ?";
+                $stmt_v = $conn->prepare($sql_v);
+                if (!$stmt_v) sendResponse(500, ["error" => "Error preparando consulta de vehículos: " . $conn->error]);
+                $stmt_v->bind_param("sii", $rfc_empresa_checador, $limit, $offset);
+            } else {
+                $stmt_v = $conn->prepare($sql_v);
+                if (!$stmt_v) sendResponse(500, ["error" => "Error preparando consulta de vehículos: " . $conn->error]);
+                $stmt_v->bind_param("s", $rfc_empresa_checador);
+            }
+
             $stmt_v->execute();
             $result_v = $stmt_v->get_result();
 
@@ -222,7 +247,7 @@ try {
 
                 if (isset($vehiculos_map[$id_v])) {
                     $vehiculos_map[$id_v]['asignaciones'][] = $asignacion;
-                } else {
+                } elseif ($limit <= 0) {
                     $vehiculos_map[$id_v] = [
                         'id_vehiculo'     => $row_a['id_vehiculo'],
                         'placa'           => $row_a['placa'],
@@ -255,10 +280,14 @@ try {
             $stmt_a->close();
 
             sendResponse(200, [
-                "success"  => true,
-                "tipo_dia" => $tipo_dia,
-                "data"     => array_values($vehiculos_map),
-                "horarios" => $horarios_planos
+                "success"       => true,
+                "page"          => $page,
+                "limit"         => $limit,
+                "total_records" => $total_records,
+                "total_pages"   => $total_pages,
+                "tipo_dia"      => $tipo_dia,
+                "data"          => array_values($vehiculos_map),
+                "horarios"      => $horarios_planos
             ]);
         }
     }

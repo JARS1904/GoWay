@@ -528,6 +528,7 @@ require_once '../../config/sync_session_foto.php';
                                 tbody.innerHTML = '<tr><td colspan="10">No hay asignaciones registradas</td></tr>';
                             }
                         }
+                        if (typeof window.reloadKPIs === 'function') window.reloadKPIs();
                     }, 500);
                 }
             };
@@ -639,28 +640,33 @@ require_once '../../config/sync_session_foto.php';
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const GW = { blue:'#0660fe', green:'#10b981', orange:'#f59e0b', red:'#ef4444', gray:'#64748b', purple:'#8b5cf6' };
-    fetch('../../api/kpis_api.php?seccion=asignaciones').then(r=>r.json()).then(data => {
-        if(!data.success) return;
-        document.getElementById('asignacionesStatsGrid').style.display = 'grid';
-        document.getElementById('asignacionesStatsGrid').innerHTML = `
-            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">assignment</span></div><div class="stat-card-content"><h3>Total Asignaciones</h3><p class="stat-number">${data.kpi.hoy_total}</p><span class="stat-label">Registradas</span></div></div>
-            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">check_circle</span></div><div class="stat-card-content"><h3>Turnos Cubiertos</h3><p class="stat-number">${data.kpi.porcentaje}%</p><span class="stat-label">${data.kpi.hoy_completadas} completados</span></div></div>
-            <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#ef4444;">warning</span></div><div class="stat-card-content"><h3>Conflictos</h3><p class="stat-number">${data.kpi.hoy_conflictivas}</p><span class="stat-label">Canceladas/Retrasadas</span></div></div>
-        `;
-        document.getElementById('asignacionesChartsGrid').style.display = 'grid';
-        if(data.estado_hoy && data.estado_hoy.data.some(v=>v>0)) {
-            const estadoColorsMap = { 'Programado': GW.gray, 'Completado': GW.green, 'En Ruta': GW.blue, 'Cancelado': GW.red, 'Retrasado': GW.orange, 'Inactiva/Cancelada': GW.red };
-            const bgColors = data.estado_hoy.labels.map(l => estadoColorsMap[l] || GW.gray);
-            new Chart(document.getElementById('chartEstadoHoy'), {
-                type: 'doughnut', data: { labels: data.estado_hoy.labels, datasets: [{ data: data.estado_hoy.data, backgroundColor: bgColors }] }, options: {plugins: {legend: {position: 'bottom'}}, cutout:'70%'}
-            });
-        }
-        if(data.top_conductores && data.top_conductores.data.length > 0) {
-            new Chart(document.getElementById('chartConductores'), {
-                type: 'bar', data: { labels: data.top_conductores.labels, datasets: [{ label:'Asignaciones', data: data.top_conductores.data, backgroundColor: GW.blue, borderRadius:4 }] }, options: { indexAxis: 'y', plugins:{legend:{display:false}} }
-            });
-        }
-    });
+    window.reloadKPIs = function() {
+        fetch('../../api/kpis_api.php?seccion=asignaciones&_t=' + Date.now(), { cache: 'no-store' }).then(r=>r.json()).then(data => {
+            if(!data.success) return;
+            document.getElementById('asignacionesStatsGrid').style.display = 'grid';
+            document.getElementById('asignacionesStatsGrid').innerHTML = `
+                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">assignment</span></div><div class="stat-card-content"><h3>Total Asignaciones</h3><p class="stat-number">${data.kpi.hoy_total}</p><span class="stat-label">Registradas</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">check_circle</span></div><div class="stat-card-content"><h3>Turnos Cubiertos</h3><p class="stat-number">${data.kpi.porcentaje}%</p><span class="stat-label">${data.kpi.hoy_completadas} completados</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#ef4444;">warning</span></div><div class="stat-card-content"><h3>Conflictos</h3><p class="stat-number">${data.kpi.hoy_conflictivas}</p><span class="stat-label">Canceladas/Retrasadas</span></div></div>
+            `;
+            document.getElementById('asignacionesChartsGrid').style.display = 'grid';
+            if(data.estado_hoy && data.estado_hoy.data.some(v=>v>0)) {
+                Chart.getChart('chartEstadoHoy')?.destroy();
+                const estadoColorsMap = { 'Programado': GW.gray, 'Completado': GW.green, 'En Ruta': GW.blue, 'Cancelado': GW.red, 'Retrasado': GW.orange, 'Inactiva/Cancelada': GW.red };
+                const bgColors = data.estado_hoy.labels.map(l => estadoColorsMap[l] || GW.gray);
+                new Chart(document.getElementById('chartEstadoHoy'), {
+                    type: 'doughnut', data: { labels: data.estado_hoy.labels, datasets: [{ data: data.estado_hoy.data, backgroundColor: bgColors }] }, options: {plugins: {legend: {position: 'bottom'}}, cutout:'70%'}
+                });
+            }
+            if(data.top_conductores && data.top_conductores.data.length > 0) {
+                Chart.getChart('chartConductores')?.destroy();
+                new Chart(document.getElementById('chartConductores'), {
+                    type: 'bar', data: { labels: data.top_conductores.labels, datasets: [{ label:'Asignaciones', data: data.top_conductores.data, backgroundColor: GW.blue, borderRadius:4 }] }, options: { indexAxis: 'y', plugins:{legend:{display:false}} }
+                });
+            }
+        });
+    };
+    window.reloadKPIs();
 });
 </script>
 </body>

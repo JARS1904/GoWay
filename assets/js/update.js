@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (typeof showNotification === 'function') {
                         showNotification(data.message || 'Ruta actualizada exitosamente', 'success');
                     }
+                    setTimeout(() => { if (typeof window.reloadKPIs === 'function') window.reloadKPIs(); }, 150);
 
                     // Recargar tabla después de 3 segundos
                     setTimeout(() => {
