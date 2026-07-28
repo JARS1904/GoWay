@@ -454,14 +454,7 @@ try {
 
             $stmt->close();
 
-            sendResponse(200, [
-                "success"     => true,
-                "total"       => $total_records,
-                "page"        => $page,
-                "limit"       => $limit,
-                "total_pages" => $total_pages,
-                "rutas"       => $routes
-            ]);
+            sendResponse(200, $routes);
         }
     }
 

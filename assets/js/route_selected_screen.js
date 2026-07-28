@@ -338,9 +338,12 @@ async function handleSearch(e) {
         
         if (Array.isArray(data)) {
             routes = processRoutes(data);
+        } else if (data.success && Array.isArray(data.rutas)) {
+            routes = processRoutes(data.rutas);
         } else if (data.error) {
             throw new Error(data.error);
         } else {
+            console.error('Datos recibidos no válidos:', data);
             throw new Error('Formato de respuesta no válido');
         }
     } catch (error) {
