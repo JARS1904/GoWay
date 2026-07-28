@@ -3,16 +3,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-// Manejar preflight CORS
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+require_once '../../config/api_middleware.php';
+aplicarCorsGoWay();
 
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
@@ -191,13 +183,12 @@ try {
 
             // Tiempo promedio de resolución (días)
             $tiempo_res = null;
-            $cols = $conn->query("SHOW COLUMNS FROM reportes LIKE 'updated_at'");
-            if ($cols && $cols->num_rows > 0) {
-                $r = $conn->query("SELECT ROUND(AVG(DATEDIFF(rep.updated_at, rep.created_at)), 1) AS promedio_dias
-                    FROM reportes rep
-                    JOIN vehiculos v ON rep.id_vehiculo = v.id_vehiculo
-                    WHERE rep.estado = 'resuelto' AND rep.archivado = 0 AND rep.updated_at IS NOT NULL AND rep.updated_at != rep.created_at $where_and");
-                if ($r) $tiempo_res = $r->fetch_assoc()['promedio_dias'];
+            $r = @$conn->query("SELECT ROUND(AVG(DATEDIFF(rep.updated_at, rep.created_at)), 1) AS promedio_dias
+                FROM reportes rep
+                JOIN vehiculos v ON rep.id_vehiculo = v.id_vehiculo
+                WHERE rep.estado = 'resuelto' AND rep.archivado = 0 AND rep.updated_at IS NOT NULL AND rep.updated_at != rep.created_at $where_and");
+            if ($r && $row_res = $r->fetch_assoc()) {
+                $tiempo_res = $row_res['promedio_dias'];
             }
 
             sendResponse(200, [

@@ -68,6 +68,16 @@ try {
     // Generar token de sesión único
     $token = bin2hex(random_bytes(32));
 
+    // Si el cliente (Flutter) envió un fcm_token, guardarlo en la tabla usuarios
+    if (!empty($data['fcm_token'])) {
+        $stmtFcm = $conn->prepare("UPDATE usuarios SET fcm_token = ? WHERE id = ?");
+        if ($stmtFcm) {
+            $stmtFcm->bind_param("si", $data['fcm_token'], $user['id']);
+            $stmtFcm->execute();
+            $stmtFcm->close();
+        }
+    }
+
     // Formatear foto_url
     $fotoUrl = null;
     if (!empty($user['foto_url'])) {

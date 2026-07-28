@@ -5,15 +5,13 @@
  */
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+require_once '../config/api_middleware.php';
+aplicarCorsGoWay();
+
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 ini_set('display_errors', 0); error_reporting(E_ALL);
 
 require_once '../config/conexion_bd.php';
@@ -21,10 +19,11 @@ function resp($code, $data) { http_response_code($code); echo json_encode($data,
 
 try {
     $conn = $conexion;
-    if ($conn->connect_error) resp(500, ["error" => "DB connection error"]);
+    if ($conn->connect_error) resp(500, ["error" => "Error de conexión interna"]);
 
     $is_superadmin   = isset($_SESSION['rol']) && $_SESSION['rol'] == 1;
-    $rfc_empresa     = (!$is_superadmin && !empty($_SESSION['rfc_empresa'])) ? $_SESSION['rfc_empresa'] : null;
+    $rfc_empresa_raw = (!$is_superadmin && !empty($_SESSION['rfc_empresa'])) ? trim($_SESSION['rfc_empresa']) : null;
+    $rfc_empresa     = $rfc_empresa_raw ? $conn->real_escape_string($rfc_empresa_raw) : null;
 
     $seccion = isset($_GET['seccion']) ? $_GET['seccion'] : 'dashboard';
 

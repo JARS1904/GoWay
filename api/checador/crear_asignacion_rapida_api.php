@@ -1,13 +1,6 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+require_once '../../config/api_middleware.php';
+aplicarCorsGoWay();
 
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
@@ -23,17 +16,7 @@ require_once '../../config/conexion_bd.php';
 try {
     $conn = $conexion;
     if ($conn->connect_error) {
-        sendResponse(500, ["success" => false, "error" => "Error de conexión: " . $conn->connect_error]);
-    }
-
-    // Auto-check de columnas de bitácora
-    $check_h = $conn->query("SHOW COLUMNS FROM asignaciones LIKE 'hora_checado_real'");
-    if ($check_h && $check_h->num_rows === 0) {
-        $conn->query("ALTER TABLE asignaciones ADD COLUMN hora_checado_real DATETIME NULL DEFAULT NULL AFTER estado");
-    }
-    $check_c = $conn->query("SHOW COLUMNS FROM asignaciones LIKE 'checado_por'");
-    if ($check_c && $check_c->num_rows === 0) {
-        $conn->query("ALTER TABLE asignaciones ADD COLUMN checado_por VARCHAR(100) NULL DEFAULT NULL AFTER hora_checado_real");
+        sendResponse(500, ["success" => false, "error" => "Error interno en la conexión con base de datos"]);
     }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

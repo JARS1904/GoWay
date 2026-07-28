@@ -1,0 +1,4 @@
+.env
+.idea/
+*.log
+config/firebase_credentials.json

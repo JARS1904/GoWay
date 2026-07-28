@@ -36,6 +36,25 @@ try {
         $resRuta = $conn->query("SELECT nombre FROM rutas WHERE id_ruta = $id_ruta");
         $nombreRuta = $resRuta->fetch_assoc()['nombre'];
         
+        // --- NOTIFICAR A PASAJEROS CON ESTA RUTA EN FAVORITOS ---
+        require_once __DIR__ . '/../../config/fcm_helper.php';
+        $tokens_destino = [];
+        $res_fav = $conn->query("SELECT u.fcm_token FROM rutas_favoritas rf INNER JOIN usuarios u ON rf.id_usuario = u.id WHERE rf.id_ruta = $id_ruta AND u.fcm_token IS NOT NULL AND u.fcm_token != ''");
+        if ($res_fav) {
+            while ($row_t = $res_fav->fetch_assoc()) {
+                $tokens_destino[] = $row_t['fcm_token'];
+            }
+        }
+        if (!empty($tokens_destino)) {
+            enviarPushMasivoGoWay(
+                $tokens_destino,
+                "⏱️ Horario actualizado",
+                "El horario de tu ruta favorita '{$nombreRuta}' cambió ($tipo_dia: $hora_salida - $hora_llegada).",
+                ['accion' => 'reload_notificaciones', 'id_ruta' => (string)$id_ruta]
+            );
+        }
+        // --- FIN NOTIFICACIÓN ---
+
         echo json_encode([
             'success' => true, 
             'message' => 'Horario actualizado exitosamente',

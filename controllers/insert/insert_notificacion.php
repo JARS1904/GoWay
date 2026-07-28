@@ -47,6 +47,69 @@ if ($stmt) {
     if ($stmt->execute()) {
         $id_insertado = $stmt->insert_id;
         
+        // --- ENVÍO DE NOTIFICACIONES PUSH REALES (FCM) ---
+        require_once __DIR__ . '/../../config/fcm_helper.php';
+        $tokens_destino = [];
+        
+        if ($is_empresa) {
+            if ($destinatario_tipo === 'checadores') {
+                // Checadores de la empresa
+                $res_tokens = $conn->prepare("SELECT fcm_token FROM checadores WHERE rfc_empresa = ? AND fcm_token IS NOT NULL AND fcm_token != ''");
+                if ($res_tokens) {
+                    $res_tokens->bind_param("s", $rfc_empresa);
+                    $res_tokens->execute();
+                    $rt = $res_tokens->get_result();
+                    while ($f = $rt->fetch_assoc()) $tokens_destino[] = $f['fcm_token'];
+                    $res_tokens->close();
+                }
+            } else {
+                // Usuarios pasajeros que tengan rutas de esta empresa en favoritos
+                $res_tokens = $conn->prepare("
+                    SELECT DISTINCT u.fcm_token 
+                    FROM usuarios u
+                    INNER JOIN rutas_favoritas rf ON u.id = rf.id_usuario
+                    INNER JOIN rutas r ON rf.id_ruta = r.id_ruta
+                    WHERE r.rfc_empresa = ? AND u.fcm_token IS NOT NULL AND u.fcm_token != ''
+                ");
+                if ($res_tokens) {
+                    $res_tokens->bind_param("s", $rfc_empresa);
+                    $res_tokens->execute();
+                    $rt = $res_tokens->get_result();
+                    while ($f = $rt->fetch_assoc()) $tokens_destino[] = $f['fcm_token'];
+                    $res_tokens->close();
+                }
+            }
+        } else {
+            // Super Admin
+            if ($destinatario_tipo === 'checadores') {
+                // Todos los checadores
+                $res_tokens = $conn->query("SELECT fcm_token FROM checadores WHERE fcm_token IS NOT NULL AND fcm_token != ''");
+                if ($res_tokens) while ($f = $res_tokens->fetch_assoc()) $tokens_destino[] = $f['fcm_token'];
+            } else {
+                if ($id_usu !== null) {
+                    // Usuario específico
+                    $res_tokens = $conn->prepare("SELECT fcm_token FROM usuarios WHERE id = ? AND fcm_token IS NOT NULL AND fcm_token != ''");
+                    if ($res_tokens) {
+                        $res_tokens->bind_param("i", $id_usu);
+                        $res_tokens->execute();
+                        $rt = $res_tokens->get_result();
+                        while ($f = $rt->fetch_assoc()) $tokens_destino[] = $f['fcm_token'];
+                        $res_tokens->close();
+                    }
+                } else {
+                    // Todos los usuarios
+                    $res_tokens = $conn->query("SELECT fcm_token FROM usuarios WHERE fcm_token IS NOT NULL AND fcm_token != ''");
+                    if ($res_tokens) while ($f = $res_tokens->fetch_assoc()) $tokens_destino[] = $f['fcm_token'];
+                }
+            }
+        }
+        
+        // Enviar Push visible y/o de recarga en segundo plano
+        if (!empty($tokens_destino)) {
+            enviarPushMasivoGoWay($tokens_destino, $titulo, $mensaje, ['tipo_alerta' => $tipo, 'accion' => 'reload_notificaciones']);
+        }
+        // --- FIN ENVÍO FCM ---
+
         $sql_nuevo = "SELECT n.*, u.nombre AS usuario_nombre 
                       FROM notificaciones n 
                       LEFT JOIN usuarios u ON n.id_usuario = u.id 

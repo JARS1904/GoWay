@@ -1,20 +1,9 @@
-<!--Se agreo para el manejo de sesión-->
 <?php
-session_start();
-if (!isset($_SESSION['id'])) {
-    header('Location: ../login.php');
-    exit();
-}
-?>
-
-<?php
+require_once '../../config/auth_admin.php';
 require_once '../../config/conexion_bd.php';
 require_once '../../config/sync_session_foto.php';
 require_once '../../config/opciones_reportes.php';
 
-// Filtro para multi-tenant (Empresas)
-$where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
-$where_emp_v = ($_SESSION['rol'] == 4) ? " WHERE v.rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
 
 // Obtener lista de vehículos con placa y modelo
 $sql_vehiculos = "SELECT id_vehiculo, placa, modelo FROM vehiculos" . $where_emp . " ORDER BY placa";

@@ -1,10 +1,5 @@
-<!--Se agreo para el manejo de sesión-->
 <?php
-session_start();
-if (!isset($_SESSION['id'])) {
-    header('Location: ../login.php');
-    exit();
-}
+require_once '../../config/auth_admin.php';
 require_once '../../config/conexion_bd.php';
 require_once '../../config/sync_session_foto.php';
 ?>

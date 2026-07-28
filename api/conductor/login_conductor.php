@@ -1,8 +1,6 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=utf-8");
-header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+require_once '../../config/api_middleware.php';
+aplicarCorsGoWay();
 
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
@@ -17,9 +15,12 @@ require_once '../../config/conexion_bd.php';
 
 try {
     $conn = $conexion;
-    
     if ($conn->connect_error) {
-        sendResponse(500, ["error" => "Connection failed: " . $conn->connect_error]);
+        sendResponse(500, ["error" => "Error interno en el servidor."]);
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        sendResponse(405, ["error" => "Método no permitido. Se espera POST."]);
     }
 
     $json = file_get_contents('php://input');
@@ -36,10 +37,13 @@ try {
         sendResponse(400, ["error" => "El RFC es requerido"]);
     }
 
-    $rfc = $conn->real_escape_string($data['rfc']);
+    $rfc = trim($data['rfc']);
 
-    // Buscar como CONDUCTOR
-    $stmt_conductor = $conn->prepare("SELECT rfc_conductor, nombre, telefono, foto, activo FROM conductores WHERE rfc_conductor = ? AND activo = 1");
+    // Buscar como CONDUCTOR usando sentencias preparadas
+    $stmt_conductor = $conn->prepare("SELECT rfc_conductor, nombre, telefono, foto, activo FROM conductores WHERE rfc_conductor = ? AND activo = 1 LIMIT 1");
+    if (!$stmt_conductor) {
+        sendResponse(500, ["error" => "Error preparando consulta."]);
+    }
     $stmt_conductor->bind_param("s", $rfc);
     $stmt_conductor->execute();
     $result_conductor = $stmt_conductor->get_result();
@@ -47,13 +51,15 @@ try {
     if ($result_conductor->num_rows > 0) {
         $row_conductor = $result_conductor->fetch_assoc();
         
-        // Cargar URL de la foto
         $fotoUrl = null;
         if (!empty($row_conductor['foto'])) {
             $fotoUrl = "assets/images/profiles/" . $row_conductor['foto'];
         }
         
         $token = bin2hex(random_bytes(32));
+        
+        // Guardar token en BD
+        guardarTokenSesion($conn, 'conductores', 'rfc_conductor', $row_conductor['rfc_conductor'], $token);
         
         sendResponse(200, [
             "success" => true,
@@ -75,6 +81,6 @@ try {
     $stmt_conductor->close();
 
 } catch (Exception $e) {
-    sendResponse(500, ["error" => "Error interno: " . $e->getMessage()]);
+    sendResponse(500, ["error" => "Error interno de procesamiento."]);
 }
 ?>
