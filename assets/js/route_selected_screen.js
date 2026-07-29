@@ -154,7 +154,10 @@ let selectedRouteId = null;
 let favorites = new Set();
 let currentFilter = 'all';
 let locations = [];
-
+let currentSelectedRouteData = null;
+let currentSchedulePage = 1;
+const SCHEDULES_PER_PAGE = 5;
+let routeMapInstance = null;
 document.addEventListener('DOMContentLoaded', () => {
     fetchLocations();
     loadFavorites();
@@ -540,11 +543,32 @@ function updateSelectedRouteCard() {
 function getUniqueSchedules(schedules) {
     const scheduleMap = {};
     schedules.forEach(schedule => {
-        const key = `${schedule.tipo_dia}-${schedule.hora_salida}-${schedule.hora_llegada}`;
+        // Filter out unassigned schedules if the toggle is enabled
+        if (typeof window.isHideSchedulesEnabled !== 'undefined' && window.isHideSchedulesEnabled) {
+            if (!schedule.estado || String(schedule.estado).trim() === '') {
+                return; // Skip this schedule
+            }
+        }
+        const key = schedule.id_horario || `${schedule.tipo_dia}-${schedule.hora_salida}-${schedule.hora_llegada}`;
         scheduleMap[key] = schedule;
     });
     return Object.values(scheduleMap);
 }
+
+// Global functions for profile panel toggles
+window.updateSchedulesDisplay = function() {
+    if (typeof currentSelectedRouteData !== 'undefined' && currentSelectedRouteData) {
+        // Re-render the schedules list
+        renderSchedulesPage();
+    }
+};
+
+window.refreshStopTooltips = function() {
+    if (typeof currentSelectedRouteData !== 'undefined' && currentSelectedRouteData) {
+        // Re-render the map markers to apply the new tooltip permanent setting
+        renderSchedulesList(currentSelectedRouteData);
+    }
+};
 
 function displayNoRoutes() {
     if(resultsContainer) {
@@ -558,6 +582,10 @@ function displayNoRoutes() {
 
 function showNoSelection() {
     if(!routeDetailsContainer) return;
+    
+    const container = document.querySelector('.container');
+    if (container) container.classList.remove('mobile-show-details');
+
     routeDetailsContainer.innerHTML = `
         <div class="no-selection">
             <i class="fas fa-route"></i>
@@ -576,6 +604,9 @@ function showRouteDetails(route) {
         return;
     }
     
+    const container = document.querySelector('.container');
+    if (container) container.classList.add('mobile-show-details');
+    
     const uniqueSchedules = getUniqueSchedules(route.horarios || []);
 
     const isTramo   = route.es_tramo == 1;
@@ -588,10 +619,15 @@ function showRouteDetails(route) {
     let contentHTML = `
         <div class="route-details">
             <div class="route-detail-header">
-                <div class="route-detail-company">${route.empresa_nombre || 'Ruta'}</div>
-                <div class="route-detail-path">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                    <button class="back-to-results-btn" onclick="backToResults()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div style="font-size: 20px; font-weight: 700; color: #111;">${route.empresa_nombre || 'Ruta'}</div>
+                </div>
+                <div style="font-size: 24px; font-weight: 700; color: #000; line-height: 1.2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
                     <span>${boardStop}</span>
-                    <i class="fas fa-arrow-right"></i>
+                    <i class="fas fa-arrow-right" style="font-size: 18px; color: #999; flex-shrink: 0;"></i>
                     <span>${alightStop}</span>
                 </div>
                 ${isTramo ? `
@@ -640,11 +676,129 @@ function showRouteDetails(route) {
 
             <div class="detail-divider"></div>
 
+            <h4 class="info-title" style="margin-bottom:14px;font-size:17px;">Paradas de la ruta:</h4>
+            <div id="routeMap" style="height: 250px; border-radius: 12px; margin-bottom: 24px; z-index: 1; border: 1px solid #eee;"></div>
+
             <h4 class="info-title" style="margin-bottom:14px;font-size:17px;">Horarios disponibles:</h4>
+            
+            <!-- Contenedor dinámico para los horarios paginados -->
+            <div id="schedulesListContainer"></div>
+            
+            <!-- Contenedor dinámico para la paginación -->
+            <div id="schedulesPaginationContainer" class="schedules-pagination-wrap"></div>
+        </div>
     `;
 
-    // ── Iterar horarios ──────────────────────────────────────
-    uniqueSchedules.forEach(schedule => {
+    routeDetailsContainer.innerHTML = contentHTML;
+
+    // Inicializar variables y renderizar primera página
+    currentSelectedRouteData = route;
+    currentSchedulePage = 1;
+    
+    renderSchedulesPage();
+    
+    // ── Inicializar Mapa de Paradas ──
+    if (routeMapInstance) {
+        routeMapInstance.remove();
+        routeMapInstance = null;
+    }
+
+    const paradasMapData = Array.isArray(route.paradas_ruta) ? route.paradas_ruta : [];
+    const paradasConCoordenadas = paradasMapData.filter(p => p.latitud && p.longitud);
+
+    if (paradasConCoordenadas.length > 0) {
+        routeMapInstance = L.map('routeMap', {
+            zoomControl: false // Opcional: Desactivar zoom control si quieres que sea más limpio
+        });
+        
+        // Agregar controles de zoom abajo a la derecha
+        L.control.zoom({ position: 'bottomright' }).addTo(routeMapInstance);
+
+        // Capa de CartoDB Voyager
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(routeMapInstance);
+
+        // Crear un grupo para auto-ajustar el zoom
+        const markersGroup = L.featureGroup();
+
+        // Icono de la imagen
+        const stopIcon = L.icon({
+            iconUrl: '../../assets/images/icons/icons8-place-marker.png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            tooltipAnchor: [0, -32]
+        });
+
+        paradasConCoordenadas.forEach(p => {
+            const isPermanent = typeof window.isShowStopNamesEnabled !== 'undefined' ? window.isShowStopNamesEnabled : true;
+            const marker = L.marker([parseFloat(p.latitud), parseFloat(p.longitud)], { icon: stopIcon })
+                .bindTooltip(p.nombre, { permanent: isPermanent, direction: 'top', className: 'map-tooltip' });
+            markersGroup.addLayer(marker);
+        });
+
+        markersGroup.addTo(routeMapInstance);
+        routeMapInstance.fitBounds(markersGroup.getBounds(), { padding: [30, 30] });
+    } else {
+        // Si no hay paradas con coordenadas, ocultamos el mapa y el título
+        const mapDiv = document.getElementById('routeMap');
+        if (mapDiv) {
+            mapDiv.style.display = 'none';
+            const title = mapDiv.previousElementSibling;
+            if (title && title.tagName === 'H4') {
+                title.style.display = 'none';
+            }
+        }
+    }
+}
+
+function changeSchedulePage(delta) {
+    if (!currentSelectedRouteData) return;
+    
+    const uniqueSchedules = getUniqueSchedules(currentSelectedRouteData.horarios || []);
+    const totalPages = Math.ceil(uniqueSchedules.length / SCHEDULES_PER_PAGE);
+    
+    currentSchedulePage += delta;
+    if (currentSchedulePage < 1) currentSchedulePage = 1;
+    if (currentSchedulePage > totalPages) currentSchedulePage = totalPages;
+    
+    renderSchedulesPage();
+}
+
+function renderSchedulesPage() {
+    const listContainer = document.getElementById('schedulesListContainer');
+    const paginationContainer = document.getElementById('schedulesPaginationContainer');
+    if (!listContainer || !paginationContainer || !currentSelectedRouteData) return;
+    
+    const route = currentSelectedRouteData;
+    const uniqueSchedules = getUniqueSchedules(route.horarios || []);
+    
+    const isTramo   = route.es_tramo == 1;
+    const boardStop = isTramo ? (route.parada_embarque || route.origen) : route.origen;
+    const alightStop= isTramo ? (route.parada_bajada   || route.destino) : route.destino;
+
+    const paradasRuta     = Array.isArray(route.paradas_ruta) ? route.paradas_ruta : [];
+    const paradasFallback = Array.isArray(route.paradas) ? route.paradas : ['No especificadas'];
+    
+    const totalPages = Math.ceil(uniqueSchedules.length / SCHEDULES_PER_PAGE);
+    
+    // Si no hay horarios, mostramos mensaje
+    if (uniqueSchedules.length === 0) {
+        listContainer.innerHTML = '<p style="color:#757575;">No hay horarios disponibles para esta ruta.</p>';
+        paginationContainer.innerHTML = '';
+        return;
+    }
+    
+    // Obtener los horarios de la página actual
+    const startIndex = (currentSchedulePage - 1) * SCHEDULES_PER_PAGE;
+    const endIndex = startIndex + SCHEDULES_PER_PAGE;
+    const pageSchedules = uniqueSchedules.slice(startIndex, endIndex);
+    
+    let contentHTML = '';
+    
+    pageSchedules.forEach(schedule => {
         const salida  = schedule.hora_abordaje || schedule.hora_salida;
         const llegada = schedule.hora_bajada   || schedule.hora_llegada;
 
@@ -683,13 +837,12 @@ function showRouteDetails(route) {
                         <i class="fas fa-calendar-alt"></i>
                     </div>
                     <div class="schedule-header-body">
-                        <div class="schedule-header-top-row">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span class="schedule-company-name">${route.empresa_nombre || 'Transporte'}</span>
-                            <div class="schedule-header-pills" aria-label="Tipo de día">
-                                <span class="schedule-pill schedule-day-badge schedule-day-absolute">${schedule.tipo_dia || 'No especificado'}</span>
-                            </div>
+                            <span class="schedule-pill schedule-day-badge">${schedule.tipo_dia || 'No especificado'}</span>
                         </div>
-                        <div class="schedule-header-info">
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: -2px;">
                             <div class="schedule-route-path-sub">
                                 <i class="fas fa-map-marker-alt" style="color:#2962FF;font-size:11px;"></i>
                                 <span>${boardStop}</span>
@@ -697,13 +850,14 @@ function showRouteDetails(route) {
                                 <i class="fas fa-map-marker-alt" style="color:#D32F2F;font-size:11px;"></i>
                                 <span>${alightStop}</span>
                             </div>
-                            <div class="schedule-state-wrap" style="margin-top: 6px;">
-                                ${renderEstadoAsignacionBadge(schedule.estado)}
+                            <div class="schedule-toggle-icon">
+                                <i class="fas fa-chevron-down"></i>
                             </div>
                         </div>
-                    </div>
-                    <div class="schedule-toggle-icon" style="margin-left: auto;">
-                        <i class="fas fa-chevron-down"></i>
+
+                        <div class="schedule-state-wrap" style="margin-top: 2px;">
+                            ${renderEstadoAsignacionBadge(schedule.estado)}
+                        </div>
                     </div>
                 </div>
 
@@ -753,7 +907,7 @@ function showRouteDetails(route) {
 
                         <!-- Vehículo -->
                         <div class="detail-row">
-                            <i class="fas fa-bus" style="color:#1565C0;"></i>
+                            <i class="fas fa-bus" style="color:#2898f3;"></i>
                             <div class="detail-row-text">
                                 <span class="detail-row-label">Vehículo</span>
                                 <span class="detail-row-value">${schedule.vehiculo_modelo || 'N/A'}</span>
@@ -791,12 +945,28 @@ function showRouteDetails(route) {
             </div><!-- /schedule-card -->
         `;
     });
-
-    contentHTML += `</div>`; // /route-details
-    routeDetailsContainer.innerHTML = contentHTML;
+    
+    listContainer.innerHTML = contentHTML;
+    
+    // Actualizar controles de paginación
+    if (totalPages > 1) {
+        paginationContainer.innerHTML = `
+            <div class="schedules-pagination">
+                <button class="pagination-btn" onclick="changeSchedulePage(-1)" ${currentSchedulePage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="pagination-text">Página ${currentSchedulePage} de ${totalPages}</span>
+                <button class="pagination-btn" onclick="changeSchedulePage(1)" ${currentSchedulePage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        `;
+    } else {
+        paginationContainer.innerHTML = '';
+    }
 
     // ── Event listeners para expandir/contraer horarios ──────────────────
-    const scheduleHeaders = routeDetailsContainer.querySelectorAll('.schedule-header');
+    const scheduleHeaders = listContainer.querySelectorAll('.schedule-header');
     scheduleHeaders.forEach(header => {
         header.addEventListener('click', () => {
             const card = header.closest('.schedule-card');
@@ -852,3 +1022,22 @@ if (userBtn) {
 document.addEventListener('click', () => {
     if (userDropdown) userDropdown.classList.remove('open');
 });
+
+// ── Volver a resultados en móvil ─────────────────
+window.backToResults = function() {
+    const container = document.querySelector('.container');
+    if (container) container.classList.remove('mobile-show-details');
+    selectedRouteId = null;
+    updateSelectedRouteCard();
+};
+
+// Función para actualizar la barra inferior en móvil
+window.setMobActive = function(activeId) {
+    document.querySelectorAll('.mob-nav-item').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const activeBtn = document.getElementById(activeId);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+};

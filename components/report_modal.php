@@ -1,6 +1,8 @@
-<!-- Panel de Reportes (convertido a lateral) -->
-<div class="modal-overlay" id="reportModalOverlay" onclick="closeReportModal()">
-    <div class="modal-container" onclick="event.stopPropagation()">
+<!-- Modal de Reportes (Bottom Sheet en móvil) -->
+<div class="modal-overlay" id="newReportModalOverlay" onclick="closeNewReportModal()">
+    <div class="modal-container" id="newReportModalContainer" onclick="event.stopPropagation()">
+        <!-- Handle del bottom sheet para móvil -->
+        <div class="bottom-sheet-handle"></div>
         <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid #eef2f6; background: #fff; margin-bottom: 0;">
             <div style="display:flex; align-items:center; gap:10px;">
                 <div style="background:#e8efff; color:#2962FF; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center;">
@@ -8,20 +10,19 @@
                 </div>
                 <h3 style="margin:0; font-size:1.25rem;">Nuevo reporte</h3>
             </div>
-            <button class="modal-close" onclick="closeReportModal()">&times;</button>
+            <button class="modal-close" onclick="closeNewReportModal()">&times;</button>
         </div>
         
         <div class="modal-body" style="padding: 24px; overflow-y: auto; flex: 1;">
             <!-- Busqueda de Vehiculo -->
-            <div style="display:flex; gap:10px; align-items:flex-end; margin-bottom:20px;">
+            <div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:20px;">
                 <div class="modal-form-group" style="flex:1; margin-bottom:0;">
-                    <label>Placa del vehículo</label>
-                    <div style="position:relative; width: 100%;">
+                    <div style="position:relative; width:100%;">
                         <i class="fas fa-car" style="position:absolute; left:12px; top:15px; color:#757575;"></i>
                         <input type="text" id="reportSearchPlaca" placeholder="Placa del vehículo" style="width: 100%; padding-left:36px;" oninput="this.value = this.value.toUpperCase()" onkeypress="if(event.key === 'Enter') searchReportAssignment()">
                     </div>
                 </div>
-                <button type="button" id="btnSearchReport" class="btn" style="width:auto; flex-shrink:0; border-radius:18px; background:#2962FF; padding:12px 24px; font-weight:500; font-size:16px;" onclick="searchReportAssignment()">Buscar</button>
+                <button type="button" id="btnSearchReport" class="btn" style="width:auto; flex-shrink:0; border-radius:18px; background:#2962FF; color:white; padding:12px 24px; font-weight:500; font-size:16px; border: 1.5px solid #2962FF;" onclick="searchReportAssignment()">Buscar</button>
             </div>
 
             <!-- Tarjeta Verde de Asignacion Encontrada -->
@@ -51,7 +52,6 @@
 
             <!-- Tipo de incidente -->
             <div class="modal-form-group">
-                <label>Tipo de incidente</label>
                 <div style="position:relative;">
                     <i class="fas fa-exclamation-triangle" style="position:absolute; left:12px; top:15px; color:#757575;"></i>
                     <select id="reportTipoIncidente" style="padding-left:36px;" required>
@@ -62,7 +62,6 @@
 
             <!-- Gravedad -->
             <div class="modal-form-group">
-                <label>Gravedad</label>
                 <div style="position:relative;">
                     <i class="fas fa-chart-bar" style="position:absolute; left:12px; top:15px; color:#757575;"></i>
                     <select id="reportGravedad" style="padding-left:36px;" required>
@@ -73,7 +72,6 @@
 
             <!-- Fecha y Hora -->
             <div class="modal-form-group">
-                <label>Fecha y hora del incidente</label>
                 <div style="position:relative;">
                     <i class="far fa-calendar-alt" style="position:absolute; left:12px; top:15px; color:#757575;"></i>
                     <input type="datetime-local" id="reportFechaHora" placeholder="Fecha y hora del incidente" style="padding-left:36px; font-family:inherit;" required>
@@ -82,30 +80,62 @@
 
             <!-- Descripción -->
             <div class="modal-form-group" style="margin-bottom:10px;">
-                <label>Descripción del incidente</label>
                 <div style="position:relative;">
-                    <i class="fas fa-align-left" style="position:absolute; left:12px; top:14px; color:#757575;"></i>
-                    <textarea id="reportDescripcion" rows="4" style="padding-left:36px; padding-top:12px; font-family:inherit;" placeholder="Descripción del incidente"></textarea>
+                    <textarea id="reportDescripcion" rows="4" style="padding:12px; font-family:inherit;" placeholder="Descripción del incidente"></textarea>
                 </div>
             </div>
         </div>
         <div class="modal-footer" style="padding: 16px 24px; background: #fff; border-top: 1px solid #eef2f6; display: flex; justify-content: space-between; align-items: center; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
-            <button class="btn" style="background:transparent; color:#64748b; font-weight:600; font-size:14px; border:none; box-shadow:none; padding:0 10px;" onclick="closeReportModal()">Cancelar</button>
-            <button class="btn" style="border-radius:18px; padding:12px 32px; background:#2962FF; font-weight:500; font-size:16px;" onclick="submitReport()">Enviar reporte</button>
+            <button class="btn" style="background:transparent; color:#64748b; font-weight:600; font-size:14px; border:none; box-shadow:none; padding:0 10px;" onclick="closeNewReportModal()">Cancelar</button>
+            <button class="btn" style="border-radius:18px; padding:12px 24px; background:#2962FF; font-weight:500; font-size:16px;" onclick="submitReport()">Enviar reporte</button>
         </div>
     </div>
 </div>
 
 <script>
     // ── Modal Reportes JS ────────────────────────────────
-    function openReportModal() {
-        const userDropdown = document.querySelector('.user-dropdown');
-        if (userDropdown) userDropdown.classList.remove('open');
+    let currentIncidentType = '';
+    let currentSeverity = '';
+
+    function openNewReportModal() {
+        const notifPanel = document.getElementById('notificationsPanel');
+        const notifOverlay = document.getElementById('notificationsOverlay');
+        if (notifPanel) notifPanel.classList.remove('active');
+        if (notifOverlay) notifOverlay.classList.remove('active');
+
+        document.getElementById('newReportModalOverlay').classList.add('active');
+        document.getElementById('newReportModalOverlay').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
         
-        document.getElementById('reportModalOverlay').classList.add('active');
-        
-        document.getElementById('reportFechaHora').value = '';
-        
+        const container = document.getElementById('newReportModalContainer');
+        if(container) {
+            void container.offsetWidth;
+            container.classList.add('slide-up-active');
+        }
+
+        if (document.getElementById('reportTipoIncidente').options.length <= 1) {
+            loadReportOptions();
+        }
+    }
+
+    function closeNewReportModal() {
+        const container = document.getElementById('newReportModalContainer');
+        if(container) {
+            container.classList.remove('slide-up-active');
+        }
+        setTimeout(() => {
+            document.getElementById('newReportModalOverlay').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('newReportModalOverlay').style.display = '';
+            }, 300);
+            if (!document.getElementById('reportsOverlay') || !document.getElementById('reportsOverlay').classList.contains('active')) {
+                document.body.style.overflow = '';
+            }
+        }, 300);
+        resetReportForm();
+    }
+
+    function resetReportForm() {
         document.getElementById('reportSearchPlaca').value = '';
         document.getElementById('reportAssignmentCard').style.display = 'none';
         document.getElementById('reportIdAsignacion').value = '';
@@ -113,29 +143,21 @@
         document.getElementById('reportEsRetorno').checked = false;
         document.getElementById('reportRetornoSection').style.display = 'none';
         window.currentAsignacionData = null;
-        
-        const tipoSelect = document.getElementById('reportTipoIncidente');
-        if (tipoSelect.options.length <= 1) {
-            fetch('../../api/usuario/reportes_api.php?action=get_options')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        tipoSelect.innerHTML = '<option value="" disabled selected>Tipo de incidente</option>';
-                        data.tipos_incidencia.forEach(t => {
-                            tipoSelect.add(new Option(t.nombre, t.id));
-                        });
-                        const gravedadesSelect = document.getElementById('reportGravedad');
-                        gravedadesSelect.innerHTML = '<option value="" disabled selected>Gravedad</option>';
-                        data.niveles_gravedad.forEach(g => {
-                            gravedadesSelect.add(new Option(g.nombre, g.id));
-                        });
-                    }
-                }).catch(e => console.error("Error loading options", e));
-        }
     }
 
-    function closeReportModal() {
-        document.getElementById('reportModalOverlay').classList.remove('active');
+    function loadReportOptions() {
+        fetch('../../api/usuario/reportes_api.php?action=get_options')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const tipoSelect = document.getElementById('reportTipoIncidente');
+                    tipoSelect.innerHTML = '<option value="" disabled selected>Tipo de incidente</option>';
+                    data.tipos_incidencia.forEach(t => { tipoSelect.add(new Option(t.nombre, t.id)); });
+                    const gravedadesSelect = document.getElementById('reportGravedad');
+                    gravedadesSelect.innerHTML = '<option value="" disabled selected>Gravedad</option>';
+                    data.niveles_gravedad.forEach(g => { gravedadesSelect.add(new Option(g.nombre, g.id)); });
+                }
+            }).catch(e => console.error("Error loading options", e));
     }
 
     function searchReportAssignment() {
@@ -162,18 +184,14 @@
                     
                     const isRetorno = document.getElementById('reportEsRetorno').checked;
                     if (isRetorno) {
-                       const texto = asig.ruta_retorno_nombre
-                            ? asig.ruta_retorno_nombre
-                            : asig.ruta_nombre;
+                       const texto = asig.ruta_retorno_nombre ? asig.ruta_retorno_nombre : asig.ruta_nombre;
                         document.getElementById('reportCardRuta').textContent = texto;
                     } else {
                         document.getElementById('reportCardRuta').textContent = asig.ruta_nombre;
                     }
                     
                     document.getElementById('reportRetornoSection').style.display = 'flex';
-                    
                     document.getElementById('reportIdAsignacion').value = asig.id_asignacion;
-                    
                     document.getElementById('reportAssignmentCard').style.display = 'block';
                     if (typeof showToast === 'function') showToast('Asignación encontrada');
                 } else {
@@ -217,11 +235,14 @@
         })
         .then(res => res.json())
         .then(data => {
-            if (data.success || data.id_reporte) {
-                if (typeof showToast === 'function') showToast('Reporte enviado con éxito');
-                closeReportModal();
+            if (data.success) {
+                showToast('Reporte enviado con éxito');
+                closeNewReportModal();
+                if (typeof loadReportsPanel === 'function') {
+                    loadReportsPanel();
+                }
             } else {
-                if (typeof showToast === 'function') showToast(data.error || data.message || 'Error al enviar reporte');
+                showToast(data.error || 'Error al enviar reporte');
             }
         })
         .catch(err => {

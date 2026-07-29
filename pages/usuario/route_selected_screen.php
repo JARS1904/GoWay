@@ -29,6 +29,10 @@ if ($_SESSION['id'] > 0) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" href="../../assets/images/logo_new.png" type="image/png">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
     <link rel="stylesheet" href="../../assets/css/route_selected_screen.css?v=<?php echo time(); ?>">
 </head>
 <body>
@@ -49,11 +53,15 @@ if ($_SESSION['id'] > 0) {
                         <i class="fas fa-sign-in-alt"></i> Iniciar sesión
                     </a>
                 <?php } else { ?>
+                    <button class="profile-nav-btn" onclick="if(typeof closeFavoritesPanel === 'function') closeFavoritesPanel(); if(typeof closeReportsPanel === 'function') closeReportsPanel(); if(typeof closeProfilePanel === 'function') closeProfilePanel();">
+                        <i class="fas fa-home"></i>
+                        Inicio
+                    </button>
                     <button class="profile-nav-btn" onclick="openFavoritesPanel()">
                         <i class="fas fa-heart"></i>
                         Favoritos
                     </button>
-                    <button class="profile-nav-btn" onclick="openReportModal()">
+                    <button class="profile-nav-btn" onclick="openReportsPanel()">
                         <i class="fas fa-exclamation-triangle"></i>
                         Reportes
                     </button>
@@ -72,12 +80,13 @@ if ($_SESSION['id'] > 0) {
                 <?php } ?>
             </nav>
 
-            <!-- Botón de descarga visible solo en móvil (el resto va a la bottom nav) -->
+            <!-- Botón de notificaciones visible solo en móvil (sustituye a Descargar App) -->
             <div class="mobile-header-actions">
-                <a href="https://goway.netlify.app" target="_blank" class="download-btn" style="font-size:13px; padding:7px 14px;">
-                    <i class="fas fa-download"></i> Descargar App
-                </a>
-                <?php if ($_SESSION['rol'] == 3) { ?>
+                <?php if ($_SESSION['rol'] != 3) { ?>
+                    <button onclick="toggleNotifications()" style="background: transparent; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <img src="../../assets/images/icons/icons_notifications.png" alt="Notificaciones" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(0.3);">
+                    </button>
+                <?php } else { ?>
                     <a href="../login.php" class="download-btn" style="font-size:13px; padding:7px 14px;">
                         <i class="fas fa-sign-in-alt"></i> Entrar
                     </a>
@@ -89,17 +98,17 @@ if ($_SESSION['id'] > 0) {
     <?php if ($_SESSION['rol'] != 3) { ?>
     <!-- ── Barra de navegación inferior (solo móvil) ───────────────── -->
     <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <button class="mob-nav-item active" id="mbn-home" onclick="if(typeof closeFavoritesPanel === 'function') closeFavoritesPanel(); if(typeof closeReportsPanel === 'function') closeReportsPanel(); if(typeof closeProfilePanel === 'function') closeProfilePanel(); setMobActive('mbn-home')">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </button>
         <button class="mob-nav-item" id="mbn-favorites" onclick="openFavoritesPanel(); setMobActive('mbn-favorites')">
             <i class="fas fa-heart"></i>
             <span>Favoritos</span>
         </button>
-        <button class="mob-nav-item" id="mbn-reports" onclick="openReportModal(); setMobActive('mbn-reports')">
+        <button class="mob-nav-item" id="mbn-reports" onclick="openReportsPanel(); setMobActive('mbn-reports')">
             <i class="fas fa-exclamation-triangle"></i>
             <span>Reportes</span>
-        </button>
-        <button class="mob-nav-item" id="mbn-notif" onclick="toggleNotifications(); setMobActive('mbn-notif')">
-            <img src="../../assets/images/icons/icons_notifications.png" alt="Notificaciones" class="mob-nav-item-icon">
-            <span>Notificaciones</span>
         </button>
         <button class="mob-nav-item" id="mbn-profile" onclick="openProfilePanel(); setMobActive('mbn-profile')">
             <?php if (!empty($_user_foto)) { ?>
@@ -186,14 +195,23 @@ if ($_SESSION['id'] > 0) {
         const ID_USUARIO = <?php echo isset($_SESSION['id']) ? $_SESSION['id'] : 0; ?>;
     </script>
     
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
     <!-- Lógica principal de la vista -->
     <script src="../../assets/js/route_selected_screen.js"></script>
 
     <?php 
     // Paneles modulares
     require_once '../../components/profile_panel.php';
-    require_once '../../components/report_modal.php';
+    ?>
+    <!-- Panel Lateral de Reportes (Historial) -->
+    <?php require_once '../../components/reports_panel.php'; ?>
+
+    <!-- Modal para crear nuevo reporte -->
+    <?php require_once '../../components/report_modal.php'; ?>
     
+    <?php
     $hide_send_notification = true;
     require_once '../../components/notifications_panel.php'; 
     
