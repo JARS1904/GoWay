@@ -13,7 +13,7 @@ if (isset($_SESSION['id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoWay - Tu destino a un solo toque</title>
     <meta name="description" content="GoWay conecta ciudades, personas y destinos. Gestiona rutas, flotas y checadores en tiempo real.">
-    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/index.css?v=<?php echo time(); ?>">
     <link rel="icon" href="assets/images/logo_new.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,15 +23,32 @@ if (isset($_SESSION['id'])) {
 <body>
 
 <nav id="mainNav">
-    <a href="index.php" class="nav-brand">
-        <img src="assets/images/logo_new.png" alt="GoWay Logo">
-        <span>GoWay</span>
-    </a>
-    <div class="nav-links">
+    <div class="nav-inner">
+        <a href="index.php" class="nav-brand">
+            <img src="assets/images/logo_new.png" alt="GoWay Logo">
+            <span>GoWay</span>
+        </a>
+        <div class="nav-links">
+            <a href="#empresas">Empresas</a>
+            <a href="#checadores">Checadores</a>
+            <a href="#usuarios">Usuarios</a>
+            <a href="https://wheat-koala-810257.hostingersite.com/products/goway/" target="_blank">Descargar GoWay App</a>
+            <a href="https://wheat-koala-810257.hostingersite.com/products/goway_checador/" target="_blank">Descargar GoWay Checador</a>
+        </div>
+        <div class="nav-actions">
+            <a href="pages/login.php" class="btn-primary-nav">Iniciar sesión</a>
+            <button class="nav-burger" id="navBurger" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+    <div class="nav-mobile" id="navMobile">
         <a href="#empresas">Empresas</a>
         <a href="#checadores">Checadores</a>
         <a href="#usuarios">Usuarios</a>
-        <a href="pages/login.php" class="btn-primary-nav">Iniciar sesión</a>
+        <a href="https://wheat-koala-810257.hostingersite.com/products/goway/" target="_blank">Descargar GoWay App</a>
+        <a href="https://wheat-koala-810257.hostingersite.com/products/goway_checador/" target="_blank">Descargar GoWay Checador</a>
+        <a href="pages/login.php" class="btn-mobile-dl">Iniciar sesión</a>
     </div>
 </nav>
 
@@ -371,6 +388,16 @@ if (isset($_SESSION['id'])) {
 </footer>
 
 <script>
+    // Mobile Menu Toggle
+    const navBurger = document.getElementById('navBurger');
+    const navMobile = document.getElementById('navMobile');
+    if (navBurger && navMobile) {
+        navBurger.addEventListener('click', () => {
+            navBurger.classList.toggle('active');
+            navMobile.classList.toggle('open');
+        });
+    }
+
     // Tab Viewer logic
     function switchTab(btn, panelId) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));

@@ -10,19 +10,26 @@ include("../controllers/controlador.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - GoWay</title>
     <link rel="icon" href="../assets/images/logo_new.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/login.css?v=<?php echo time(); ?>">
 </head>
 <body>
 
 <nav id="mainNav">
-    <a href="../index.php" class="nav-brand">
-        <img src="../assets/images/logo_new.png" alt="GoWay Logo">
-        <span>GoWay</span>
-    </a>
-    <div class="nav-links">
-        <a href="../index.php">Inicio</a>
-        <a href="registro.php">Registrarse</a>
-        <a href="registro_empresa.php" class="btn-primary-nav">Registrar empresa</a>
+    <div class="nav-inner">
+        <a href="../index.php" class="nav-brand">
+            <img src="../assets/images/logo_new.png" alt="GoWay Logo">
+            <span>GoWay</span>
+        </a>
+        <div class="nav-links">
+            <a href="../index.php">Inicio</a>
+            <a href="registro.php">Registrar usuario</a>
+        </div>
+        <div class="nav-actions">
+            <a href="registro_empresa.php" class="btn-primary-nav">Registrar empresa</a>
+        </div>
     </div>
 </nav>
 
@@ -74,7 +81,7 @@ include("../controllers/controlador.php");
             <button name="btninvitado" type="submit" class="lg-btn" style="background: transparent; color: #2962FF; border: 1.5px solid #2962FF; box-shadow: none;">Continuar como invitado</button>
         </form>
 
-        <p class="lg-footer">¿No tienes cuenta? <a href="registro.php">Regístrate</a> &nbsp;·&nbsp; <a href="registro_empresa.php">Registrar empresa</a></p>
+        <p class="lg-footer">¿No tienes cuenta? <a href="registro.php">Registrar usuario</a> &nbsp;·&nbsp; <a href="registro_empresa.php">Registrar empresa</a></p>
 
         <hr class="lg-divider">
         <button class="lg-admin-btn" onclick="openAdminModal()">

@@ -6,19 +6,26 @@
     <title>Registro de Empresa - GoWay</title>
     <meta name="description" content="Registra tu empresa en GoWay y empieza a gestionar tu flota de transporte público de manera inteligente.">
     <link rel="icon" href="../assets/images/logo_new.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/company_registration.css?v=<?php echo time(); ?>">
 </head>
 <body>
 
 <nav id="mainNav">
-    <a href="../index.php" class="nav-brand">
-        <img src="../assets/images/logo_new.png" alt="GoWay Logo">
-        <span>GoWay</span>
-    </a>
-    <div class="nav-links">
-        <a href="../index.php">Inicio</a>
-        <a href="login.php">Iniciar sesión</a>
-        <a href="registro.php" class="btn-primary-nav">Registro de Usuario</a>
+    <div class="nav-inner">
+        <a href="../index.php" class="nav-brand">
+            <img src="../assets/images/logo_new.png" alt="GoWay Logo">
+            <span>GoWay</span>
+        </a>
+        <div class="nav-links">
+            <a href="../index.php">Inicio</a>
+            <a href="login.php">Iniciar sesión</a>
+        </div>
+        <div class="nav-actions">
+            <a href="registro.php" class="btn-primary-nav">Registrar usuario</a>
+        </div>
     </div>
 </nav>
 
