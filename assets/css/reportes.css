@@ -27,6 +27,10 @@
     overflow-y: auto;
 }
 
+.report-form-container::-webkit-scrollbar { width: 6px; }
+.report-form-container::-webkit-scrollbar-track { background: transparent; }
+.report-form-container::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
 .reports-list-container {
     background: white;
     padding: 25px;
@@ -104,6 +108,10 @@
     min-height: 0;
     align-content: start;
 }
+
+.reports-grid::-webkit-scrollbar { width: 6px; }
+.reports-grid::-webkit-scrollbar-track { background: transparent; }
+.reports-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
 
 .report-card {
     background: #f8fafc;
@@ -745,3 +753,8 @@
         gap: 6px;
     }
 }
+
+/* ---------------- SCROLLBAR ---------------- */
+::-webkit-scrollbar, *::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track, *::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }

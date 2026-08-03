@@ -11,7 +11,7 @@ require_once '../../config/sync_session_foto.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horarios - Transporte Público</title>
     <link rel="stylesheet" href="../../assets/css/style.css?v=<?php echo time(); ?>">
-    <link rel="icon" href="../../assets/images/logo_new.png" type="image/png">
+    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>

@@ -3227,3 +3227,8 @@ input:checked + .slider:before {
 .ios-toggle input:checked + .ios-toggle-slider:before {
     transform: translateX(20px);
 }
+
+/* ---------------- SCROLLBAR ---------------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }

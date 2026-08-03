@@ -316,3 +316,7 @@ nav.scrolled {
     .rg-grid { grid-template-columns: 1fr; }
     .rg-grid .rg-field-full { grid-column: 1; }
 }
+/* ---------------- SCROLLBAR ---------------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }

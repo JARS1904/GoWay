@@ -9,7 +9,7 @@ include("../controllers/controlador.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - GoWay</title>
-    <link rel="icon" href="../assets/images/logo_new.png" type="image/png">
+    <link rel="icon" href="../assets/images/logo.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@ include("../controllers/controlador.php");
 <nav id="mainNav">
     <div class="nav-inner">
         <a href="../index.php" class="nav-brand">
-            <img src="../assets/images/logo_new.png" alt="GoWay Logo">
+            <img src="../assets/images/logo.png" alt="GoWay Logo">
             <span>GoWay</span>
         </a>
         <div class="nav-links">
@@ -38,7 +38,7 @@ include("../controllers/controlador.php");
     <!-- ── Left brand panel ── -->
     <div class="lg-panel">
         <div class="lg-panel-brand">
-            <img src="../assets/images/logo_new.png" alt="GoWay logo">
+            <img src="../assets/images/logo.png" alt="GoWay logo">
             <span>GoWay</span>
         </div>
         <p class="lg-panel-tagline">Tu destino,<br>a un solo toque.</p>

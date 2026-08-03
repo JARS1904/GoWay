@@ -83,7 +83,7 @@ $nav_categories['Gestión'] = [
     <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
 
     <div class="logo">
-        <img src="<?php echo $base_url; ?>assets/images/logo_new.png" alt="Logo de GoWay" class="logo-img">
+        <img src="<?php echo $base_url; ?>assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
         <h1>GoWay</h1>
         <button class="desktop-toggle-btn" onclick="toggleDesktopSidebar()">
             <img src="<?php echo $base_url; ?>assets/images/icons/icons8_panel.png" alt="Colapsar" style="width: 24px; height: 24px; object-fit: contain;">

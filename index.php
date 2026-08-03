@@ -14,7 +14,7 @@ if (isset($_SESSION['id'])) {
     <title>GoWay - Tu destino a un solo toque</title>
     <meta name="description" content="GoWay conecta ciudades, personas y destinos. Gestiona rutas, flotas y checadores en tiempo real.">
     <link rel="stylesheet" href="assets/css/index.css?v=<?php echo time(); ?>">
-    <link rel="icon" href="assets/images/logo_new.png" type="image/png">
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@ if (isset($_SESSION['id'])) {
 <nav id="mainNav">
     <div class="nav-inner">
         <a href="index.php" class="nav-brand">
-            <img src="assets/images/logo_new.png" alt="GoWay Logo">
+            <img src="assets/images/logo.png" alt="GoWay Logo">
             <span>GoWay</span>
         </a>
         <div class="nav-links">
@@ -131,7 +131,7 @@ if (isset($_SESSION['id'])) {
                 <img src="assets/images/empresa/1-dashboard.png" alt="Dashboard Empresa GoWay">
             </div>
             <div class="empresa-float-badge">
-                <div class="badge-icon">📊</div>
+                <div class="badge-icon"><i class="fa-solid fa-chart-line" style="color: #fff;"></i></div>
                 <div class="badge-info">
                     <strong>KPIs en vivo</strong>
                     <span>Actualización en tiempo real</span>
@@ -279,15 +279,50 @@ if (isset($_SESSION['id'])) {
             </div>
         </div>
 
-        <div class="screenshots-grid">
-            <div class="screenshot-card">
-                <img src="assets/images/checador/1-bucar-vehiculo.jpeg" alt="Buscar vehículo">
+        <div class="carousel-wrapper">
+            <div class="screenshots-grid">
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/picture-1-login.jpeg" alt="Login">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/picture-2-search-schedules.jpeg" alt="Buscar horarios">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/picture-3-search-schedule-options.jpeg" alt="Opciones de horario">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/picture-4-reports.jpeg" alt="Reportes">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/picture-5-bitacora.jpeg" alt="Bitácora">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/picture-6-bitacora-details.jpeg" alt="Detalles bitácora">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/picture-7-bitacora-table-mode.jpeg" alt="Modo tabla">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/picture-8-profile.jpeg" alt="Perfil">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/picture-9-config.jpeg" alt="Configuración">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/checador/pciture-10-notifications.jpeg" alt="Notificaciones">
+                </div>
             </div>
-            <div class="screenshot-card">
-                <img src="assets/images/checador/3-reportes.jpeg" alt="Reportes">
-            </div>
-            <div class="screenshot-card">
-                <img src="assets/images/checador/4-perfil.jpeg" alt="Perfil">
+            <div class="carousel-controls">
+                <button class="btn-carousel prev-slide" aria-label="Anterior">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <button class="btn-carousel next-slide" aria-label="Siguiente">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
             </div>
         </div>
 
@@ -335,15 +370,50 @@ if (isset($_SESSION['id'])) {
             </a>
         </div>
 
-        <div class="screenshots-grid">
-            <div class="screenshot-card">
-                <img src="assets/images/usuario/1-seleccion-rutas.jpeg" alt="Selección de rutas">
+        <div class="carousel-wrapper">
+            <div class="screenshots-grid">
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-1-home.jpeg" alt="Inicio">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-2-selection.jpeg" alt="Selección de rutas">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-3-minimap.jpeg" alt="Minimapa">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-4-schedule-info.jpeg" alt="Horarios">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-5-favorites.jpeg" alt="Favoritos">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-6-reportes.jpeg" alt="Reportes">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-7-profile.jpeg" alt="Perfil">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-8-map.jpeg" alt="Mapa">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-9-config.jpeg" alt="Configuración">
+                </div>
+                <div class="screenshot-card">
+                    <img src="assets/images/usuario/picture-10-notifications.jpeg" alt="Notificaciones">
+                </div>
             </div>
-            <div class="screenshot-card">
-                <img src="assets/images/usuario/2-horarios-disponibles.jpeg" alt="Horarios disponibles">
-            </div>
-            <div class="screenshot-card">
-                <img src="assets/images/usuario/4-reportes.jpeg" alt="Reportes">
+            <div class="carousel-controls">
+                <button class="btn-carousel prev-slide" aria-label="Anterior">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <button class="btn-carousel next-slide" aria-label="Siguiente">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
             </div>
         </div>
 
@@ -353,36 +423,49 @@ if (isset($_SESSION['id'])) {
 <!-- FOOTER MODERNO -->
 <footer class="site-footer">
     <div class="footer-inner">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <div class="brand-name">
-                    <img src="assets/images/logo_new.png" alt="GoWay">
-                    GoWay
-                </div>
-                <p>Sistema inteligente de transporte público. Conectamos empresas, checadores y usuarios en una sola plataforma segura y eficiente.</p>
+        <div class="footer-brand">
+            <a href="#" class="brand-name" style="text-decoration: none;">
+                <img src="assets/images/logo.png" alt="GoWay Logo">
+                <span>GoWay</span>
+            </a>
+            <p class="footer-tagline">Tu compañero inteligente en el transporte público.</p>
+        </div>
+        
+        <div class="footer-links">
+            <div class="footer-col">
+                <h5>Producto</h5>
+                <a href="#empresas">Empresas</a>
+                <a href="#checadores">Checadores</a>
+                <a href="#usuarios">Usuarios</a>
+                <a href="https://wheat-koala-810257.hostingersite.com/products/goway/" target="_blank">Descargar GoWay App</a>
+                <a href="https://wheat-koala-810257.hostingersite.com/products/goway_checador/" target="_blank">Descargar GoWay Checador</a>
             </div>
             <div class="footer-col">
-                <h4>Plataforma</h4>
-                <a href="#empresas">Para Empresas</a>
-                <a href="#checadores">Para Checadores</a>
-                <a href="#usuarios">Para Usuarios</a>
-                <a href="pages/login.php">Iniciar sesión</a>
-            </div>
-            <div class="footer-col">
-                <h4>Cuenta</h4>
+                <h5>Cuenta</h5>
                 <a href="pages/registro_empresa.php">Registrar empresa</a>
                 <a href="pages/registro.php">Crear cuenta usuario</a>
                 <a href="pages/login.php">Acceder al panel</a>
             </div>
             <div class="footer-col">
-                <h4>GoWay</h4>
-                <a href="#inicio">Inicio</a>
-                <a href="#empresas">Características</a>
-                <a href="pages/login.php">Soporte</a>
+                <h5>Legal</h5>
+                <a href="#">Política de Privacidad</a>
+                <a href="#">Términos de Servicio</a>
             </div>
         </div>
-        <div class="footer-bottom">
-            <span>&copy; <?php echo date('Y'); ?> GoWay. Todos los derechos reservados.</span>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; <?php echo date('Y'); ?> GoWay. Un producto hecho por Artisan Software.</p>
+        <div class="footer-socials">
+            <a href="#" aria-label="GitHub">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+            </a>
+            <a href="#" aria-label="Twitter">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+            </a>
         </div>
     </div>
 </footer>
@@ -395,6 +478,12 @@ if (isset($_SESSION['id'])) {
         navBurger.addEventListener('click', () => {
             navBurger.classList.toggle('active');
             navMobile.classList.toggle('open');
+        });
+        navMobile.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navBurger.classList.remove('active');
+                navMobile.classList.remove('open');
+            });
         });
     }
 
@@ -428,6 +517,65 @@ if (isset($_SESSION['id'])) {
     });
 
     revealElements.forEach(el => revealObserver.observe(el));
+
+    // Lógica para Carrusel 3D Coverflow (estilo Pear Inc)
+    document.querySelectorAll('.carousel-wrapper').forEach(wrapper => {
+        const grid = wrapper.querySelector('.screenshots-grid');
+        const slides = Array.from(grid.querySelectorAll('.screenshot-card'));
+        const btnPrev = wrapper.querySelector('.prev-slide');
+        const btnNext = wrapper.querySelector('.next-slide');
+        // Iniciar en la tarjeta central (índice 1 si son 3 tarjetas)
+        let currentIndex = Math.floor(slides.length / 2);
+
+        function updateCarousel() {
+            const isMobile = window.innerWidth <= 900;
+            let baseTx = isMobile ? 80 : 130;
+            let stepTx = isMobile ? 40 : 60;
+            let baseTz = 100;
+
+            slides.forEach((slide, index) => {
+                const offset = index - currentIndex;
+                const absOffset = Math.abs(offset);
+                const sign = Math.sign(offset);
+                
+                let tx = absOffset === 0 ? 0 : sign * (baseTx + (absOffset - 1) * stepTx);
+                let tz = absOffset === 0 ? 0 : -(absOffset * baseTz);
+                let scale = absOffset === 0 ? 1 : (1 - (absOffset * 0.15));
+                
+                slide.style.transform = `translate3d(${tx}px, 0, ${tz}px) scale(${scale})`;
+                slide.style.zIndex = 10 - absOffset;
+                slide.style.opacity = absOffset > 2 ? 0 : 1;
+            });
+        }
+
+        slides.forEach((slide, i) => {
+            slide.addEventListener('click', () => {
+                currentIndex = i;
+                updateCarousel();
+            });
+        });
+
+        if (btnPrev) {
+            btnPrev.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateCarousel();
+                }
+            });
+        }
+        
+        if (btnNext) {
+            btnNext.addEventListener('click', () => {
+                if (currentIndex < slides.length - 1) {
+                    currentIndex++;
+                    updateCarousel();
+                }
+            });
+        }
+
+        updateCarousel();
+        window.addEventListener('resize', updateCarousel);
+    });
 </script>
 </body>
 </html>

@@ -457,3 +457,8 @@ nav.scrolled {
 @media (max-width: 480px) {
     .adm-card { padding: 36px 22px 28px; }
 }
+
+/* ---------------- SCROLLBAR ---------------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }

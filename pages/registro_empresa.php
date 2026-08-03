@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Empresa - GoWay</title>
     <meta name="description" content="Registra tu empresa en GoWay y empieza a gestionar tu flota de transporte público de manera inteligente.">
-    <link rel="icon" href="../assets/images/logo_new.png" type="image/png">
+    <link rel="icon" href="../assets/images/logo.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
 <nav id="mainNav">
     <div class="nav-inner">
         <a href="../index.php" class="nav-brand">
-            <img src="../assets/images/logo_new.png" alt="GoWay Logo">
+            <img src="../assets/images/logo.png" alt="GoWay Logo">
             <span>GoWay</span>
         </a>
         <div class="nav-links">
@@ -34,7 +34,7 @@
     <!-- Left panel -->
     <div class="rg-panel">
         <div class="rg-panel-brand">
-            <img src="../assets/images/logo_new.png" alt="GoWay logo">
+            <img src="../assets/images/logo.png" alt="GoWay logo">
             <span>GoWay</span>
         </div>
         <p class="rg-panel-tagline">Registra tu empresa y<br>gestiona tu flota con GoWay.</p>

@@ -25,6 +25,14 @@ $can_send   = ($is_admin || $is_empresa) && empty($hide_send_notification);
     border: none !important;
     padding: 8px 16px !important;
 }
+
+/* ──────────────── SCROLLBAR PANEL NOTIFICACIONES ──────────────── */
+.notifications-panel::-webkit-scrollbar, 
+.notifications-body::-webkit-scrollbar { width: 6px; height: 6px; }
+.notifications-panel::-webkit-scrollbar-track, 
+.notifications-body::-webkit-scrollbar-track { background: transparent; }
+.notifications-panel::-webkit-scrollbar-thumb, 
+.notifications-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
 </style>
 <!-- Panel Lateral de Notificaciones -->
 <div class="notifications-panel" id="notificationsPanel">

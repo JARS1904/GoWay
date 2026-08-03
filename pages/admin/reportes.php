@@ -44,7 +44,7 @@ if ($conexion->error) {
     <title>Reportes - Transporte Público</title>
     <link rel="stylesheet" href="../../assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../../assets/css/reportes.css?v=<?php echo time(); ?>">
-    <link rel="icon" href="../../assets/images/logo_new.png" type="image/png">
+    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
     <script src="../../assets/js/notifications.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>

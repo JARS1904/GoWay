@@ -5,7 +5,7 @@
         <!-- Header -->
         <div class="summary-header">
             <div style="display:flex;align-items:center;gap:14px">
-                <img src="../../assets/images/logo_new.png" alt="GoWay" style="width:42px;height:42px;object-fit:contain;flex-shrink:0;">
+                <img src="../../assets/images/logo.png" alt="GoWay" style="width:42px;height:42px;object-fit:contain;flex-shrink:0;">
                 <div>
                     <h2 style="margin:0 0 4px;font-size:1.35rem;">Resumen ejecutivo de reportes</h2>
                     <p class="summary-meta" id="summaryPeriodo" style="display:none"></p>
@@ -456,7 +456,7 @@
             <style>${printCSS}</style>
         </head><body>
             <div class="print-header">
-                <img src="${window.location.origin}/GoWay/assets/images/logo_new.png" alt="GoWay">
+                <img src="${window.location.origin}/GoWay/assets/images/logo.png" alt="GoWay">
                 <div>
                     <h2>Resumen ejecutivo de reportes</h2>
                     <p>${generadoText}</p>
