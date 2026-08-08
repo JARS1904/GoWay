@@ -29,7 +29,15 @@ include("../controllers/controlador.php");
         </div>
         <div class="nav-actions">
             <a href="registro_empresa.php" class="btn-primary-nav">Registrar empresa</a>
+            <button class="nav-burger" id="navBurger" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+        <a href="../index.php">Inicio</a>
+        <a href="registro.php">Registrar usuario</a>
+        <a href="registro_empresa.php">Registrar empresa</a>
     </div>
 </nav>
 
@@ -170,6 +178,22 @@ include("../controllers/controlador.php");
             const input = document.getElementById('password');
             input.type = input.type === 'password' ? 'text' : 'password';
         });
+
+        // Mobile Menu Toggle
+        const navBurger = document.getElementById('navBurger');
+        const navMobile = document.getElementById('navMobile');
+        if (navBurger && navMobile) {
+            navBurger.addEventListener('click', () => {
+                navBurger.classList.toggle('active');
+                navMobile.classList.toggle('open');
+            });
+            navMobile.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navBurger.classList.remove('active');
+                    navMobile.classList.remove('open');
+                });
+            });
+        }
     </script>
 </body>
 </html>

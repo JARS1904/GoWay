@@ -2,3 +2,9 @@
 .idea/
 *.log
 config/firebase_credentials.json
+
+# Archivos subidos por los usuarios
+assets/images/uploads/*
+!assets/images/uploads/.gitkeep
+assets/images/profiles/*
+!assets/images/profiles/.gitkeep

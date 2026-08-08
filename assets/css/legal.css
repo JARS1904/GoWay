@@ -1,0 +1,150 @@
+/* ================================================================
+   legal.css — Estilos para documentos legales de GoWay (Términos, Privacidad)
+   ================================================================ */
+
+.legal-hero {
+    padding: calc(72px + 80px) 24px 60px; /* 72px is nav height approx */
+    background: radial-gradient(circle at top center, rgba(6, 96, 254, 0.05), transparent 70%);
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+.legal-eyebrow {
+    display: inline-flex; 
+    align-items: center; 
+    gap: 8px;
+    font-size: 0.82rem; 
+    font-weight: 700; 
+    text-transform: uppercase;
+    letter-spacing: 0.12em; 
+    color: #0660fe;
+    background: rgba(6, 96, 254, 0.06); 
+    border: 1px solid rgba(6, 96, 254, 0.15);
+    padding: 6px 16px; 
+    border-radius: 980px; 
+    margin-bottom: 24px;
+}
+.legal-hero h1 { 
+    font-size: clamp(2rem, 5vw, 3rem); 
+    color: #0f172a; 
+    margin-bottom: 16px; 
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+.legal-hero p { 
+    font-size: 1.05rem; 
+    color: #475569; 
+    max-width: 540px; 
+    margin: 0 auto; 
+    line-height: 1.6;
+}
+.legal-meta { 
+    margin-top: 20px; 
+    font-size: 0.85rem; 
+    color: #94a3b8; 
+}
+
+.legal-body { 
+    max-width: 800px; 
+    margin: 0 auto; 
+    padding: 72px 24px 120px; 
+}
+
+.legal-toc {
+    background: #ffffff; 
+    border: 1px solid #e2e8f0;
+    border-radius: 12px; 
+    padding: 24px 28px; 
+    margin-bottom: 56px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+.legal-toc h4 {
+    font-size: 0.85rem; 
+    font-weight: 700; 
+    text-transform: uppercase;
+    letter-spacing: 0.1em; 
+    color: #64748b; 
+    margin-bottom: 16px;
+}
+.legal-toc ol { 
+    padding-left: 20px; 
+    margin: 0; 
+}
+.legal-toc ol li { 
+    font-size: 0.95rem; 
+    color: #475569; 
+    margin-bottom: 8px; 
+    line-height: 1.6; 
+}
+.legal-toc ol li a { 
+    color: #334155; 
+    text-decoration: none; 
+    transition: color .2s; 
+}
+.legal-toc ol li a:hover { 
+    color: #0660fe; 
+}
+
+.legal-section { margin-bottom: 64px; }
+.legal-section h2 {
+    font-size: 1.4rem; 
+    font-weight: 700; 
+    color: #0f172a;
+    margin-bottom: 20px; 
+    padding-bottom: 12px; 
+    border-bottom: 1px solid #e2e8f0;
+    letter-spacing: -0.01em;
+}
+.legal-section h3 { 
+    font-size: 1.1rem; 
+    font-weight: 600; 
+    color: #1e293b; 
+    margin: 24px 0 12px; 
+}
+.legal-section p { 
+    font-size: 1.05rem; 
+    color: #475569; 
+    line-height: 1.8; 
+    margin-bottom: 16px; 
+}
+.legal-section ul { 
+    margin: 0 0 16px 0; 
+    padding-left: 24px; 
+}
+.legal-section ul li { 
+    font-size: 1.05rem; 
+    color: #475569; 
+    line-height: 1.8; 
+    margin-bottom: 10px; 
+}
+.legal-section a { 
+    color: #0660fe; 
+    text-decoration: underline; 
+    text-underline-offset: 3px; 
+}
+.legal-section a:hover { 
+    color: #044bce; 
+}
+
+.legal-highlight {
+    background: rgba(6, 96, 254, 0.05); 
+    border: 1px solid rgba(6, 96, 254, 0.15);
+    border-radius: 8px;
+    padding: 16px 20px; 
+    margin: 24px 0;
+}
+.legal-highlight p { 
+    margin-bottom: 0; 
+    font-size: 0.95rem; 
+    color: #1e293b; 
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .legal-hero {
+        padding: calc(72px + 40px) 20px 40px;
+    }
+    .legal-hero h1 { font-size: 2.2rem; }
+    .legal-body { padding: 40px 20px 80px; }
+    .legal-section h2 { font-size: 1.25rem; }
+    .legal-section p, .legal-section ul li { font-size: 1rem; }
+}

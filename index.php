@@ -448,8 +448,8 @@ if (isset($_SESSION['id'])) {
             </div>
             <div class="footer-col">
                 <h5>Legal</h5>
-                <a href="#">Política de Privacidad</a>
-                <a href="#">Términos de Servicio</a>
+                <a href="pages/legal/privacy.php">Política de Privacidad</a>
+                <a href="pages/legal/terms.php">Términos de Servicio</a>
             </div>
         </div>
     </div>

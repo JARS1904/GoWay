@@ -25,7 +25,15 @@
         </div>
         <div class="nav-actions">
             <a href="registro.php" class="btn-primary-nav">Registrar usuario</a>
+            <button class="nav-burger" id="navBurger" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+        <a href="../index.php">Inicio</a>
+        <a href="login.php">Iniciar sesión</a>
+        <a href="registro.php">Registrar usuario</a>
     </div>
 </nav>
 
@@ -246,6 +254,22 @@ document.getElementById('empresaRegForm').addEventListener('submit', async funct
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><polyline points="9 14 11 16 15 12"/></svg> Crear cuenta empresarial';
     }
 });
+
+// Mobile Menu Toggle
+const navBurger = document.getElementById('navBurger');
+const navMobile = document.getElementById('navMobile');
+if (navBurger && navMobile) {
+    navBurger.addEventListener('click', () => {
+        navBurger.classList.toggle('active');
+        navMobile.classList.toggle('open');
+    });
+    navMobile.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            navBurger.classList.remove('active');
+            navMobile.classList.remove('open');
+        });
+    });
+}
 </script>
 
 </body>
