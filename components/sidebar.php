@@ -8,33 +8,33 @@ $logout_url   = $base_url . 'pages/logout.php';
 
 $nav_categories = [
     'Principal' => [
-        'dashboard' => ['label' => 'Dashboard', 'icon' => 'icon_dashboard.png', 'href' => $admin_prefix . 'dashboard.php']
+        'dashboard' => ['label' => 'Dashboard', 'icon' => 'sidebar/icons8-dashboard-layout-100.png', 'href' => $admin_prefix . 'dashboard.php']
     ]
 ];
 
 if ($_SESSION['rol'] == 1) {
-    $nav_categories['Principal']['empresas'] = ['label' => 'Empresa', 'icon' => 'icon_empresas.png', 'href' => $admin_prefix . 'empresas.php'];
+    $nav_categories['Principal']['empresas'] = ['label' => 'Empresa', 'icon' => 'sidebar/icons8-enterprise-100.png', 'href' => $admin_prefix . 'empresas.php'];
 }
 
 $nav_categories['Principal'] = array_merge($nav_categories['Principal'], [
-    'rutas'        => ['label' => 'Rutas',        'icon' => 'icon_rutas.png',        'href' => $admin_prefix . 'rutas.php'],
-    'horarios'     => ['label' => 'Horarios',     'icon' => 'icon_horarios.png',     'href' => $admin_prefix . 'horarios.php'],
-    'conductores'  => ['label' => 'Conductores',  'icon' => 'icon_conductores.png',  'href' => $admin_prefix . 'conductores.php'],
-    'vehiculos'    => ['label' => 'Vehículos',    'icon' => 'icon_vehiculos.png',    'href' => $admin_prefix . 'vehiculos.php'],
-    'paradas'      => ['label' => 'Paradas',      'icon' => 'icon_paradas.png',      'href' => $admin_prefix . 'paradas_ruta.php'],
-    'asignaciones' => ['label' => 'Asignaciones', 'icon' => 'icon_asignacion.png',   'href' => $admin_prefix . 'asignaciones.php'],
+    'rutas'        => ['label' => 'Rutas',        'icon' => 'sidebar/icons8-puntero-azul-100.png',        'href' => $admin_prefix . 'rutas.php'],
+    'horarios'     => ['label' => 'Horarios',     'icon' => 'sidebar/icons8-reloj-100.png',     'href' => $admin_prefix . 'horarios.php'],
+    'conductores'  => ['label' => 'Conductores',  'icon' => 'sidebar/icons8-conductor-100.png',  'href' => $admin_prefix . 'conductores.php'],
+    'vehiculos'    => ['label' => 'Vehículos',    'icon' => 'sidebar/icons8-servicio-de-transporte-100.png',    'href' => $admin_prefix . 'vehiculos.php'],
+    'paradas'      => ['label' => 'Paradas',      'icon' => 'sidebar/icons8-privado-100.png',      'href' => $admin_prefix . 'paradas_ruta.php'],
+    'asignaciones' => ['label' => 'Asignaciones', 'icon' => 'sidebar/icons8-hierarchy-100.png',   'href' => $admin_prefix . 'asignaciones.php'],
 ]);
 
 $usuarios_nav = [];
 if ($_SESSION['rol'] == 1) {
-    $usuarios_nav['usuarios'] = ['label' => 'Usuarios', 'icon' => 'icon_usuarios.png', 'href' => $admin_prefix . 'usuarios.php'];
+    $usuarios_nav['usuarios'] = ['label' => 'Usuarios', 'icon' => 'sidebar/icons8-usuario-masculino-en-círculo-100.png', 'href' => $admin_prefix . 'usuarios.php'];
 }
-$usuarios_nav['checadores'] = ['label' => 'Checadores', 'icon' => 'icon_checadores.png', 'href' => $admin_prefix . 'checadores.php'];
+$usuarios_nav['checadores'] = ['label' => 'Checadores', 'icon' => 'sidebar/icons8-documentos-de-identificación-comprobados-100.png', 'href' => $admin_prefix . 'checadores.php'];
 $nav_categories['Usuarios'] = $usuarios_nav;
 
 $nav_categories['Gestión'] = [
-    'reportes'       => ['label' => 'Reportes',       'icon' => 'icon_reportes.png',        'href' => $admin_prefix . 'reportes.php'],
-    'notificaciones' => ['label' => 'Notificaciones',  'icon' => 'icons_notifications.png',  'href' => $admin_prefix . 'notificaciones.php'],
+    'reportes'       => ['label' => 'Reportes',       'icon' => 'sidebar/icons8-document-100.png',        'href' => $admin_prefix . 'reportes.php'],
+    'notificaciones' => ['label' => 'Notificaciones',  'icon' => 'sidebar/icons8-campana-100.png',  'href' => $admin_prefix . 'notificaciones.php'],
 ];
 ?>
 
@@ -117,7 +117,7 @@ $nav_categories['Gestión'] = [
         <img src="<?php echo $base_url; ?>assets/images/logo.png" alt="Logo de GoWay" class="logo-img">
         <h1>GoWay</h1>
         <button class="desktop-toggle-btn" onclick="toggleDesktopSidebar()">
-            <img src="<?php echo $base_url; ?>assets/images/icons/icons8_panel.png" alt="Colapsar"
+            <img src="<?php echo $base_url; ?>assets/images/icons/sidebar/icons8-mostrar-panel-lateral-derecho-100.png" alt="Colapsar"
                  style="width:24px;height:24px;object-fit:contain;">
         </button>
     </div>
@@ -169,7 +169,19 @@ $nav_categories['Gestión'] = [
             <span class="material-icons">logout</span>
         </a>
     </div>
+
+    <!-- Créditos de íconos -->
+    <style>
+        .sidebar.collapsed .sidebar-credits-link {
+            display: none !important;
+        }
+    </style>
+    <div class="sidebar-credits-link" style="font-size: 11px; text-align: center; padding: 5px 15px 15px; margin-top: 0px; color: #888;">
+        <a href="#" id="openCredits" style="color: inherit; text-decoration: underline;">Créditos de Íconos</a>
+    </div>
 </aside>
+
+<?php require_once __DIR__ . '/credits_modal.php'; ?>
 
 
 <script>
