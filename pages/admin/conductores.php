@@ -16,6 +16,8 @@ require_once '../../config/sync_session_foto.php';
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
     <link rel="icon" href="../../assets/images/logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
     <div class="container">
@@ -39,6 +41,24 @@ require_once '../../config/sync_session_foto.php';
             </header>
 
             <section class="content">
+                <!-- Mapa de conductores en vivo -->
+                <div class="section-header" style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="margin: 0;">Mapa en Vivo</h3>
+                    <div class="route-controls" style="flex: 1; max-width: 300px; display: flex;">
+                        <select id="liveMapRouteSelect" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; color: #374151; background: #fff; cursor: pointer;">
+                            <option value="">— Ver todos (sin ruta) —</option>
+                            <?php
+                            $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
+                            $res = $conexion->query("SELECT id_ruta, nombre FROM rutas" . $where_emp . " ORDER BY nombre ASC");
+                            while ($r = $res->fetch_assoc()) {
+                                echo "<option value=\"{$r['id_ruta']}\">" . htmlspecialchars($r['nombre']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <div id="liveMap" style="height: 400px; width: 100%; border-radius: 8px; margin-bottom: 25px; z-index: 1;"></div>
+
                 <div class="section-header">
                     <h3>Lista de Conductores</h3>
                     <button class="btn-add">+ Agregar nuevo conductor</button>
@@ -267,6 +287,17 @@ require_once '../../config/sync_session_foto.php';
     <script src="../../assets/js/notifications.js"></script>
     <script src="../../assets/js/pagination.js"></script>
     
+    <!-- Leaflet & Firebase SDKs -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- Pasar variables de sesión a JS -->
+    <script>
+        const CURRENT_EMPRESA_RFC = "<?php echo $_SESSION['rol'] == 1 ? 'ALL' : $_SESSION['rfc_empresa']; ?>";
+    </script>
+    <script src="../../assets/js/live_tracking.js?v=<?php echo time(); ?>"></script>
+
     <script>
         // Manejar cierre de modal de agregar
         document.getElementById('closeModal').addEventListener('click', () => {

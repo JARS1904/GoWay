@@ -80,7 +80,7 @@ require_once '../../config/sync_session_foto.php';
                     <?php if ($is_superadmin): ?>
                     <div class="stat-card">
                         <div class="stat-card-icon empresas">
-                            <img src="../../assets/images/icons/icons8-empresa-dashboard-resumen.png" alt="Empresas">
+                            <img src="../../assets/images/icons/dashboard/icons8-enterprise-100.png" alt="Empresas">
                         </div>
                         <div class="stat-card-content">
                             <h3>Empresas</h3>
@@ -92,7 +92,7 @@ require_once '../../config/sync_session_foto.php';
 
                     <div class="stat-card">
                         <div class="stat-card-icon rutas">
-                            <img src="../../assets/images/icons/icons8-ruta-dashboard-resumen.png" alt="Rutas">
+                            <img src="../../assets/images/icons/dashboard/icons8-carretera-100.png" alt="Rutas">
                         </div>
                         <div class="stat-card-content">
                             <h3>Rutas</h3>
@@ -103,7 +103,7 @@ require_once '../../config/sync_session_foto.php';
 
                     <div class="stat-card">
                         <div class="stat-card-icon vehiculos">
-                            <img src="../../assets/images/icons/icons8-vehiculo-dashboard-resumen.png" alt="Vehículos">
+                            <img src="../../assets/images/icons/dashboard/icons8-transporte-terrestre-100.png" alt="Vehículos">
                         </div>
                         <div class="stat-card-content">
                             <h3>Vehículos</h3>
@@ -114,7 +114,7 @@ require_once '../../config/sync_session_foto.php';
 
                     <div class="stat-card">
                         <div class="stat-card-icon conductores">
-                            <img src="../../assets/images/icons/icons8-conductor-dashboard-resumen.png" alt="Conductores">
+                            <img src="../../assets/images/icons/dashboard/icons8-conductor-100.png" alt="Conductores">
                         </div>
                         <div class="stat-card-content">
                             <h3>Conductores</h3>
@@ -125,7 +125,7 @@ require_once '../../config/sync_session_foto.php';
 
                     <div class="stat-card">
                         <div class="stat-card-icon horarios">
-                            <img src="../../assets/images/icons/icons8-horario-dashboard-resumen.png" alt="Horarios">
+                            <img src="../../assets/images/icons/dashboard/icons8-horas-extras-100.png" alt="Horarios">
                         </div>
                         <div class="stat-card-content">
                             <h3>Horarios</h3>
@@ -136,7 +136,7 @@ require_once '../../config/sync_session_foto.php';
 
                     <div class="stat-card">
                         <div class="stat-card-icon checadores">
-                            <img src="../../assets/images/icons/icons8-checador-dashboard-resumen.png" alt="Checadores">
+                            <img src="../../assets/images/icons/dashboard/icons8-verified-account-100.png" alt="Checadores">
                         </div>
                         <div class="stat-card-content">
                             <h3>Checadores</h3>
@@ -202,27 +202,29 @@ require_once '../../config/sync_session_foto.php';
                     <h2>Acciones Rápidas</h2>
                     <div class="actions-grid">
                         <a href="rutas.php" class="action-btn">
-                            <img class="action-icon" src="../../assets/images/icons/icons8-rutas-dashboard.png" alt="Rutas">
+                            <img class="action-icon" src="../../assets/images/icons/dashboard/icons8-carretera-100.png" alt="Rutas">
                             <span>Gestionar Rutas</span>
                         </a>
                         <a href="vehiculos.php" class="action-btn">
-                            <img class="action-icon" src="../../assets/images/icons/icons8-vehiculos-dashboard.png" alt="Vehículos">
+                            <img class="action-icon" src="../../assets/images/icons/dashboard/icons8-transporte-terrestre-100.png" alt="Vehículos">
                             <span>Gestionar Vehículos</span>
                         </a>
                         <a href="conductores.php" class="action-btn">
-                            <img class="action-icon" src="../../assets/images/icons/icons8-conditores-dashboard.png" alt="Conductores">
+                            <img class="action-icon" src="../../assets/images/icons/dashboard/icons8-conductor-100.png" alt="Conductores">
                             <span>Gestionar Conductores</span>
                         </a>
                         <a href="horarios.php" class="action-btn">
-                            <img class="action-icon" src="../../assets/images/icons/icons8-horario-dashboard.png" alt="Horarios">
+                            <img class="action-icon" src="../../assets/images/icons/dashboard/icons8-horas-extras-100.png" alt="Horarios">
                             <span>Gestionar Horarios</span>
                         </a>
                         <a href="checadores.php" class="action-btn">
-                            <img class="action-icon" src="../../assets/images/icons/icons8-checadores-dashboard.png" alt="Checadores">
+                            <img class="action-icon" src="../../assets/images/icons/dashboard/icons8-verified-account-100.png" alt="Checadores">
                             <span>Gestionar Checadores</span>
                         </a>
                     </div>
                 </div>
+
+                <!-- Los créditos de íconos ahora se manejan en el modal global del sidebar -->
             </section>
         </main>
     </div>

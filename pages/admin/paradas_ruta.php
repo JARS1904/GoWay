@@ -236,15 +236,24 @@ const stopsBody      = document.getElementById('stopsBody');
 const noStopsMsg     = document.getElementById('noStopsMsg');
 
 let map, routeMarkers, returnMarkers;
-const customMarkerIcon = L.icon({
-    iconUrl: '../../assets/images/icons/icons8-place-marker.png',
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40]
-});
+    const iconOrigin = L.icon({
+        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100.png',
+        iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40]
+    });
+    const iconDest = L.icon({
+        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100 (2).png',
+        iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40]
+    });
+    const iconStop = L.icon({
+        iconUrl: '../../assets/images/icons/maps/icons8-bus-stop-100.png',
+        iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40]
+    });
 document.addEventListener("DOMContentLoaded", () => {
     map = L.map('map').setView([18.1729, -93.1090], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | <a target="_blank" href="https://icons8.com/icon/Od91LuQPaarw/place-marker">Geo-cerca</a>, <a target="_blank" href="https://icons8.com/icon/yqTGgVcAZYHJ/bus-stop">Bus Stop</a> by <a target="_blank" href="https://icons8.com">Icons8</a>'
+    }).addTo(map);
     L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Buscar calle o lugar..." })
         .on('markgeocode', function(e) { map.fitBounds(e.geocode.bbox); })
         .addTo(map);
@@ -297,9 +306,17 @@ async function loadReturnStops(id_retorno) {
         const res  = await fetch(`${API_PARADAS}?action=paradas&id_ruta=${id_retorno}`);
         const data = await res.json();
         if(Array.isArray(data)) {
+            data.sort((a, b) => a.orden - b.orden);
+            const maxOrden = Math.max(...data.map(p => p.orden));
             data.forEach(p => {
+                const isFirst = parseInt(p.orden) === 0;
+                const isLast  = parseInt(p.orden) === parseInt(maxOrden) && data.length > 1;
+                let currentIcon = iconStop;
+                if (isFirst) currentIcon = iconOrigin;
+                else if (isLast) currentIcon = iconDest;
+
                 if(p.latitud && p.longitud) {
-                    L.marker([p.latitud, p.longitud], {icon: customMarkerIcon}).bindPopup(`<b>Retorno:</b> ${p.nombre}`).addTo(returnMarkers);
+                    L.marker([p.latitud, p.longitud], {icon: currentIcon}).bindPopup(`<b>Retorno:</b> ${p.nombre}`).addTo(returnMarkers);
                 }
             });
         }
@@ -365,15 +382,20 @@ function renderStops(paradas, highlight = null) {
     
     routeMarkers.clearLayers();
     paradas.forEach(p => {
+        const isFirst = parseInt(p.orden) === 0;
+        const isLast  = parseInt(p.orden) === parseInt(maxOrden) && paradas.length > 1;
+        
+        let currentIcon = iconStop;
+        if (isFirst) currentIcon = iconOrigin;
+        else if (isLast) currentIcon = iconDest;
+
         if(p.latitud && p.longitud) {
-            let m = L.marker([p.latitud, p.longitud], {icon: customMarkerIcon, draggable: true}).bindPopup(`<b>${p.orden}</b>: ${p.nombre}`).addTo(routeMarkers);
+            let m = L.marker([p.latitud, p.longitud], {icon: currentIcon, draggable: true}).bindPopup(`<b>${p.orden}</b>: ${p.nombre}`).addTo(routeMarkers);
             m.on('dragend', function(e) {
                 updateStopCoordinates(p.id_parada, m.getLatLng(), p);
             });
         }
 
-        const isFirst = p.orden === 0;
-        const isLast  = p.orden === maxOrden && paradas.length > 1;
         let nameClass = '';
         let roleLabel = '';
         if (isFirst) { nameClass = 'stop-origin'; roleLabel = ' <em style="font-size:11px;color:#b45309;">(origen)</em>'; }
@@ -424,7 +446,7 @@ function renderStops(paradas, highlight = null) {
         
         stopsBody.appendChild(tr);
     });
-    if(routeMarkers.getLayers().length > 0) { setTimeout(() => map.fitBounds(routeMarkers.getBounds().pad(0.1)), 100); }
+    if(routeMarkers.getLayers().length > 0) { setTimeout(() => map.fitBounds(routeMarkers.getBounds().pad(0.1)), 400); }
 }
 
 // ── Escape helpers (seguridad XSS) ──

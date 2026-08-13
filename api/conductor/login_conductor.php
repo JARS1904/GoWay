@@ -40,7 +40,7 @@ try {
     $rfc = trim($data['rfc']);
 
     // Buscar como CONDUCTOR usando sentencias preparadas
-    $stmt_conductor = $conn->prepare("SELECT rfc_conductor, nombre, telefono, foto, activo FROM conductores WHERE rfc_conductor = ? AND activo = 1 LIMIT 1");
+    $stmt_conductor = $conn->prepare("SELECT c.rfc_conductor, c.nombre, c.telefono, c.foto, c.activo, c.rfc_empresa, e.nombre AS empresa_nombre, e.telefono AS empresa_telefono, e.direccion AS empresa_direccion, e.email AS empresa_email FROM conductores c LEFT JOIN empresas e ON c.rfc_empresa = e.rfc_empresa WHERE c.rfc_conductor = ? AND c.activo = 1 LIMIT 1");
     if (!$stmt_conductor) {
         sendResponse(500, ["error" => "Error preparando consulta."]);
     }
@@ -71,7 +71,12 @@ try {
                 "rol" => "conductor",
                 "foto_url" => $fotoUrl,
                 "telefono" => $row_conductor['telefono'],
-                "fecha_registro" => ''
+                "fecha_registro" => '',
+                "rfc_empresa" => $row_conductor['rfc_empresa'],
+                "empresa_nombre" => $row_conductor['empresa_nombre'],
+                "empresa_telefono" => $row_conductor['empresa_telefono'],
+                "empresa_direccion" => $row_conductor['empresa_direccion'],
+                "empresa_email" => $row_conductor['empresa_email']
             ]
         ]);
     } else {

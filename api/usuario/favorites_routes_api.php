@@ -66,7 +66,8 @@ try {
                             v.capacidad AS vehiculo_capacidad,
                             a.id_asignacion,
                             a.estado AS estado,
-                            a.asientos_disp AS asientos_disponibles
+                            a.asientos_disp AS asientos_disponibles,
+                            a.rfc_conductor
                         FROM horarios h
                         LEFT JOIN (
                             SELECT a1.*
