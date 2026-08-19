@@ -35,6 +35,24 @@ try {
 
     // Manejar solicitud GET
     if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
+        // [NUEVO] Obtener resumen de todas las rutas
+        if ($_GET['action'] === 'get_all_routes_summary') {
+            $sql = "SELECT r.id_ruta, r.nombre, r.origen, r.destino, e.nombre AS empresa_nombre, 
+                           (SELECT COUNT(*) FROM paradas_ruta pr WHERE pr.id_ruta = r.id_ruta) + 2 AS cantidad_paradas
+                    FROM rutas r
+                    LEFT JOIN empresas e ON r.rfc_empresa = e.rfc_empresa
+                    WHERE r.activa = 1
+                    ORDER BY r.id_ruta ASC";
+            $result = $conn->query($sql);
+            $rutas = [];
+            if ($result) {
+                while ($row = $result->fetch_assoc()) {
+                    $rutas[] = $row;
+                }
+            }
+            sendResponse(200, $rutas);
+        }
+
 
         // ── Obtener lista de ubicaciones (orígenes, destinos y paradas registradas) ──
         if ($_GET['action'] === 'locations') {
