@@ -41,7 +41,7 @@ require_once '../../config/sync_session_foto.php';
 
             <section class="content">
                 <div class="section-header">
-                    <h3>Lista de Usuarios</h3>
+                    <h3>Lista de usuarios</h3>
                     <button class="btn-add">+ Agregar nuevo usuario</button>
                 </div>
                 <table class="data-table">
@@ -80,8 +80,18 @@ require_once '../../config/sync_session_foto.php';
                                 
                                 echo '<tr data-id="' . $row["id"] . '">
                                         <td data-label="Nombre" data-nombre="' . $nombre_esc . '"><div class="avatar-cell">' . $avatar . '<span>' . $nombre_esc . '</span></div></td>
-                                        <td data-label="Email">' . htmlspecialchars($row["email"]) . '</td>
-                                        <td data-label="Rol" data-rol="' . $row["rol"] . '">' . $rol_label . '</td>
+                                        <td data-label="Email">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">email</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.htmlspecialchars($row["email"]).'</span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Rol" data-rol="' . $row["rol"] . '">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">badge</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.$rol_label.'</span>
+                                            </div>
+                                        </td>
                                         <td>
                                             <div class="kebab-menu">
                                                 <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">

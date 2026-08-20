@@ -40,7 +40,7 @@ require_once '../../config/sync_session_foto.php';
 
             <section class="content">
                 <div class="section-header">
-                    <h3>Lista de Checadores</h3>
+                    <h3>Lista de checadores</h3>
                     <button class="btn-add">+ Agregar nuevo checador</button>
                 </div>
                 <table class="data-table">
@@ -78,10 +78,25 @@ require_once '../../config/sync_session_foto.php';
                                     : '<div class="avatar-initials">' . $initial . '</div>';
                                 
                                 echo '<tr data-id="'.$row["rfc_checador"].'">
-                                        <td data-label="RFC del Checador" data-id="'.$row["rfc_checador"].'">'.htmlspecialchars($row["rfc_checador"]).'</td>
-                                        <td data-label="RFC de la Empresa">'.htmlspecialchars($row["rfc_empresa"]).'</td>
+                                        <td data-label="RFC del Checador" data-id="'.$row["rfc_checador"].'">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">badge</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.htmlspecialchars($row["rfc_checador"]).'</span>
+                                            </div>
+                                        </td>
+                                        <td data-label="RFC de la Empresa">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.htmlspecialchars($row["rfc_empresa"]).'</span>
+                                            </div>
+                                        </td>
                                         <td data-label="Nombre" data-nombre="' . $nombre_esc . '"><div class="avatar-cell">' . $avatar . '<span>' . $nombre_esc . '</span></div></td>
-                                        <td data-label="Usuario">'.htmlspecialchars($row["usuario"]).'</td>
+                                        <td data-label="Usuario">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">account_circle</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.htmlspecialchars($row["usuario"]).'</span>
+                                            </div>
+                                        </td>
                                         <td data-label="Estado"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
                                             <div class="kebab-menu">
@@ -359,10 +374,13 @@ require_once '../../config/sync_session_foto.php';
                     const row = btn.closest('tr');
                     const cells = row.querySelectorAll('td');
                     
-                    document.getElementById('edit_rfc_checador').value = cells[0].textContent.trim();
-                    document.getElementById('edit_rfc_empresa').value = cells[1].textContent.trim();
+                    const span0 = cells[0].querySelector('span:last-child');
+                    document.getElementById('edit_rfc_checador').value = span0 ? span0.textContent.trim() : cells[0].textContent.replace('badge', '').trim();
+                    const span1 = cells[1].querySelector('span:last-child');
+                    document.getElementById('edit_rfc_empresa').value = span1 ? span1.textContent.trim() : cells[1].textContent.replace('domain', '').trim();
                     document.getElementById('edit_nombre').value = cells[2].dataset.nombre;
-                    document.getElementById('edit_usuario').value = cells[3].textContent.trim();
+                    const span3 = cells[3].querySelector('span:last-child');
+                    document.getElementById('edit_usuario').value = span3 ? span3.textContent.trim() : cells[3].textContent.replace('account_circle', '').trim();
                     document.getElementById('edit_password').value = '';
                     
                     const statusText = cells[4].querySelector('span').textContent.trim();
@@ -396,8 +414,8 @@ require_once '../../config/sync_session_foto.php';
                 const tr = document.querySelector(`tr[data-id="${reg.rfc_checador}"]`);
                 if (tr) {
                     const cells = tr.querySelectorAll('td');
-                    cells[0].textContent = reg.rfc_checador;
-                    cells[1].textContent = reg.rfc_empresa;
+                    cells[0].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">badge</span><span style="font-weight:600; color:#0f172a;">${reg.rfc_checador}</span></div>`;
+                    cells[1].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span><span style="font-weight:600; color:#0f172a;">${reg.rfc_empresa}</span></div>`;
                     
                     // Actualizar nombre y mantener avatar original o actualizarlo si se subió foto
                     cells[2].dataset.nombre = reg.nombre;
@@ -409,7 +427,7 @@ require_once '../../config/sync_session_foto.php';
                         cells[2].innerHTML = `<div class="avatar-cell">${currentAvatarHtml}<span>${reg.nombre}</span></div>`;
                     }
                     
-                    cells[3].textContent = reg.usuario;
+                    cells[3].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">account_circle</span><span style="font-weight:600; color:#0f172a;">${reg.usuario}</span></div>`;
                     
                     const statusClass = reg.activo == 1 ? 'status-active' : 'status-inactive';
                     const statusText = reg.activo == 1 ? 'Sí' : 'No';

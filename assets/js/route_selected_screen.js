@@ -724,17 +724,27 @@ function showRouteDetails(route) {
         // Crear un grupo para auto-ajustar el zoom
         const markersGroup = L.featureGroup();
 
-        // Icono de la imagen
-        const stopIcon = L.icon({
-            iconUrl: '../../assets/images/icons/icons8-place-marker.png',
-            iconSize: [32, 32],
-            iconAnchor: [16, 32],
-            tooltipAnchor: [0, -32]
+        // Iconos de mapa
+        const iconOrigin = L.icon({
+            iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100 (2).png',
+            iconSize: [40, 40], iconAnchor: [20, 40], tooltipAnchor: [0, -40]
+        });
+        const iconDest = L.icon({
+            iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100.png',
+            iconSize: [40, 40], iconAnchor: [20, 40], tooltipAnchor: [0, -40]
+        });
+        const iconStop = L.icon({
+            iconUrl: '../../assets/images/icons/maps/icons8-bus-stop-100.png',
+            iconSize: [40, 40], iconAnchor: [20, 40], tooltipAnchor: [0, -40]
         });
 
-        paradasConCoordenadas.forEach(p => {
+        paradasConCoordenadas.forEach((p, index) => {
+            let currentIcon = iconStop;
+            if (index === 0) currentIcon = iconOrigin;
+            else if (index === paradasConCoordenadas.length - 1) currentIcon = iconDest;
+
             const isPermanent = typeof window.isShowStopNamesEnabled !== 'undefined' ? window.isShowStopNamesEnabled : true;
-            const marker = L.marker([parseFloat(p.latitud), parseFloat(p.longitud)], { icon: stopIcon })
+            const marker = L.marker([parseFloat(p.latitud), parseFloat(p.longitud)], { icon: currentIcon })
                 .bindTooltip(p.nombre, { permanent: isPermanent, direction: 'top', className: 'map-tooltip' });
             markersGroup.addLayer(marker);
         });

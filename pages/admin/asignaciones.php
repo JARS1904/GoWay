@@ -41,7 +41,7 @@ require_once '../../config/sync_session_foto.php';
             <section class="content">
     <!-- KPI Dashboard Section -->
     <div class="kpi-section-title" style="margin-top:0;">
-        <h2>Indicadores Operativos</h2>
+        <h2>Indicadores operativos</h2>
         <span class="kpi-section-badge">Asignaciones Operativas</span>
     </div>
     
@@ -64,7 +64,7 @@ require_once '../../config/sync_session_foto.php';
         </div>
     </div>
                 <div class="section-header">
-                    <h3>Lista de Asignaciones</h3>
+                    <h3>Lista de asignaciones</h3>
                     <button class="btn-add">+ Agregar nueva asignación</button>
                 </div>
                 <div class="table-responsive" style="overflow-x: auto; width: 100%;">
@@ -72,11 +72,11 @@ require_once '../../config/sync_session_foto.php';
                     <thead>
                         <tr>
                             <th>Empresa</th>
-                            <th>Placa</th>
+                            <th>Vehículo</th>
                             <th>Conductor</th>
                             <th>Ruta</th>
                             <th>Horario</th>
-                            <th>Fecha</th>
+
                             <th>Asientos</th>
                             <th>Estado</th>
                             <th>Activa</th>
@@ -106,17 +106,47 @@ require_once '../../config/sync_session_foto.php';
                                 $statusText = $row["activa"] ? 'Sí' : 'No';
                                 
                                 echo '<tr>
-                                        <td data-label="Empresa" data-id="'.$row["id_asignacion"].'">'.$row["rfc_empresa"].'</td>
-                                        <td data-label="Placa">'.$row["placa"].'</td>
-                                        <td data-label="Conductor">'.$row["rfc_conductor"].'</td>
-                                        <td data-label="Ruta">'.$row["nombre_ruta"].'</td>
-                                        <td data-label="Horario">
-                                            <strong>ID: '.$row["id_horario"].'</strong><br>
-                                            <span style="font-size: 0.85em; color: #666;">'.$row["tipo_dia"].'</span><br>
-                                            <span style="font-size: 0.85em; color: #666;">'.$row["hora_salida"].'</span>
+                                        <td data-label="Empresa" data-id="'.$row["id_asignacion"].'">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.$row["rfc_empresa"].'</span>
+                                            </div>
                                         </td>
-                                        <td data-label="Fecha">'.$row["fecha"].'</td>
-                                        <td data-label="Asientos">'.$row["asientos_disp"].'</td>
+                                        <td data-label="Vehículo">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">airport_shuttle</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.$row["placa"].'</span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Conductor">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">badge</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.$row["rfc_conductor"].'</span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Ruta">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">route</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.$row["nombre_ruta"].'</span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Horario">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">schedule</span>
+                                                <div style="font-size: 0.85em; color: #666;">
+                                                    ID: '.$row["id_horario"].'<br>
+                                                    '.$row["tipo_dia"].'<br>
+                                                    '.$row["hora_salida"].'
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td data-label="Asientos">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">groups</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.$row["asientos_disp"].'</span>
+                                            </div>
+                                        </td>
                                         <td data-label="Estado">'.ucfirst(str_replace("_", " ", $row["estado"])).'</td>
                                         <td data-label="Activa"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
@@ -583,21 +613,20 @@ require_once '../../config/sync_session_foto.php';
                         
                         if (tr) {
                             const cells = tr.querySelectorAll('td');
-                            cells[0].textContent = reg.rfc_empresa;
-                            cells[1].textContent = reg.placa;
-                            cells[2].textContent = reg.rfc_conductor;
-                            cells[3].textContent = reg.nombre_ruta;
-                            cells[4].innerHTML = `<strong>ID: ${reg.id_horario}</strong><br><span style="font-size: 0.85em; color: #666;">${reg.tipo_dia}</span><br><span style="font-size: 0.85em; color: #666;">${reg.hora_salida}</span>`;
-                            cells[5].textContent = reg.fecha;
-                            cells[6].textContent = reg.asientos_disp;
+                            cells[0].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span><span style="font-weight:600; color:#0f172a;">${reg.rfc_empresa}</span></div>`;
+                            cells[1].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">airport_shuttle</span><span style="font-weight:600; color:#0f172a;">${reg.placa}</span></div>`;
+                            cells[2].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">badge</span><span style="font-weight:600; color:#0f172a;">${reg.rfc_conductor}</span></div>`;
+                            cells[3].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">route</span><span style="font-weight:600; color:#0f172a;">${reg.nombre_ruta}</span></div>`;
+                            cells[4].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">schedule</span><div style="font-size: 0.85em; color: #666;">ID: ${reg.id_horario}<br>${reg.tipo_dia}<br>${reg.hora_salida}</div></div>`;
+                            cells[5].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">groups</span><span style="font-weight:600; color:#0f172a;">${reg.asientos_disp}</span></div>`;
                             
                             let estadoTexto = reg.estado.replace("_", " ");
                             estadoTexto = estadoTexto.charAt(0).toUpperCase() + estadoTexto.slice(1);
-                            cells[7].textContent = estadoTexto;
+                            cells[6].textContent = estadoTexto;
                             
                             const statusClass = reg.activa == 1 ? 'status-active' : 'status-inactive';
                             const statusText = reg.activa == 1 ? 'Sí' : 'No';
-                            cells[8].innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+                            cells[7].innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
                             
                             // Update dataset of edit button
                             const editBtn = tr.querySelector('.btn-edit');
@@ -640,9 +669,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!data.success) return;
             document.getElementById('asignacionesStatsGrid').style.display = 'grid';
             document.getElementById('asignacionesStatsGrid').innerHTML = `
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">assignment</span></div><div class="stat-card-content"><h3>Total Asignaciones</h3><p class="stat-number">${data.kpi.hoy_total}</p><span class="stat-label">Registradas</span></div></div>
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">check_circle</span></div><div class="stat-card-content"><h3>Turnos Cubiertos</h3><p class="stat-number">${data.kpi.porcentaje}%</p><span class="stat-label">${data.kpi.hoy_completadas} completados</span></div></div>
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#ef4444;">warning</span></div><div class="stat-card-content"><h3>Conflictos</h3><p class="stat-number">${data.kpi.hoy_conflictivas}</p><span class="stat-label">Canceladas/Retrasadas</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(6, 96, 254, 0.1);"><span class="material-icons" style="color:#0660fe;">assignment</span></div><div class="stat-card-content"><h3>Total Asignaciones</h3><p class="stat-number">${data.kpi.hoy_total}</p><span class="stat-label">Registradas</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(16, 185, 129, 0.1);"><span class="material-icons" style="color:#10b981;">check_circle</span></div><div class="stat-card-content"><h3>Turnos Cubiertos</h3><p class="stat-number">${data.kpi.porcentaje}%</p><span class="stat-label">${data.kpi.hoy_completadas} completados</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(239, 68, 68, 0.1);"><span class="material-icons" style="color:#ef4444;">warning</span></div><div class="stat-card-content"><h3>Conflictos</h3><p class="stat-number">${data.kpi.hoy_conflictivas}</p><span class="stat-label">Canceladas/Retrasadas</span></div></div>
             `;
             document.getElementById('asignacionesChartsGrid').style.display = 'grid';
             if(data.estado_hoy && data.estado_hoy.data.some(v=>v>0)) {

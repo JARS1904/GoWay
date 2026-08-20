@@ -23,17 +23,17 @@ document.addEventListener("DOMContentLoaded", () => {
     map = L.map('liveMap').setView([19.4326, -99.1332], 12);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | <a target="_blank" href="https://icons8.com/icon/gs0Idfz02EOO/bus">Bus</a>, <a target="_blank" href="https://icons8.com/icon/Od91LuQPaarw/place-marker">Geo-cerca</a>, <a target="_blank" href="https://icons8.com/icon/yqTGgVcAZYHJ/bus-stop">Bus Stop</a> by <a target="_blank" href="https://icons8.com">Icons8</a>'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     routeStopsLayer = L.featureGroup().addTo(map);
 
     const iconOrigin = L.icon({
-        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100.png',
+        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100 (2).png',
         iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40]
     });
     const iconDest = L.icon({
-        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100 (2).png',
+        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100.png',
         iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40]
     });
     const iconStop = L.icon({

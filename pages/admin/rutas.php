@@ -40,7 +40,7 @@ require_once '../../config/sync_session_foto.php';
             <section class="content">
     <!-- KPI Dashboard Section -->
     <div class="kpi-section-title" style="margin-top:0;">
-        <h2>Indicadores Operativos</h2>
+        <h2>Indicadores operativos</h2>
         <span class="kpi-section-badge">Gestión de Rutas</span>
     </div>
     
@@ -59,13 +59,13 @@ require_once '../../config/sync_session_foto.php';
         <div class="chart-card">
             <div class="chart-card-header">
                 <div class="chart-card-title"><h4>Top rutas</h4><span>Con más paradas asignadas</span></div>
-                <div class="chart-card-icon green"><span class="material-icons">place</span></div>
+                <div class="chart-card-icon orange"><span class="material-icons">place</span></div>
             </div>
             <canvas id="chartTopParadas" height="160"></canvas>
         </div>
     </div>
                 <div class="section-header">
-                    <h3>Lista de Rutas</h3>
+                    <h3>Lista de rutas</h3>
                     <button class="btn-add">+ Agregar nueva ruta</button>
                 </div>
 
@@ -122,15 +122,25 @@ require_once '../../config/sync_session_foto.php';
                                 }
                                 
                                 echo '<tr>
-                                        <td data-label="Nombre" data-id="'.$row["id_ruta"].'">'.$row["nombre"].'</td>
+                                        <td data-label="Nombre" data-id="'.$row["id_ruta"].'">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">route</span>
+                                                <span style="font-weight:600; color:#0f172a;">'.$row["nombre"].'</span>
+                                            </div>
+                                        </td>
                                         <td data-label="Origen">' . htmlspecialchars($row["origen"]) . '</td>
                                         <td data-label="Destino">' . htmlspecialchars($row["destino"]) . '</td>
                                         <td data-label="Paradas">' . ($row['total_paradas'] > 0
-                                            ? '<a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#dbeafe;color:#1d4ed8;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">' . $row['total_paradas'] . ' paradas</a>'
-                                            : '<a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#fee2e2;color:#b91c1c;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">Sin paradas</a>') . '</td>
+                                            ? '<a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#fef3c7;color:#d97706;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">' . $row['total_paradas'] . ' paradas</a>'
+                                            : '<a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#fef3c7;color:#d97706;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">Sin paradas</a>') . '</td>
                                         <td data-label="Ruta de retorno" data-id-retorno="' . ($row['id_ruta_retorno'] ? $row['id_ruta_retorno'] : '') . '">' . $retornoBadge . '</td>
                                         <td data-label="Activa"><span class="'.$statusClass.'">' . $statusText . '</span></td>
-                                        <td data-label="RFC de la Empresa">' . $row["rfc_empresa"] . '</td>
+                                        <td data-label="RFC de la Empresa">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span>
+                                                <span style="font-weight:600; color:#0f172a;">' . htmlspecialchars($row["rfc_empresa"]) . '</span>
+                                            </div>
+                                        </td>
                                         <td>
                                             <div class="kebab-menu">
                                                 <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
@@ -404,13 +414,23 @@ require_once '../../config/sync_session_foto.php';
                 tr.setAttribute('data-id', reg.id_ruta);
                 
                 tr.innerHTML = `
-                    <td data-label="Nombre" data-id="${reg.id_ruta}">${reg.nombre}</td>
+                    <td data-label="Nombre">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">route</span>
+                            <span style="font-weight:600; color:#0f172a;">${reg.nombre}</span>
+                        </div>
+                    </td>
                     <td data-label="Origen">${reg.origen}</td>
                     <td data-label="Destino">${reg.destino}</td>
-                    <td data-label="Paradas"><a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#fee2e2;color:#b91c1c;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">Sin paradas</a></td>
+                    <td data-label="Paradas"><a href="paradas_ruta.php" style="display:inline-flex;align-items:center;gap:5px;background:#fef3c7;color:#d97706;border-radius:12px;padding:3px 11px;font-size:12px;font-weight:600;text-decoration:none;">Sin paradas</a></td>
                     <td data-label="Ruta de retorno" data-id-retorno="${reg.id_ruta_retorno || ''}">${retornoBadge}</td>
                     <td data-label="Activa"><span class="status-badge ${statusClass}">${statusText}</span></td>
-                    <td data-label="RFC de la Empresa">${reg.rfc_empresa}</td>
+                    <td data-label="RFC de la Empresa">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span>
+                            <span style="font-weight:600; color:#0f172a;">${reg.rfc_empresa}</span>
+                        </div>
+                    </td>
                     <td>
                         <div class="kebab-menu">
                             <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
@@ -467,7 +487,9 @@ require_once '../../config/sync_session_foto.php';
                     const cells = row.querySelectorAll('td');
                     
                     document.getElementById('edit_id_ruta').value = cells[0].getAttribute('data-id') || row.getAttribute('data-id');
-                    document.getElementById('edit_nombre').value = cells[0].textContent.trim();
+                    const nombreSpan = cells[0].querySelector('span:last-child');
+                    document.getElementById('edit_nombre').value = nombreSpan ? nombreSpan.textContent.trim() : cells[0].textContent.replace('route', '').trim();
+                    
                     document.getElementById('edit_origen').value = cells[1].textContent.trim();
                     document.getElementById('edit_destino').value = cells[2].textContent.trim();
                     
@@ -476,7 +498,8 @@ require_once '../../config/sync_session_foto.php';
                     
                     const statusText = cells[5].querySelector('span').textContent.trim();
                     document.getElementById('edit_activa').value = statusText === 'Sí' ? 1 : 0;
-                    document.getElementById('edit_rfc_empresa').value = cells[6].textContent.trim();
+                    const rfcSpan = cells[6].querySelector('span:last-child');
+                    document.getElementById('edit_rfc_empresa').value = rfcSpan ? rfcSpan.textContent.trim() : cells[6].textContent.replace('domain', '').trim();
                     
                     document.getElementById('editRouteModal').classList.add('active');
                 }
@@ -491,7 +514,7 @@ require_once '../../config/sync_session_foto.php';
                 if (tr) {
                     const cells = tr.querySelectorAll('td');
                     
-                    cells[0].textContent = reg.nombre;
+                    cells[0].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">route</span><span style="font-weight:600; color:#0f172a;">${reg.nombre}</span></div>`;
                     cells[1].textContent = reg.origen;
                     cells[2].textContent = reg.destino;
                     
@@ -521,7 +544,7 @@ require_once '../../config/sync_session_foto.php';
                     const statusText = reg.activa == 1 ? 'Sí' : 'No';
                     cells[5].innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
                     
-                    cells[6].textContent = reg.rfc_empresa;
+                    cells[6].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span><span style="font-weight:600; color:#0f172a;">${reg.rfc_empresa}</span></div>`;
                     
                     Array.from(tr.children).forEach(td => {
                         td.style.transition = 'background-color 0.5s';
@@ -589,9 +612,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1. Render Stats
             document.getElementById('rutasStatsGrid').style.display = 'grid';
             document.getElementById('rutasStatsGrid').innerHTML = `
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">route</span></div><div class="stat-card-content"><h3>Rutas Activas</h3><p class="stat-number">${data.kpi.activas}</p><span class="stat-label">De ${data.kpi.total} totales</span></div></div>
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">place</span></div><div class="stat-card-content"><h3>Paradas Totales</h3><p class="stat-number">${data.kpi.paradas}</p><span class="stat-label">En el sistema</span></div></div>
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#f59e0b;">loop</span></div><div class="stat-card-content"><h3>Rutas con Retorno</h3><p class="stat-number">${data.kpi.con_retorno}</p><span class="stat-label">Configuradas</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(6, 96, 254, 0.1);"><span class="material-icons" style="color:#0660fe;">route</span></div><div class="stat-card-content"><h3>Rutas Activas</h3><p class="stat-number">${data.kpi.activas}</p><span class="stat-label">De ${data.kpi.total} totales</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(245, 158, 11, 0.1);"><span class="material-icons" style="color:#f59e0b;">place</span></div><div class="stat-card-content"><h3>Paradas Totales</h3><p class="stat-number">${data.kpi.paradas}</p><span class="stat-label">En el sistema</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(234, 88, 12, 0.1);"><span class="material-icons" style="color:#ea580c;">loop</span></div><div class="stat-card-content"><h3>Rutas con Retorno</h3><p class="stat-number">${data.kpi.con_retorno}</p><span class="stat-label">Configuradas</span></div></div>
             `;
 
             // 2. Render Charts
@@ -606,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(data.top_paradas && data.top_paradas.data.length > 0) {
                 Chart.getChart('chartTopParadas')?.destroy();
                 new Chart(document.getElementById('chartTopParadas'), {
-                    type: 'bar', data: { labels: data.top_paradas.labels.map(l=>l.substring(0,20)), datasets: [{ label:'Paradas', data: data.top_paradas.data, backgroundColor: GW.green, borderRadius:4 }] }, options: { indexAxis: 'y', plugins:{legend:{display:false}} }
+                    type: 'bar', data: { labels: data.top_paradas.labels.map(l=>l.substring(0,20)), datasets: [{ label:'Paradas', data: data.top_paradas.data, backgroundColor: GW.orange, borderRadius:4 }] }, options: { indexAxis: 'y', plugins:{legend:{display:false}} }
                 });
             }
         });

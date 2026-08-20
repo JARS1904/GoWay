@@ -43,10 +43,10 @@ require_once '../../config/sync_session_foto.php';
             <section class="content">
                 <!-- Mapa de conductores en vivo -->
                 <div class="section-header" style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                    <h3 style="margin: 0;">Mapa en Vivo</h3>
+                    <h3 style="margin: 0;">Mapa en vivo</h3>
                     <div class="route-controls" style="flex: 1; max-width: 300px; display: flex;">
                         <select id="liveMapRouteSelect" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; color: #374151; background: #fff; cursor: pointer;">
-                            <option value="">— Ver todos (sin ruta) —</option>
+                            <option value="">Selecciona una ruta</option>
                             <?php
                             $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
                             $res = $conexion->query("SELECT id_ruta, nombre FROM rutas" . $where_emp . " ORDER BY nombre ASC");
@@ -60,7 +60,7 @@ require_once '../../config/sync_session_foto.php';
                 <div id="liveMap" style="height: 400px; width: 100%; border-radius: 8px; margin-bottom: 25px; z-index: 1;"></div>
 
                 <div class="section-header">
-                    <h3>Lista de Conductores</h3>
+                    <h3>Lista de conductores</h3>
                     <button class="btn-add">+ Agregar nuevo conductor</button>
                 </div>
                 <table class="data-table">
@@ -99,11 +99,31 @@ require_once '../../config/sync_session_foto.php';
                                     : '<div class="avatar-initials">' . $initial . '</div>';
                                 
                                 echo '<tr data-id="'.$row["rfc_conductor"].'">
-                                        <td data-label="RFC del Conductor" data-id="'.$row["rfc_conductor"].'">' . htmlspecialchars($row["rfc_conductor"]) . '</td>
-                                        <td data-label="RFC de la Empresa">'.htmlspecialchars($row["rfc_empresa"]).'</td>
+                                        <td data-label="RFC del Conductor" data-id="'.$row["rfc_conductor"].'">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">badge</span>
+                                                <span style="font-weight:600; color:#0f172a;">' . htmlspecialchars($row["rfc_conductor"]) . '</span>
+                                            </div>
+                                        </td>
+                                        <td data-label="RFC de la Empresa">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span>
+                                                <span style="font-weight:600; color:#0f172a;">' . htmlspecialchars($row["rfc_empresa"]) . '</span>
+                                            </div>
+                                        </td>
                                         <td data-label="Nombre" data-nombre="' . $nombre_esc . '"><div class="avatar-cell">' . $avatar . '<span>' . $nombre_esc . '</span></div></td>
-                                        <td data-label="Licencia">'.htmlspecialchars($row["licencia"]).'</td>
-                                        <td data-label="Teléfono">'.htmlspecialchars($row["telefono"]).'</td>
+                                        <td data-label="Licencia">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">credit_card</span>
+                                                <span style="font-weight:600; color:#0f172a;">' . htmlspecialchars($row["licencia"]) . '</span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Teléfono">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <span class="material-icons" style="font-size:16px; color:#94a3b8;">phone</span>
+                                                <span style="font-weight:600; color:#0f172a;">' . htmlspecialchars($row["telefono"]) . '</span>
+                                            </div>
+                                        </td>
                                         <td data-label="Activo"><span class="'.$statusClass.'">'.$statusText.'</span></td>
                                         <td>
                                             <div class="kebab-menu">
@@ -333,11 +353,31 @@ require_once '../../config/sync_session_foto.php';
                 tr.style.opacity = '0';
                 
                 tr.innerHTML = `
-                    <td data-label="RFC del Conductor" data-id="${reg.rfc_conductor}">${reg.rfc_conductor}</td>
-                    <td data-label="RFC de la Empresa">${reg.rfc_empresa}</td>
+                    <td data-label="RFC del Conductor" data-id="${reg.rfc_conductor}">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">badge</span>
+                            <span style="font-weight:600; color:#0f172a;">${reg.rfc_conductor}</span>
+                        </div>
+                    </td>
+                    <td data-label="RFC de la Empresa">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span>
+                            <span style="font-weight:600; color:#0f172a;">${reg.rfc_empresa}</span>
+                        </div>
+                    </td>
                     <td data-label="Nombre" data-nombre="${reg.nombre}"><div class="avatar-cell">${avatarHtml}<span>${reg.nombre}</span></div></td>
-                    <td data-label="Licencia">${reg.licencia}</td>
-                    <td data-label="Teléfono">${reg.telefono}</td>
+                    <td data-label="Licencia">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">credit_card</span>
+                            <span style="font-weight:600; color:#0f172a;">${reg.licencia}</span>
+                        </div>
+                    </td>
+                    <td data-label="Teléfono">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">phone</span>
+                            <span style="font-weight:600; color:#0f172a;">${reg.telefono}</span>
+                        </div>
+                    </td>
                     <td data-label="Activo"><span class="${statusClass}">${statusText}</span></td>
                     <td>
                         <div class="kebab-menu">
@@ -390,11 +430,19 @@ require_once '../../config/sync_session_foto.php';
                     const row = btn.closest('tr');
                     const cells = row.querySelectorAll('td');
                     
-                    document.getElementById('edit_rfc_conductor').value = cells[0].textContent.trim();
-                    document.getElementById('edit_rfc_empresa').value = cells[1].textContent.trim();
+                    const r1Span = cells[0].querySelector('span:last-child');
+                    document.getElementById('edit_rfc_conductor').value = r1Span ? r1Span.textContent.trim() : cells[0].textContent.replace('badge', '').trim();
+                    
+                    const r2Span = cells[1].querySelector('span:last-child');
+                    document.getElementById('edit_rfc_empresa').value = r2Span ? r2Span.textContent.trim() : cells[1].textContent.replace('domain', '').trim();
+                    
                     document.getElementById('edit_nombre').value = cells[2].dataset.nombre;
-                    document.getElementById('edit_licencia').value = cells[3].textContent.trim();
-                    document.getElementById('edit_telefono').value = cells[4].textContent.trim();
+                    
+                    const lSpan = cells[3].querySelector('span:last-child');
+                    document.getElementById('edit_licencia').value = lSpan ? lSpan.textContent.trim() : cells[3].textContent.replace('credit_card', '').trim();
+                    
+                    const tSpan = cells[4].querySelector('span:last-child');
+                    document.getElementById('edit_telefono').value = tSpan ? tSpan.textContent.trim() : cells[4].textContent.replace('phone', '').trim();
                     
                     const statusText = cells[5].querySelector('span').textContent.trim();
                     document.getElementById('edit_activo').value = statusText === 'Sí' ? 1 : 0;
@@ -427,8 +475,8 @@ require_once '../../config/sync_session_foto.php';
                 const tr = document.querySelector(`tr[data-id="${reg.rfc_conductor}"]`);
                 if (tr) {
                     const cells = tr.querySelectorAll('td');
-                    cells[0].textContent = reg.rfc_conductor;
-                    cells[1].textContent = reg.rfc_empresa;
+                    cells[0].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">badge</span><span style="font-weight:600; color:#0f172a;">${reg.rfc_conductor}</span></div>`;
+                    cells[1].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span><span style="font-weight:600; color:#0f172a;">${reg.rfc_empresa}</span></div>`;
                     
                     // Actualizar nombre y mantener avatar original o actualizarlo si se subió foto
                     cells[2].dataset.nombre = reg.nombre;
@@ -440,8 +488,8 @@ require_once '../../config/sync_session_foto.php';
                         cells[2].innerHTML = `<div class="avatar-cell">${currentAvatarHtml}<span>${reg.nombre}</span></div>`;
                     }
                     
-                    cells[3].textContent = reg.licencia;
-                    cells[4].textContent = reg.telefono;
+                    cells[3].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">credit_card</span><span style="font-weight:600; color:#0f172a;">${reg.licencia}</span></div>`;
+                    cells[4].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">phone</span><span style="font-weight:600; color:#0f172a;">${reg.telefono}</span></div>`;
                     
                     const statusClass = reg.activo == 1 ? 'status-active' : 'status-inactive';
                     const statusText = reg.activo == 1 ? 'Sí' : 'No';

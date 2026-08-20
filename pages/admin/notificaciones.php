@@ -122,7 +122,7 @@ require_once '../../config/conexion_bd.php';
 
                                 echo "
                                 <tr>
-                                    <td>
+                                    <td data-label='Tipo de Notificación'>
                                         <div style='display: flex; align-items: center; gap: 10px;'>
                                             <div class='notif-icon-circle {$icon_bg_class}' style='width: 32px; height: 32px;'>
                                                 {$icon_svg}
@@ -130,9 +130,24 @@ require_once '../../config/conexion_bd.php';
                                             <span><strong>{$tipo_text}</strong></span>
                                         </div>
                                     </td>
-                                    <td>{$titulo}</td>
-                                    <td>{$target}</td>
-                                    <td>{$fecha}</td>
+                                    <td data-label='Título'>
+                                        <div style='display:flex; align-items:center; gap:8px;'>
+                                            <span class='material-icons' style='font-size:16px; color:#94a3b8;'>short_text</span>
+                                            <span style='font-weight:600; color:#0f172a;'>{$titulo}</span>
+                                        </div>
+                                    </td>
+                                    <td data-label='A quién'>
+                                        <div style='display:flex; align-items:center; gap:8px;'>
+                                            <span class='material-icons' style='font-size:16px; color:#94a3b8;'>groups</span>
+                                            <span style='font-weight:600; color:#0f172a;'>{$target}</span>
+                                        </div>
+                                    </td>
+                                    <td data-label='Fecha'>
+                                        <div style='display:flex; align-items:center; gap:8px;'>
+                                            <span class='material-icons' style='font-size:16px; color:#94a3b8;'>calendar_today</span>
+                                            <span style='font-weight:600; color:#0f172a;'>{$fecha}</span>
+                                        </div>
+                                    </td>
                                 </tr>";
                             }
                         } else {

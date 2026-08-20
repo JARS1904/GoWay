@@ -40,7 +40,7 @@ require_once '../../config/sync_session_foto.php';
             <section class="content">
     <!-- KPI Dashboard Section -->
     <div class="kpi-section-title" style="margin-top:0;">
-        <h2>Indicadores Operativos</h2>
+        <h2>Indicadores operativos</h2>
         <span class="kpi-section-badge">Flota de Vehículos</span>
     </div>
     
@@ -50,7 +50,7 @@ require_once '../../config/sync_session_foto.php';
         <div class="chart-card">
             <div class="chart-card-header">
                 <div class="chart-card-title"><h4>Estado de la flota</h4><span>Disponibilidad actual</span></div>
-                <div class="chart-card-icon green"><span class="material-icons">directions_bus</span></div>
+                <div class="chart-card-icon blue"><span class="material-icons">directions_bus</span></div>
             </div>
             <canvas id="chartEstadoVehiculos" height="160"></canvas>
         </div>
@@ -63,7 +63,7 @@ require_once '../../config/sync_session_foto.php';
         </div>
     </div>
                 <div class="section-header">
-                    <h3>Lista de Vehículos</h3>
+                    <h3>Lista de vehículos</h3>
                     <button class="btn-add">+ Agregar nuevo vehículo</button>
                 </div>
                 <table class="data-table">
@@ -96,10 +96,30 @@ require_once '../../config/sync_session_foto.php';
                             $statusText = $row["activo"] ? 'Sí' : 'No';
                             
                                 echo '<tr data-id="'.$row["id_vehiculo"].'">
-                                    <td data-label="Número de placa" data-id="'.$row["id_vehiculo"].'">' . $row["placa"] . '</td>
-                                    <td data-label="Modelo">' . $row["modelo"] . '</td>
-                                    <td data-label="Capacidad">' . $row["capacidad"] . '</td>
-                                    <td data-label="RFC de la Empresa">' . $row["rfc_empresa"] . '</td>
+                                    <td data-label="Número de placa" data-id="'.$row["id_vehiculo"].'">
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">branding_watermark</span>
+                                            <span style="font-weight:600; color:#0f172a;">' . htmlspecialchars($row["placa"]) . '</span>
+                                        </div>
+                                    </td>
+                                    <td data-label="Modelo">
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">airport_shuttle</span>
+                                            <span style="font-weight:600; color:#0f172a;">' . htmlspecialchars($row["modelo"]) . '</span>
+                                        </div>
+                                    </td>
+                                    <td data-label="Capacidad">
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">groups</span>
+                                            <span style="font-weight:600; color:#0f172a;">' . htmlspecialchars($row["capacidad"]) . '</span>
+                                        </div>
+                                    </td>
+                                    <td data-label="RFC de la Empresa">
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span>
+                                            <span style="font-weight:600; color:#0f172a;">' . htmlspecialchars($row["rfc_empresa"]) . '</span>
+                                        </div>
+                                    </td>
                                     <td data-label="Activa"><span class="'.$statusClass.'">' . $statusText . '</span></td>
                                     <td>
                                         <div class="kebab-menu">
@@ -280,10 +300,30 @@ require_once '../../config/sync_session_foto.php';
                         tr.setAttribute('data-id', reg.id_vehiculo);
                         
                         tr.innerHTML = `
-                            <td data-label="Número de placa" data-id="${reg.id_vehiculo}">${reg.placa}</td>
-                            <td data-label="Modelo">${reg.modelo}</td>
-                            <td data-label="Capacidad">${reg.capacidad}</td>
-                            <td data-label="RFC de la Empresa">${reg.rfc_empresa}</td>
+                            <td data-label="Número de placa" data-id="${reg.id_vehiculo}">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="material-icons" style="font-size:16px; color:#94a3b8;">branding_watermark</span>
+                                    <span style="font-weight:600; color:#0f172a;">${reg.placa}</span>
+                                </div>
+                            </td>
+                            <td data-label="Modelo">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="material-icons" style="font-size:16px; color:#94a3b8;">airport_shuttle</span>
+                                    <span style="font-weight:600; color:#0f172a;">${reg.modelo}</span>
+                                </div>
+                            </td>
+                            <td data-label="Capacidad">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="material-icons" style="font-size:16px; color:#94a3b8;">groups</span>
+                                    <span style="font-weight:600; color:#0f172a;">${reg.capacidad}</span>
+                                </div>
+                            </td>
+                            <td data-label="RFC de la Empresa">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span>
+                                    <span style="font-weight:600; color:#0f172a;">${reg.rfc_empresa}</span>
+                                </div>
+                            </td>
                             <td data-label="Estado"><span class="status-badge ${statusClass}">${statusText}</span></td>
                             <td>
                                 <div class="kebab-menu">
@@ -348,10 +388,10 @@ require_once '../../config/sync_session_foto.php';
                         const tr = document.querySelector(`tr[data-id="${reg.id_vehiculo}"]`);
                         if (tr) {
                             const cells = tr.querySelectorAll('td');
-                            cells[0].textContent = reg.placa;
-                            cells[1].textContent = reg.modelo;
-                            cells[2].textContent = reg.capacidad;
-                            cells[3].textContent = reg.rfc_empresa;
+                            cells[0].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">branding_watermark</span><span style="font-weight:600; color:#0f172a;">${reg.placa}</span></div>`;
+                            cells[1].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">airport_shuttle</span><span style="font-weight:600; color:#0f172a;">${reg.modelo}</span></div>`;
+                            cells[2].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">groups</span><span style="font-weight:600; color:#0f172a;">${reg.capacidad}</span></div>`;
+                            cells[3].innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span class="material-icons" style="font-size:16px; color:#94a3b8;">domain</span><span style="font-weight:600; color:#0f172a;">${reg.rfc_empresa}</span></div>`;
                             
                             const statusClass = reg.activo == 1 ? 'status-active' : 'status-inactive';
                             const statusText = reg.activo == 1 ? 'Sí' : 'No';
@@ -414,10 +454,17 @@ require_once '../../config/sync_session_foto.php';
                         const cells = row.querySelectorAll('td');
                         
                         document.getElementById('edit_id_vehiculo').value = cells[0].getAttribute('data-id') || row.getAttribute('data-id');
-                        document.getElementById('edit_placa').value = cells[0].textContent.trim();
-                        document.getElementById('edit_modelo').value = cells[1].textContent.trim();
-                        document.getElementById('edit_capacidad').value = cells[2].textContent.trim();
-                        document.getElementById('edit_rfc_empresa').value = cells[3].textContent.trim();
+                        const pSpan = cells[0].querySelector('span:last-child');
+                        document.getElementById('edit_placa').value = pSpan ? pSpan.textContent.trim() : cells[0].textContent.replace('branding_watermark', '').trim();
+                        
+                        const mSpan = cells[1].querySelector('span:last-child');
+                        document.getElementById('edit_modelo').value = mSpan ? mSpan.textContent.trim() : cells[1].textContent.replace('airport_shuttle', '').trim();
+                        
+                        const cSpan = cells[2].querySelector('span:last-child');
+                        document.getElementById('edit_capacidad').value = cSpan ? cSpan.textContent.trim() : cells[2].textContent.replace('groups', '').trim();
+                        
+                        const rSpan = cells[3].querySelector('span:last-child');
+                        document.getElementById('edit_rfc_empresa').value = rSpan ? rSpan.textContent.trim() : cells[3].textContent.replace('domain', '').trim();
                         
                         const statusText = cells[4].querySelector('span').textContent.trim();
                         document.getElementById('edit_activo').value = statusText === 'Sí' ? 1 : 0;
@@ -486,9 +533,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!data.success) return;
             document.getElementById('vehiculosStatsGrid').style.display = 'grid';
             document.getElementById('vehiculosStatsGrid').innerHTML = `
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">directions_bus</span></div><div class="stat-card-content"><h3>Total Flota</h3><p class="stat-number">${data.kpi.total}</p><span class="stat-label">Registrados</span></div></div>
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">check_circle</span></div><div class="stat-card-content"><h3>Disponibilidad</h3><p class="stat-number">${data.kpi.disp}%</p><span class="stat-label">Activos</span></div></div>
-                
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(6, 96, 254, 0.1);"><span class="material-icons" style="color:#0660fe;">local_shipping</span></div><div class="stat-card-content"><h3>Total Flota</h3><p class="stat-number">${data.kpi.total}</p><span class="stat-label">Registrados</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(16, 185, 129, 0.1);"><span class="material-icons" style="color:#10b981;">check_circle</span></div><div class="stat-card-content"><h3>Disponibilidad</h3><p class="stat-number">${data.kpi.disp}%</p><span class="stat-label">Activos</span></div></div>
             `;
             document.getElementById('vehiculosChartsGrid').style.display = 'grid';
             if(data.estado_vehiculos && data.estado_vehiculos.data.some(v=>v>0)) {
@@ -500,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(data.modelos && data.modelos.data.length > 0) {
                 Chart.getChart('chartModelos')?.destroy();
                 new Chart(document.getElementById('chartModelos'), {
-                    type: 'bar', data: { labels: data.modelos.labels, datasets: [{ label:'Unidades', data: data.modelos.data, backgroundColor: GW.blue, borderRadius:4 }] }, options: { plugins:{legend:{display:false}} }
+                    type: 'bar', data: { labels: data.modelos.labels, datasets: [{ label:'Unidades', data: data.modelos.data, backgroundColor: GW.orange, borderRadius:4 }] }, options: { plugins:{legend:{display:false}} }
                 });
             }
         });

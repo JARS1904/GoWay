@@ -38,7 +38,7 @@ require_once '../../config/sync_session_foto.php';
             <section class="content">
     <!-- KPI Dashboard Section -->
     <div class="kpi-section-title" style="margin-top:0;">
-        <h2>Indicadores Operativos</h2>
+        <h2>Indicadores operativos</h2>
         <span class="kpi-section-badge">Horarios y Frecuencias</span>
     </div>
     
@@ -48,7 +48,7 @@ require_once '../../config/sync_session_foto.php';
         <div class="chart-card">
             <div class="chart-card-header">
                 <div class="chart-card-title"><h4>Bandas horarias</h4><span>Distribución por franja del día</span></div>
-                <div class="chart-card-icon purple"><span class="material-icons">schedule</span></div>
+                <div class="chart-card-icon green"><span class="material-icons">view_day</span></div>
             </div>
             <canvas id="chartFranjas" height="160"></canvas>
         </div>
@@ -61,7 +61,7 @@ require_once '../../config/sync_session_foto.php';
         </div>
     </div>
                 <div class="section-header">
-                    <h3>Horarios Disponibles</h3>
+                    <h3>Horarios disponibles</h3>
                     <button class="btn-add">+ Agregar nuevo horario</button>
                 </div>
                 <table class="data-table">
@@ -98,11 +98,36 @@ require_once '../../config/sync_session_foto.php';
                                     data-salida=\"{$salida}\"
                                     data-llegada=\"{$llegada}\"
                                     data-frecuencia=\"{$frecuencia}\">
-                                    <td data-label=\"Ruta\">{$ruta}</td>
-                                    <td data-label=\"Día\">{$dia}</td>
-                                    <td data-label=\"Hora salida\">{$salida}</td>
-                                    <td data-label=\"Hora llegada\">{$llegada}</td>
-                                    <td data-label=\"Frecuencia\">{$frecuencia}</td>
+                                    <td data-label=\"Ruta\">
+                                        <div style=\"display:flex; align-items:center; gap:8px;\">
+                                            <span class=\"material-icons\" style=\"font-size:16px; color:#94a3b8;\">route</span>
+                                            <span style=\"font-weight:600; color:#0f172a;\">{$ruta}</span>
+                                        </div>
+                                    </td>
+                                    <td data-label=\"Día\">
+                                        <div style=\"display:flex; align-items:center; gap:8px;\">
+                                            <span class=\"material-icons\" style=\"font-size:16px; color:#94a3b8;\">calendar_today</span>
+                                            <span>{$dia}</span>
+                                        </div>
+                                    </td>
+                                    <td data-label=\"Hora salida\">
+                                        <div style=\"display:flex; align-items:center; gap:8px;\">
+                                            <span class=\"material-icons\" style=\"font-size:16px; color:#94a3b8;\">schedule</span>
+                                            <span>{$salida}</span>
+                                        </div>
+                                    </td>
+                                    <td data-label=\"Hora llegada\">
+                                        <div style=\"display:flex; align-items:center; gap:8px;\">
+                                            <span class=\"material-icons\" style=\"font-size:16px; color:#94a3b8;\">schedule</span>
+                                            <span>{$llegada}</span>
+                                        </div>
+                                    </td>
+                                    <td data-label=\"Frecuencia\">
+                                        <div style=\"display:flex; align-items:center; gap:8px;\">
+                                            <span class=\"material-icons\" style=\"font-size:16px; color:#94a3b8;\">loop</span>
+                                            <span>{$frecuencia}</span>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div class=\"kebab-menu\">
                                             <button class=\"kebab-btn\" onclick=\"toggleKebabMenu(this, event)\">
@@ -290,11 +315,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 tr.setAttribute('data-frecuencia', reg.frecuencia || '—');
                 
                 tr.innerHTML = `
-                    <td data-label="Ruta">${reg.ruta}</td>
-                    <td data-label="Día">${reg.tipo_dia}</td>
-                    <td data-label="Hora salida">${reg.hora_salida}</td>
-                    <td data-label="Hora llegada">${reg.hora_llegada}</td>
-                    <td data-label="Frecuencia">${reg.frecuencia || '—'}</td>
+                    <td data-label="Ruta">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">route</span>
+                            <span style="font-weight:600; color:#0f172a;">${reg.ruta}</span>
+                        </div>
+                    </td>
+                    <td data-label="Día">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">calendar_today</span>
+                            <span>${reg.tipo_dia}</span>
+                        </div>
+                    </td>
+                    <td data-label="Hora salida">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">schedule</span>
+                            <span>${reg.hora_salida}</span>
+                        </div>
+                    </td>
+                    <td data-label="Hora llegada">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">schedule</span>
+                            <span>${reg.hora_llegada}</span>
+                        </div>
+                    </td>
+                    <td data-label="Frecuencia">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">loop</span>
+                            <span>${reg.frecuencia || '—'}</span>
+                        </div>
+                    </td>
                     <td>
                         <div class="kebab-menu">
                             <button class="kebab-btn" onclick="toggleKebabMenu(this, event)">
@@ -398,11 +448,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (tr) {
                     const cells = tr.querySelectorAll('td');
-                    cells[0].textContent = reg.ruta;
-                    cells[1].textContent = reg.tipo_dia;
-                    cells[2].textContent = reg.hora_salida;
-                    cells[3].textContent = reg.hora_llegada;
-                    cells[4].textContent = reg.frecuencia || '—';
+                    cells[0].innerHTML = `
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">route</span>
+                            <span style="font-weight:600; color:#0f172a;">${reg.ruta}</span>
+                        </div>
+                    `;
+                    cells[1].innerHTML = `
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">calendar_today</span>
+                            <span>${reg.tipo_dia}</span>
+                        </div>
+                    `;
+                    cells[2].innerHTML = `
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">schedule</span>
+                            <span>${reg.hora_salida}</span>
+                        </div>
+                    `;
+                    cells[3].innerHTML = `
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">schedule</span>
+                            <span>${reg.hora_llegada}</span>
+                        </div>
+                    `;
+                    cells[4].innerHTML = `
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-icons" style="font-size:16px; color:#94a3b8;">loop</span>
+                            <span>${reg.frecuencia || '—'}</span>
+                        </div>
+                    `;
                     
                     // Update dataset
                     tr.setAttribute('data-id-ruta', reg.id_ruta);
@@ -496,9 +571,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!data.success) return;
             document.getElementById('horariosStatsGrid').style.display = 'grid';
             document.getElementById('horariosStatsGrid').innerHTML = `
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:var(--primary-color);">schedule</span></div><div class="stat-card-content"><h3>Servicios Diarios</h3><p class="stat-number">${data.kpi.total}</p><span class="stat-label">Registrados</span></div></div>
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#10b981;">route</span></div><div class="stat-card-content"><h3>Rutas Cubiertas</h3><p class="stat-number">${data.kpi.rutas_cubiertas}</p><span class="stat-label">Con horario asignado</span></div></div>
-                <div class="stat-card"><div class="stat-card-icon"><span class="material-icons" style="color:#8b5cf6;">av_timer</span></div><div class="stat-card-content"><h3>Con Frecuencia</h3><p class="stat-number">${data.kpi.con_frecuencia}</p><span class="stat-label">Definida</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(59, 130, 246, 0.1);"><span class="material-icons" style="color:#3b82f6;">schedule</span></div><div class="stat-card-content"><h3>Servicios Diarios</h3><p class="stat-number">${data.kpi.total}</p><span class="stat-label">Registrados</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(6, 96, 254, 0.1);"><span class="material-icons" style="color:#0660fe;">route</span></div><div class="stat-card-content"><h3>Rutas Cubiertas</h3><p class="stat-number">${data.kpi.rutas_cubiertas}</p><span class="stat-label">Con horario asignado</span></div></div>
+                <div class="stat-card"><div class="stat-card-icon" style="background:rgba(234, 88, 12, 0.1);"><span class="material-icons" style="color:#ea580c;">loop</span></div><div class="stat-card-content"><h3>Con Frecuencia</h3><p class="stat-number">${data.kpi.con_frecuencia}</p><span class="stat-label">Definida</span></div></div>
             `;
             document.getElementById('horariosChartsGrid').style.display = 'grid';
             if(data.franjas && data.franjas.data.some(v=>v>0)) {

@@ -148,7 +148,7 @@ require_once '../../config/sync_session_foto.php';
 
                 <!-- KPI CHARTS SECTION -->
                 <div class="kpi-section-title">
-                    <h2>Indicadores de Rendimiento</h2>
+                    <h2>Indicadores de rendimiento</h2>
                     <span class="kpi-section-badge">KPI en Tiempo Real</span>
                 </div>
 
@@ -160,7 +160,7 @@ require_once '../../config/sync_session_foto.php';
                                 <h4>Estado de la flota</h4>
                                 <span>Veh&iacute;culos registrados</span>
                             </div>
-                            <div class="chart-card-icon green">
+                            <div class="chart-card-icon blue">
                                 <span class="material-icons">directions_bus</span>
                             </div>
                         </div>
@@ -175,7 +175,7 @@ require_once '../../config/sync_session_foto.php';
                                 <h4>Asignaciones</h4>
                                 <span>Hist&oacute;rico general</span>
                             </div>
-                            <div class="chart-card-icon blue">
+                            <div class="chart-card-icon green">
                                 <span class="material-icons">calendar_today</span>
                             </div>
                         </div>
@@ -189,7 +189,7 @@ require_once '../../config/sync_session_foto.php';
                                 <h4>Estado de reportes</h4>
                                 <span>Sin archivar</span>
                             </div>
-                            <div class="chart-card-icon purple">
+                            <div class="chart-card-icon orange">
                                 <span class="material-icons">fact_check</span>
                             </div>
                         </div>
@@ -199,7 +199,7 @@ require_once '../../config/sync_session_foto.php';
 
                 <!-- Acciones Rápidas -->
                 <div class="quick-actions">
-                    <h2>Acciones Rápidas</h2>
+                    <h2>Acciones rápidas</h2>
                     <div class="actions-grid">
                         <a href="rutas.php" class="action-btn">
                             <img class="action-icon" src="../../assets/images/icons/dashboard/icons8-carretera-100.png" alt="Rutas">

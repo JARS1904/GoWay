@@ -108,7 +108,7 @@ require_once '../../config/sync_session_foto.php';
                 <h3>Paradas</h3>
                 <div class="route-controls">
                     <select id="routeSelect">
-                        <option value="">— Selecciona una ruta —</option>
+                        <option value="">Selecciona una ruta</option>
                         <?php
                         $where_emp = ($_SESSION['rol'] == 4) ? " WHERE rfc_empresa = '".$_SESSION['rfc_empresa']."'" : "";
                         $res = $conexion->query(
@@ -139,9 +139,24 @@ require_once '../../config/sync_session_foto.php';
                 <table class="data-table" id="stopsTable" style="display:none;">
                     <thead>
                         <tr>
-                            <th>Orden</th>
-                            <th>Nombre de la parada</th>
-                            <th>Minutos desde origen</th>
+                            <th>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="material-icons" style="font-size:16px; color:#94a3b8;">tag</span>
+                                    <span>Orden</span>
+                                </div>
+                            </th>
+                            <th>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="material-icons" style="font-size:16px; color:#94a3b8;">location_on</span>
+                                    <span>Nombre de la parada</span>
+                                </div>
+                            </th>
+                            <th>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="material-icons" style="font-size:16px; color:#94a3b8;">schedule</span>
+                                    <span>Minutos desde origen</span>
+                                </div>
+                            </th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -237,11 +252,11 @@ const noStopsMsg     = document.getElementById('noStopsMsg');
 
 let map, routeMarkers, returnMarkers;
     const iconOrigin = L.icon({
-        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100.png',
+        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100 (2).png?v=2',
         iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40]
     });
     const iconDest = L.icon({
-        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100 (2).png',
+        iconUrl: '../../assets/images/icons/maps/icons8-geo-cerca-100.png?v=2',
         iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40]
     });
     const iconStop = L.icon({
@@ -252,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
     map = L.map('map').setView([18.1729, -93.1090], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
         maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | <a target="_blank" href="https://icons8.com/icon/Od91LuQPaarw/place-marker">Geo-cerca</a>, <a target="_blank" href="https://icons8.com/icon/yqTGgVcAZYHJ/bus-stop">Bus Stop</a> by <a target="_blank" href="https://icons8.com">Icons8</a>'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Buscar calle o lugar..." })
         .on('markgeocode', function(e) { map.fitBounds(e.geocode.bbox); })

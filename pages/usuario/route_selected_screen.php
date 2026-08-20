@@ -53,10 +53,7 @@ if ($_SESSION['id'] > 0) {
                         <i class="fas fa-sign-in-alt"></i> Iniciar sesión
                     </a>
                 <?php } else { ?>
-                    <button class="profile-nav-btn" onclick="if(typeof closeFavoritesPanel === 'function') closeFavoritesPanel(); if(typeof closeReportsPanel === 'function') closeReportsPanel(); if(typeof closeProfilePanel === 'function') closeProfilePanel();">
-                        <i class="fas fa-home"></i>
-                        Inicio
-                    </button>
+
                     <button class="profile-nav-btn" onclick="openFavoritesPanel()">
                         <i class="fas fa-heart"></i>
                         Favoritos
@@ -66,7 +63,7 @@ if ($_SESSION['id'] > 0) {
                         Reportes
                     </button>
                     <button class="profile-nav-btn" onclick="toggleNotifications()">
-                        <img src="../../assets/images/icons/icons_notifications.png" alt="Notificaciones" class="profile-nav-btn-icon">
+                        <i class="fas fa-bell"></i>
                         Notificaciones
                     </button>
                     <button class="profile-nav-btn" onclick="openProfilePanel()">
@@ -84,7 +81,7 @@ if ($_SESSION['id'] > 0) {
             <div class="mobile-header-actions">
                 <?php if ($_SESSION['rol'] != 3) { ?>
                     <button onclick="toggleNotifications()" style="background: transparent; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        <img src="../../assets/images/icons/icons_notifications.png" alt="Notificaciones" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(0.3);">
+                        <i class="fas fa-bell" style="font-size: 20px; color: #546e7a;"></i>
                     </button>
                 <?php } else { ?>
                     <a href="../login.php" class="download-btn" style="font-size:13px; padding:7px 14px;">

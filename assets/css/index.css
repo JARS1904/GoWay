@@ -1047,6 +1047,7 @@ footer:not(.site-footer) {
     align-items: center;
     justify-content: center;
     color: var(--text-body);
+    text-decoration: none;
     transition: color .2s, transform .2s;
 }
 .footer-socials a:hover {
